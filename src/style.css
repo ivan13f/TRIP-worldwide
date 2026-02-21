@@ -1,0 +1,291 @@
+/* =========================================
+   TRIP — Design System v1 (Accurat-ish)
+   Drop into: src/style.css
+   ========================================= */
+
+:root {
+  /* --- Palette (from your image) --- */
+  --ink: #0f1116;            /* deep background */
+  --slate: #3e4456;          /* dark slate */
+  --fog: #d7e8e9;            /* soft off-white */
+  --muted: #a8b3b6;          /* muted text */
+  --stroke: rgba(215,232,233,.16);
+
+  --coral: #e68263;          /* warm accent */
+  --rust: #8f4636;           /* deep warm */
+  --teal: #2aa478;           /* green-teal */
+  --sea: #3b9492;            /* teal-blue */
+  --violet: #7853e6;         /* purple */
+  --azure: #1295e9;          /* bright blue */
+
+  /* --- Typography scale --- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --h1: clamp(2.4rem, 3.8vw, 4.2rem);
+  --h2: clamp(1.4rem, 2.2vw, 2.1rem);
+  --h3: clamp(1.05rem, 1.2vw, 1.25rem);
+  --p: 1rem;
+  --small: 0.92rem;
+
+  /* --- Spacing / layout --- */
+  --max: 1120px;
+  --gutter: clamp(18px, 3vw, 28px);
+  --r: 18px;
+  --r-lg: 26px;
+
+  /* --- Shadows --- */
+  --shadow-1: 0 14px 50px rgba(0,0,0,.35);
+  --shadow-2: 0 10px 28px rgba(0,0,0,.28);
+
+  /* --- Chart defaults (you can use in Plot themes later) --- */
+  --grid: rgba(215,232,233,.12);
+  --axis: rgba(215,232,233,.45);
+}
+
+/* =========================================
+   Base
+   ========================================= */
+html, body {
+  background: radial-gradient(1200px 600px at 15% 10%, rgba(120,83,230,.18), transparent 55%),
+              radial-gradient(900px 450px at 70% 20%, rgba(42,164,120,.18), transparent 55%),
+              radial-gradient(900px 600px at 75% 85%, rgba(230,130,99,.18), transparent 55%),
+              var(--ink);
+  color: var(--fog);
+  font-family: var(--font-sans);
+  line-height: 1.45;
+  letter-spacing: 0.1px;
+}
+
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+p { font-size: var(--p); color: rgba(215,232,233,.86); margin: 0.6rem 0 0; }
+small { font-size: var(--small); color: rgba(215,232,233,.72); }
+
+code, pre { font-family: var(--font-mono); }
+pre { background: rgba(255,255,255,.04); border: 1px solid var(--stroke); border-radius: 14px; padding: 14px; overflow: auto; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(215,232,233,.18), transparent);
+  margin: 28px 0;
+}
+
+/* =========================================
+   Page container + section rhythm
+   ========================================= */
+.trip-page {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 28px var(--gutter) 84px;
+}
+
+.trip-section {
+  margin-top: 34px;
+}
+
+.trip-kicker {
+  font-size: 0.9rem;
+  color: rgba(215,232,233,.65);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.trip-h1 { font-size: var(--h1); line-height: 1.02; margin: 10px 0 0; }
+.trip-h2 { font-size: var(--h2); line-height: 1.1; margin: 0; }
+.trip-h3 { font-size: var(--h3); line-height: 1.15; margin: 0; color: rgba(215,232,233,.92); }
+
+.trip-lede {
+  font-size: 1.05rem;
+  color: rgba(215,232,233,.84);
+  max-width: 62ch;
+}
+
+/* =========================================
+   Layout utilities
+   ========================================= */
+.grid {
+  display: grid;
+  gap: 18px;
+}
+.grid-2 {
+  grid-template-columns: 1.2fr 0.8fr;
+}
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+.stack { display: grid; gap: 14px; }
+
+/* =========================================
+   Cards, panels, pills
+   ========================================= */
+.card {
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r);
+  padding: 18px;
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(10px);
+}
+
+.card--tight { padding: 14px; }
+.card--flat { box-shadow: none; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(215,232,233,.18);
+  background: rgba(255,255,255,.03);
+  color: rgba(215,232,233,.85);
+  font-size: 0.9rem;
+}
+.pill b { color: var(--fog); font-weight: 650; }
+
+/* =========================================
+   Hero layout
+   ========================================= */
+.hero {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid rgba(215,232,233,.14);
+  background:
+    radial-gradient(120% 120% at 15% 15%, rgba(42,164,120,.55), transparent 45%),
+    radial-gradient(110% 120% at 55% 45%, rgba(120,83,230,.65), transparent 55%),
+    radial-gradient(120% 140% at 80% 25%, rgba(42,164,120,.55), transparent 50%),
+    linear-gradient(180deg, rgba(62,68,86,.55), rgba(15,17,22,.55));
+  box-shadow: var(--shadow-1);
+}
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
+  padding: 26px;
+}
+@media (max-width: 900px) {
+  .hero__inner { grid-template-columns: 1fr; }
+}
+
+.hero__meta {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.hero__badge {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.9rem;
+  color: rgba(215,232,233,.85);
+}
+.dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: linear-gradient(90deg, var(--teal), var(--violet), var(--coral));
+  box-shadow: 0 0 0 3px rgba(255,255,255,.06);
+}
+
+/* =========================================
+   “RQ Cards” – clickable story navigation
+   ========================================= */
+.rq {
+  position: relative;
+  overflow: hidden;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.rq:hover {
+  transform: translateY(-2px);
+  border-color: rgba(215,232,233,.26);
+}
+
+.rq::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(400px 220px at 10% 20%, rgba(18,149,233,.22), transparent 55%),
+              radial-gradient(420px 260px at 60% 40%, rgba(120,83,230,.22), transparent 55%),
+              radial-gradient(420px 260px at 90% 80%, rgba(230,130,99,.18), transparent 55%);
+  opacity: .9;
+  pointer-events: none;
+}
+
+.rq__inner { position: relative; display: grid; gap: 10px; }
+.rq__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.rq__tag {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: rgba(215,232,233,.7);
+}
+.rq__arrow {
+  font-size: 1.2rem;
+  opacity: .8;
+}
+
+/* =========================================
+   Buttons / links
+   ========================================= */
+.btnrow { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(215,232,233,.18);
+  background: rgba(255,255,255,.03);
+  color: rgba(215,232,233,.92);
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(215,232,233,.28);
+  background: rgba(255,255,255,.05);
+  text-decoration: none;
+}
+.btn--primary {
+  border-color: rgba(120,83,230,.42);
+  background: linear-gradient(90deg, rgba(120,83,230,.25), rgba(42,164,120,.18));
+}
+.btn--primary:hover {
+  border-color: rgba(120,83,230,.62);
+}
+
+/* =========================================
+   Footer / sources
+   ========================================= */
+.sources {
+  display: grid;
+  gap: 10px;
+}
+.sources a {
+  color: rgba(215,232,233,.82);
+}
+.sources a:hover {
+  color: var(--fog);
+}
+
+/* =========================================
+   Small print method note
+   ========================================= */
+.note {
+  border-left: 3px solid rgba(42,164,120,.65);
+  padding-left: 14px;
+  color: rgba(215,232,233,.80);
+}
+.note b { color: var(--fog); }
