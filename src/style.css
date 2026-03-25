@@ -289,3 +289,278 @@ hr {
   color: rgba(215,232,233,.80);
 }
 .note b { color: var(--fog); }
+
+
+/* =========================================
+   NARRATIVE / EDITORIAL STORY LAYOUT
+   Used by index.md single-scroll story.
+   ========================================= */
+
+/* Main story wrapper. Slightly less padded than .trip-page.
+   Observable Framework adds its own outer padding, so we just
+   constrain width and handle vertical rhythm here. */
+.trip-story {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) 100px;
+}
+
+/* ── Hero ─────────────────────────────────── */
+
+/* The editorial hero replaces the old nav-style hero. No gradient box —
+   it lives directly on the page background, letting the radial gradients
+   from <body> do the atmospheric work. */
+.trip-hero-editorial {
+  padding: clamp(56px, 9vw, 96px) 0 clamp(48px, 7vw, 72px);
+  max-width: 860px;
+}
+
+.trip-hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: rgba(215,232,233,.55);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+.trip-hero-kicker .sep { color: rgba(215,232,233,.22); }
+
+/* The big display headline. Tight leading, negative letter-spacing —
+   this is the visual anchor of the whole page. */
+.trip-hero-title {
+  font-size: clamp(3.2rem, 7vw, 6.4rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  color: var(--fog);
+  margin: 0 0 26px;
+}
+
+.trip-hero-sub {
+  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+  color: rgba(215,232,233,.74);
+  max-width: 60ch;
+  line-height: 1.64;
+  margin: 0 0 36px;
+}
+
+/* The big "23.5%" number + explanatory label anchored at the bottom of the hero. */
+.trip-hero-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding: 26px 0;
+  border-top: 1px solid var(--stroke);
+  border-bottom: 1px solid var(--stroke);
+  flex-wrap: wrap;
+}
+
+.trip-hero-stat__num {
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--coral);      /* coral = "this number is a problem" */
+}
+
+.trip-hero-stat__label {
+  font-size: 0.94rem;
+  color: rgba(215,232,233,.62);
+  max-width: 36ch;
+  line-height: 1.56;
+}
+
+/* ── Chapters ─────────────────────────────── */
+
+/* Each chapter is a full vertical section. The large top margin
+   creates breathing room between ideas — readers need space to absorb
+   a chart before the next claim lands. */
+.trip-chapter {
+  margin-top: clamp(72px, 11vw, 108px);
+}
+
+/* "01  The global average ————————"
+   A mono-spaced chapter label with a line extending to the right.
+   Purely typographic wayfinding — not interactive, not a ToC. */
+.trip-chapter-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: rgba(215,232,233,.32);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.trip-chapter-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(215,232,233,.12) 0%, transparent 85%);
+}
+
+/* ── Prose column ─────────────────────────── */
+
+/* Reading text is constrained to ~64 characters per line — the sweet spot
+   for comfortable legibility. Charts break out of this to full width. */
+.trip-prose {
+  max-width: 64ch;
+}
+
+.trip-prose p {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: rgba(215,232,233,.80);
+  margin: 0;
+}
+.trip-prose p + p { margin-top: 1em; }
+
+/* ── Pull quote ───────────────────────────── */
+
+/* A large typographic callout that interrupts the reading flow —
+   used for the single most important claim in a chapter. */
+.trip-pullquote {
+  border-left: 3px solid var(--coral);
+  padding: 8px 0 8px 22px;
+  font-size: clamp(1.18rem, 2.1vw, 1.52rem);
+  line-height: 1.36;
+  color: var(--fog);
+  max-width: 52ch;
+  margin: 32px 0;
+  font-weight: 500;
+}
+.trip-pullquote--teal  { border-left-color: var(--teal); }
+.trip-pullquote--muted { border-left-color: rgba(215,232,233,.24); color: rgba(215,232,233,.72); font-size: clamp(1rem, 1.5vw, 1.2rem); }
+
+/* ── Stat callout row ─────────────────────── */
+
+/* Two or three big numbers side-by-side, separated from body text.
+   Used to crystallise the "before / after" of a chapter. */
+.trip-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+  padding: 28px 0;
+  border-top: 1px solid var(--stroke);
+  border-bottom: 1px solid var(--stroke);
+  margin: 36px 0;
+}
+
+.trip-stat__num {
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.trip-stat__num--coral { color: var(--coral); }
+.trip-stat__num--teal  { color: var(--teal); }
+.trip-stat__num--muted { color: rgba(215,232,233,.42); }
+
+.trip-stat__label {
+  font-size: 0.86rem;
+  color: rgba(215,232,233,.55);
+  max-width: 22ch;
+  margin-top: 8px;
+  line-height: 1.45;
+}
+
+/* ── Figure container + caption ───────────── */
+
+/* Charts sit in .trip-figure to get consistent margin and overflow handling.
+   Captions are small, muted — supporting the chart, not repeating it. */
+.trip-figure {
+  margin: 36px 0 0;
+  overflow: hidden;          /* clip any D3 overflow from margins */
+}
+
+.trip-caption {
+  font-size: 0.82rem;
+  color: rgba(215,232,233,.46);
+  margin-top: 10px;
+  max-width: 72ch;
+  line-height: 1.52;
+}
+
+/* ── Callout boxes ────────────────────────── */
+
+/* Used for short, punchy factual callouts that need visual separation.
+   Coral for "alarming" data; teal for "constructive" context. */
+.trip-callout {
+  background: rgba(230,130,99,.06);
+  border: 1px solid rgba(230,130,99,.20);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin: 28px 0;
+}
+.trip-callout--teal {
+  background: rgba(42,164,120,.06);
+  border-color: rgba(42,164,120,.20);
+}
+
+.trip-callout__headline {
+  font-size: 1.02rem;
+  font-weight: 650;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+.trip-callout--teal .trip-callout__headline { color: var(--teal); }
+
+/* ── Inline text highlights ───────────────── */
+
+/* For numbers or key terms inside prose that deserve weight
+   without a full callout box. */
+.hl           { font-weight: 650; color: var(--fog); }
+.hl--coral    { color: var(--coral); font-weight: 650; }
+.hl--teal     { color: var(--teal);  font-weight: 650; }
+
+/* ── Sources / footer ─────────────────────── */
+
+.trip-sources {
+  margin-top: clamp(64px, 10vw, 96px);
+  padding-top: 28px;
+  border-top: 1px solid var(--stroke);
+}
+
+.trip-sources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+  margin-top: 16px;
+}
+@media (max-width: 700px) {
+  .trip-sources-grid { grid-template-columns: 1fr; }
+}
+
+.trip-sources-item {
+  font-size: 0.86rem;
+  color: rgba(215,232,233,.55);
+  line-height: 1.5;
+}
+.trip-sources-item a { color: rgba(215,232,233,.72); }
+.trip-sources-item a:hover { color: var(--fog); }
+
+/* ── Chart placeholders ───────────────────── */
+
+/* Temporary containers while D3 charts are being built.
+   They occupy the correct space in the layout so the narrative reads
+   correctly even before visualisations are ready.
+   Remove this rule once all charts are implemented. */
+.chart-placeholder {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 320px;
+  background: rgba(255,255,255,.018);
+  border: 1px dashed rgba(215,232,233,.10);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(215,232,233,.26);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: .06em;
+}
+.chart-placeholder--tall { min-height: 480px; }
