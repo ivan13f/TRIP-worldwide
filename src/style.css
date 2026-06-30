@@ -1,291 +1,1126 @@
-/* =========================================
-   TRIP — Design System v1 (Accurat-ish)
-   Drop into: src/style.css
-   ========================================= */
+/* ============================================================
+   TRIP — Design System
+   Trans Rights Worldwide
+   Dark editorial. Grain texture. Purple → emerald color axis.
+   ============================================================ */
+
+/* ── Custom properties ──────────────────────────────────────── */
 
 :root {
-  /* --- Palette (from your image) --- */
-  --ink: #0f1116;            /* deep background */
-  --slate: #3e4456;          /* dark slate */
-  --fog: #d7e8e9;            /* soft off-white */
-  --muted: #a8b3b6;          /* muted text */
-  --stroke: rgba(215,232,233,.16);
 
-  --coral: #e68263;          /* warm accent */
-  --rust: #8f4636;           /* deep warm */
-  --teal: #2aa478;           /* green-teal */
-  --sea: #3b9492;            /* teal-blue */
-  --violet: #7853e6;         /* purple */
-  --azure: #1295e9;          /* bright blue */
+  /* --- Core palette ---
+     The piece lives on the purple → emerald axis (from the Accurat
+     Milan Design Week reference). Coral is the warm counter-accent
+     used for data highlights that signal tension or urgency.       */
+  --ink:     #0f1116;          /* near-black background              */
+  --slate:   #1e2130;          /* elevated surface (cards, panels)   */
+  --fog:     #d7e8e9;          /* primary text                       */
+  --muted:   #8a9aa0;          /* secondary text, axis labels        */
+  --stroke:  rgba(215,232,233,.13);  /* borders, dividers            */
 
-  /* --- Typography scale --- */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --violet:  #6e5cc5;          /* deep purple — low TRIP score end   */
+  --emerald: #35bf78;          /* saturated green — high score end   */
+  --coral:   #e68263;          /* warm accent — global average line  */
+  --rust:    #8f4636;          /* deep warm, secondary               */
+  --azure:   #2a8fd4;          /* cool blue, regime annotations      */
 
-  --h1: clamp(2.4rem, 3.8vw, 4.2rem);
-  --h2: clamp(1.4rem, 2.2vw, 2.1rem);
-  --h3: clamp(1.05rem, 1.2vw, 1.25rem);
-  --p: 1rem;
-  --small: 0.92rem;
+  /* --- Typography ---
+     DM Sans: warm humanist geometric — headings AND body prose.
+              Hierarchy via weight: display=800, h2=700, h3=600, body=400.
+     DM Mono: monospace — section kickers, figure labels, data captions. */
+  --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body:    'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'DM Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
 
-  /* --- Spacing / layout --- */
-  --max: 1120px;
-  --gutter: clamp(18px, 3vw, 28px);
-  --r: 18px;
-  --r-lg: 26px;
+  /* --- Type scale --- */
+  --text-hero:  clamp(3.0rem, 6.5vw, 6.0rem);
+  --text-h2:    clamp(1.5rem, 2.4vw, 2.2rem);
+  --text-h3:    clamp(1.1rem, 1.4vw, 1.3rem);
+  --text-body:  1rem;
+  --text-small: 0.88rem;
+  --text-kicker: 0.78rem;
+
+  /* --- Layout --- */
+  --max:      1120px;
+  --prose:    68ch;
+  --gutter:   clamp(20px, 4vw, 48px);
+  --section-gap: clamp(80px, 12vw, 130px);
+
+  /* --- Surfaces --- */
+  --r:     16px;
+  --r-lg:  24px;
 
   /* --- Shadows --- */
-  --shadow-1: 0 14px 50px rgba(0,0,0,.35);
-  --shadow-2: 0 10px 28px rgba(0,0,0,.28);
+  --shadow-1: 0 16px 56px rgba(0,0,0,.42);
+  --shadow-2: 0 8px 28px rgba(0,0,0,.28);
 
-  /* --- Chart defaults (you can use in Plot themes later) --- */
-  --grid: rgba(215,232,233,.12);
-  --axis: rgba(215,232,233,.45);
+  /* --- Chart / data tokens --- */
+  --grid-line:  rgba(215,232,233,.09);
+  --axis-line:  rgba(215,232,233,.32);
+  --tick-label: rgba(215,232,233,.52);
 }
 
-/* =========================================
-   Base
-   ========================================= */
-html, body {
-  background: radial-gradient(1200px 600px at 15% 10%, rgba(120,83,230,.18), transparent 55%),
-              radial-gradient(900px 450px at 70% 20%, rgba(42,164,120,.18), transparent 55%),
-              radial-gradient(900px 600px at 75% 85%, rgba(230,130,99,.18), transparent 55%),
-              var(--ink);
+
+/* ── Reset / base ───────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    /* Purple bloom — upper left */
+    radial-gradient(900px 600px at 8% 12%,  rgba(110,92,197,.20), transparent 60%),
+    /* Emerald bloom — upper right */
+    radial-gradient(800px 500px at 78% 8%,  rgba(53,191,120,.16), transparent 55%),
+    /* Violet bleed — mid */
+    radial-gradient(600px 500px at 18% 55%, rgba(110,92,197,.10), transparent 60%),
+    /* Emerald bleed — lower right */
+    radial-gradient(700px 500px at 85% 80%, rgba(53,191,120,.10), transparent 60%),
+    /* Coral glow — very subtle lower left */
+    radial-gradient(500px 350px at 5% 92%,  rgba(230,130,99,.08), transparent 55%),
+    var(--ink);
   color: var(--fog);
-  font-family: var(--font-sans);
-  line-height: 1.45;
-  letter-spacing: 0.1px;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.62;
 }
 
-a { color: inherit; text-decoration: none; }
-a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+/* ── Film grain overlay ─────────────────────────────────────── */
+/*   SVG feTurbulence rendered as a fixed pseudo-element overlay.
+     Subtle animation gives it the quality of analogue film grain.
+     Opacity is intentionally low — it adds texture, not noise.    */
 
-p { font-size: var(--p); color: rgba(215,232,233,.86); margin: 0.6rem 0 0; }
-small { font-size: var(--small); color: rgba(215,232,233,.72); }
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='250' height='250' filter='url(%23g)' opacity='1'/></svg>");
+  opacity: 0.072;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain 9s steps(8) infinite;
+}
 
-code, pre { font-family: var(--font-mono); }
-pre { background: rgba(255,255,255,.04); border: 1px solid var(--stroke); border-radius: 14px; padding: 14px; overflow: auto; }
+@keyframes grain {
+  0%   { transform: translate(0,   0)   }
+  12%  { transform: translate(-4%, -9%) }
+  25%  { transform: translate(-12%, 4%) }
+  37%  { transform: translate(6%, -22%) }
+  50%  { transform: translate(-4%, 22%) }
+  62%  { transform: translate(-13%, 8%) }
+  75%  { transform: translate(12%, 0%)  }
+  87%  { transform: translate(0%,  13%) }
+  100% { transform: translate(0,   0)   }
+}
+
+
+/* ── Typography — base elements ─────────────────────────────── */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--fog);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+  margin: 0;
+}
+
+p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: rgba(215,232,233,.80);
+  line-height: 1.72;
+  margin: 0;
+}
+p + p { margin-top: 1em; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+small {
+  font-size: var(--text-small);
+  color: rgba(215,232,233,.55);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+pre {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  padding: 14px 18px;
+  overflow-x: auto;
+}
 
 hr {
-  border: 0;
+  border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(215,232,233,.18), transparent);
-  margin: 28px 0;
+  background: linear-gradient(90deg, transparent, rgba(215,232,233,.16), transparent);
+  margin: 36px 0;
 }
 
-/* =========================================
-   Page container + section rhythm
-   ========================================= */
-.trip-page {
+
+/* ── Page skeleton ──────────────────────────────────────────── */
+
+/* Observable Framework wraps content in its own container.
+   We max-width the story and handle all vertical rhythm here. */
+.observablehq-body,
+.observablehq--content {
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+.trip-story {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 28px var(--gutter) 84px;
+  padding: 0 var(--gutter) 120px;
 }
 
-.trip-section {
-  margin-top: 34px;
+
+/* ── Page header ────────────────────────────────────────────── */
+
+.trip-header {
+  padding: clamp(60px, 10vw, 110px) 0 clamp(48px, 7vw, 80px);
+  max-width: 800px;
 }
 
 .trip-kicker {
-  font-size: 0.9rem;
-  color: rgba(215,232,233,.65);
-  letter-spacing: .12em;
+  font-family: var(--font-mono);
+  font-size: var(--text-kicker);
+  color: rgba(215,232,233,.45);
+  letter-spacing: .16em;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+/* Decorative line after kicker text */
+.trip-kicker::after {
+  content: "";
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(110,92,197,.55), transparent);
 }
 
-.trip-h1 { font-size: var(--h1); line-height: 1.02; margin: 10px 0 0; }
-.trip-h2 { font-size: var(--h2); line-height: 1.1; margin: 0; }
-.trip-h3 { font-size: var(--h3); line-height: 1.15; margin: 0; color: rgba(215,232,233,.92); }
+.trip-h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--fog);
+  margin-bottom: 28px;
+}
+
+/* Gradient accent on the last word/phrase of the h1 — applied via <em> */
+.trip-h1 em {
+  font-style: normal;
+  background: linear-gradient(95deg, var(--violet) 0%, var(--emerald) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
 .trip-lede {
-  font-size: 1.05rem;
-  color: rgba(215,232,233,.84);
-  max-width: 62ch;
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 1.7vw, 1.22rem);
+  color: rgba(215,232,233,.74);
+  max-width: 60ch;
+  line-height: 1.68;
+  margin-bottom: 28px;
 }
 
-/* =========================================
-   Layout utilities
-   ========================================= */
-.grid {
-  display: grid;
-  gap: 18px;
+.trip-byline {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: rgba(215,232,233,.38);
+  letter-spacing: .04em;
 }
-.grid-2 {
-  grid-template-columns: 1.2fr 0.8fr;
+.trip-byline a:hover { color: rgba(215,232,233,.72); }
+
+
+/* ── Sections ───────────────────────────────────────────────── */
+
+.trip-section {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-top: var(--section-gap);
 }
-.grid-3 {
-  grid-template-columns: repeat(3, 1fr);
+
+/* Full-bleed section — breaks out of the max-width column.
+   Used for the flagship Act V graphic.                           */
+.trip-section--full {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
 }
-@media (max-width: 900px) {
+/* Re-constrain the text intro of a full-bleed section */
+.trip-section--full > *:not(#flagship-sticky) {
+  max-width: var(--max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.trip-section--footer {
+  border-top: 1px solid var(--stroke);
+  padding-top: clamp(48px, 7vw, 72px);
+  margin-top: var(--section-gap);
+}
+
+/* Act label — mono, upper-case, with extending rule line */
+.trip-section > .trip-kicker {
+  margin-bottom: 16px;
+}
+
+.trip-h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  color: var(--fog);
+  margin-bottom: 20px;
+}
+
+.trip-h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 600;
+  color: rgba(215,232,233,.90);
+  margin-bottom: 14px;
+}
+
+/* Prose column — constrained to comfortable reading width */
+.trip-section > p,
+.trip-prose {
+  max-width: var(--prose);
+  font-size: 1.02rem;
+  line-height: 1.74;
+  color: rgba(215,232,233,.78);
+}
+
+
+/* ── Pull quote ─────────────────────────────────────────────── */
+
+.trip-pullquote {
+  border-left: 3px solid var(--coral);
+  padding: 6px 0 6px 24px;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.0vw, 1.48rem);
+  font-weight: 500;
+  line-height: 1.38;
+  color: var(--fog);
+  max-width: 52ch;
+  margin: 36px 0;
+}
+.trip-pullquote--violet { border-left-color: var(--violet); }
+.trip-pullquote--emerald { border-left-color: var(--emerald); }
+
+
+/* ── Stat callout ───────────────────────────────────────────── */
+
+.trip-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 28px 0;
+  border-top: 1px solid var(--stroke);
+  border-bottom: 1px solid var(--stroke);
+  margin: 40px 0;
+}
+
+.trip-stat__num {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.trip-stat__num--coral   { color: var(--coral); }
+.trip-stat__num--violet  { color: var(--violet); }
+.trip-stat__num--emerald { color: var(--emerald); }
+.trip-stat__num--muted   { color: rgba(215,232,233,.38); }
+
+.trip-stat__label {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: rgba(215,232,233,.50);
+  max-width: 24ch;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+
+/* ── Inline highlights ──────────────────────────────────────── */
+
+.hl            { font-weight: 600; color: var(--fog); }
+.hl--coral     { color: var(--coral);   font-weight: 600; }
+.hl--violet    { color: var(--violet);  font-weight: 600; }
+.hl--emerald   { color: var(--emerald); font-weight: 600; }
+
+
+/* ── Callout boxes ──────────────────────────────────────────── */
+
+.trip-callout {
+  background: rgba(110,92,197,.07);
+  border: 1px solid rgba(110,92,197,.22);
+  border-radius: var(--r);
+  padding: 18px 24px;
+  margin: 32px 0;
+}
+.trip-callout--emerald {
+  background: rgba(53,191,120,.06);
+  border-color: rgba(53,191,120,.20);
+}
+.trip-callout--coral {
+  background: rgba(230,130,99,.06);
+  border-color: rgba(230,130,99,.20);
+}
+
+.trip-callout__headline {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--violet);
+  margin-bottom: 8px;
+}
+.trip-callout--emerald .trip-callout__headline { color: var(--emerald); }
+.trip-callout--coral   .trip-callout__headline { color: var(--coral); }
+
+
+/* ── Chart figures ──────────────────────────────────────────── */
+
+.trip-figure {
+  margin-top: 36px;
+  overflow: hidden;
+}
+
+.trip-caption {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: rgba(215,232,233,.38);
+  margin-top: 12px;
+  max-width: 70ch;
+  line-height: 1.55;
+  letter-spacing: .02em;
+}
+
+
+/* ── Scroll reveal ──────────────────────────────────────────── */
+/*   Charts start invisible and translate in when they scroll into
+     view. The .revealed class is added by lib/scroll.js via
+     IntersectionObserver (Level 2 interaction).                  */
+
+.chart-container {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(.22,.68,0,1.1),
+              transform 0.65s cubic-bezier(.22,.68,0,1.1);
+}
+.chart-container.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger siblings when multiple charts reveal in sequence */
+.chart-container:nth-child(2) { transition-delay: 0.08s; }
+.chart-container:nth-child(3) { transition-delay: 0.16s; }
+
+/* ── Band reveal (distributionTrend.js) ─────────────────────── */
+/*   SVG paths with class .band--hidden start invisible.
+     initScroll() removes this class when the chart scrolls into
+     view, triggering the transition and revealing the percentile
+     bands and p25 annotation in Act I.                          */
+
+.band--hidden {
+  opacity: 0;
+  transition: opacity 0.8s ease 0.3s;
+}
+
+
+/* ── Chart placeholders ─────────────────────────────────────── */
+/*   Temporary containers while D3 charts are being built.
+     Remove this block once all charts are implemented.           */
+
+.chart-placeholder {
+  width: 100%;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(110,92,197,.04);
+  border: 1px dashed rgba(110,92,197,.20);
+  border-radius: var(--r);
+  color: rgba(215,232,233,.22);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.chart-placeholder--flagship {
+  min-height: 70vh;
+  background: rgba(53,191,120,.03);
+  border-color: rgba(53,191,120,.14);
+}
+
+
+/* ── Flagship scrollytelling layout ────────────────────────── */
+/*   Act V uses Scrollama for step-based scroll interaction.
+     The graphic is sticky; the step text scrolls over it.        */
+
+#flagship-sticky {
+  position: relative;
+  /* Total scroll height = graphic stays sticky for ~4 × 100vh */
+}
+
+#flagship-graphic {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Ensure the D3 SVG can go full-bleed */
+  z-index: 1;
+}
+
+#flagship-steps {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+  /* Extra bottom padding so the last step can fully trigger */
+  padding-bottom: 50vh;
+}
+
+.step {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 var(--gutter);
+  pointer-events: none;
+}
+
+.step p {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.38;
+  color: rgba(215,232,233,.0);   /* invisible by default */
+  max-width: 36ch;
+  background: rgba(15,17,22,.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r);
+  padding: 22px 28px;
+  transition: color 0.35s ease, opacity 0.35s ease;
+}
+
+/* Scrollama adds .is-active to the current step */
+.step.is-active p {
+  color: var(--fog);
+}
+
+
+/* ── Layout utilities ───────────────────────────────────────── */
+
+.grid   { display: grid; gap: 18px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 860px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 
 .stack { display: grid; gap: 14px; }
+.cluster { display: flex; flex-wrap: wrap; gap: 10px; }
 
-/* =========================================
-   Cards, panels, pills
-   ========================================= */
+
+/* ── Card surface ───────────────────────────────────────────── */
+
 .card {
-  background: rgba(255,255,255,.045);
+  background: rgba(255,255,255,.04);
   border: 1px solid var(--stroke);
   border-radius: var(--r);
-  padding: 18px;
+  padding: 20px;
   box-shadow: var(--shadow-2);
-  backdrop-filter: blur(10px);
+}
+.card--tight  { padding: 14px; }
+.card--violet { border-color: rgba(110,92,197,.28); background: rgba(110,92,197,.06); }
+.card--emerald{ border-color: rgba(53,191,120,.24); background: rgba(53,191,120,.05); }
+
+
+/* ── Sources / footer ───────────────────────────────────────── */
+
+.trip-sources {
+  max-width: var(--prose);
 }
 
-.card--tight { padding: 14px; }
-.card--flat { box-shadow: none; }
-
-.pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(215,232,233,.18);
-  background: rgba(255,255,255,.03);
-  color: rgba(215,232,233,.85);
-  font-size: 0.9rem;
+.trip-small {
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  color: rgba(215,232,233,.38);
+  letter-spacing: .03em;
+  line-height: 1.6;
 }
-.pill b { color: var(--fog); font-weight: 650; }
 
-/* =========================================
-   Hero layout
-   ========================================= */
+
+/* ── Observable Framework overrides ─────────────────────────── */
+/*   Suppress Framework's default heading/body styles so ours win. */
+
+.observablehq h1,
+.observablehq h2,
+.observablehq h3 {
+  font-family: var(--font-display) !important;
+}
+
+.observablehq p {
+  font-family: var(--font-body) !important;
+  max-width: none;
+}
+
+/* Hide Observable's default header bar */
+#observablehq-header { display: none; }
+
+
+/* ================================================================
+   PAGE STRUCTURE — index.md layout classes
+   These match the actual HTML in index.md. The .trip-* classes
+   above are design system primitives; these are the page layout.
+   ================================================================ */
+
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+
 .hero {
   position: relative;
-  border-radius: var(--r-lg);
   overflow: hidden;
-  border: 1px solid rgba(215,232,233,.14);
-  background:
-    radial-gradient(120% 120% at 15% 15%, rgba(42,164,120,.55), transparent 45%),
-    radial-gradient(110% 120% at 55% 45%, rgba(120,83,230,.65), transparent 55%),
-    radial-gradient(120% 140% at 80% 25%, rgba(42,164,120,.55), transparent 50%),
-    linear-gradient(180deg, rgba(62,68,86,.55), rgba(15,17,22,.55));
-  box-shadow: var(--shadow-1);
+  min-height: 96vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(48px, 10vw, 120px) var(--gutter) clamp(60px, 8vw, 100px);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.hero__inner {
-  display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-  gap: 18px;
-  padding: 26px;
-}
-@media (max-width: 900px) {
-  .hero__inner { grid-template-columns: 1fr; }
-}
-
-.hero__meta {
-  display: grid;
-  gap: 12px;
-  align-content: start;
-}
-
-.hero__badge {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  font-size: 0.9rem;
-  color: rgba(215,232,233,.85);
-}
-.dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: linear-gradient(90deg, var(--teal), var(--violet), var(--coral));
-  box-shadow: 0 0 0 3px rgba(255,255,255,.06);
-}
-
-/* =========================================
-   “RQ Cards” – clickable story navigation
-   ========================================= */
-.rq {
+/* Ensure text stack sits above the geometry block */
+.hero > *:not(.hero-geometry) {
   position: relative;
-  overflow: hidden;
-  transition: transform .15s ease, border-color .15s ease;
-}
-.rq:hover {
-  transform: translateY(-2px);
-  border-color: rgba(215,232,233,.26);
+  z-index: 1;
 }
 
-.rq::before {
-  content: "";
+
+/* ── Accurat-inspired color geometry ─────────────────────────
+   Two overlapping rectangles (violet / emerald) in the top-right
+   of the hero. Each half is 54% wide so they share a 4% bleed
+   at the centre — producing the additive teal blend from the
+   reference image. A hairline rule cuts across for detail.    */
+
+.hero-geometry {
   position: absolute;
-  inset: -2px;
-  background: radial-gradient(400px 220px at 10% 20%, rgba(18,149,233,.22), transparent 55%),
-              radial-gradient(420px 260px at 60% 40%, rgba(120,83,230,.22), transparent 55%),
-              radial-gradient(420px 260px at 90% 80%, rgba(230,130,99,.18), transparent 55%);
-  opacity: .9;
+  top: 4%;
+  right: -2%;
+  width: clamp(260px, 38vw, 540px);
+  height: 80%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hg-violet {
+  position: absolute;
+  top: 0; left: 0;
+  width: 54%;
+  height: 100%;
+  background: rgba(110, 92, 197, 0.72);
+}
+
+.hg-emerald {
+  position: absolute;
+  top: 0; right: 0;
+  width: 54%;
+  height: 100%;
+  background: rgba(53, 191, 120, 0.65);
+}
+
+/* Horizontal rule across the geometry — Accurat detail */
+.hg-rule {
+  position: absolute;
+  top: 42%;
+  left: -6%;
+  width: 112%;
+  height: 1px;
+  background: rgba(15, 17, 22, 0.50);
+}
+
+
+/* ── Hero typography ──────────────────────────────────────── */
+
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-kicker);
+  color: rgba(215,232,233,.38);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  /* Slightly smaller than the global hero scale */
+  font-size: clamp(2.6rem, 5.5vw, 5.2rem);
+  font-weight: 800;
+  letter-spacing: -0.034em;
+  line-height: 0.95;
+  margin: 0 0 18px;
+  /* Fog → emerald gradient */
+  background: linear-gradient(110deg,
+    var(--fog)     0%,
+    var(--fog)     52%,
+    var(--emerald) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.5vw, 1.12rem);
+  color: rgba(215,232,233,.50);
+  margin: 0 0 18px;
+  line-height: 1.6;
+}
+
+/* Short intro paragraph — the human framing beneath the title line */
+.hero-intro {
+  font-family: var(--font-body);
+  font-size: clamp(0.88rem, 1.2vw, 1.0rem);
+  color: rgba(215,232,233,.38);
+  max-width: 52ch;
+  line-height: 1.72;
+  margin: 0 0 44px;
+}
+
+.hero-scroll-cue {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  color: rgba(215,232,233,.22);
+  display: inline-block;
+  animation: scrollPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { transform: translateY(0);   opacity: .22; }
+  50%       { transform: translateY(6px); opacity: .50; }
+}
+
+
+/* ── Act sections — 3-column grid ───────────────────────────── */
+/*   Center column holds narrative + charts.
+     Left/right columns hold aside annotations.
+     Charts span full width; prose stays in center.             */
+
+.act {
+  --aside-w: 200px;
+  --col-gap: clamp(24px, 3.5vw, 52px);
+
+  display: grid;
+  grid-template-columns:
+    [full-start aside-l-start] var(--aside-w)
+    [aside-l-end body-start]   minmax(0, 760px)
+    [body-end aside-r-start]   var(--aside-w)
+    [aside-r-end full-end];
+  column-gap: var(--col-gap);
+  justify-content: center;
+
+  padding-top: var(--section-gap);
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  align-items: start;
+}
+
+/* All children default to the center body column */
+.act > * {
+  grid-column: body-start / body-end;
+  min-width: 0;
+}
+
+/* Charts span the full 3-column width for maximum impact */
+.act > .chart-container {
+  grid-column: full-start / full-end;
+}
+
+/* Typology grid also spans full width */
+.act > .typology-grid {
+  grid-column: full-start / full-end;
+}
+
+
+/* ── Act typography ────────────────────────────────────────── */
+
+.act-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-kicker);
+  color: rgba(215,232,233,.32);
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.act-kicker::after {
+  content: "";
+  flex: 1;
+  max-width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(110,92,197,.45), transparent);
+}
+
+/* Section kicker — replaces act h2 titles.
+   DM Mono, small, muted. Appears just before body text.
+   Mirrors the "{B} WHAT WE DO" style from Accurat Tech. */
+.act-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(215,232,233,.32);
+  margin: 0 0 20px;
+}
+
+/* act-title kept in CSS but no longer used in HTML —
+   available if a section ever needs a proper h2 again. */
+.act-title {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  color: var(--fog);
+  margin: 0 0 12px;
+  letter-spacing: -0.022em;
+}
+
+.act-body {
+  max-width: 64ch;
+}
+
+.act-body p {
+  font-size: 1.02rem;
+  line-height: 1.78;
+  color: rgba(215,232,233,.76);
+}
+
+.act-body--after-chart {
+  margin-top: clamp(36px, 5vw, 60px);
+}
+
+/* Figure label — monospace caption below each chart.
+   Styled like "FIG. 1" in the Accurat Tech reference.
+   Explicit .act > selector beats .act > * so grid-column sticks. */
+.act > .fig-label,
+.fig-label {
+  grid-column: full-start / full-end;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: rgba(215,232,233,.25);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(215,232,233,.07);
+  display: flex;
+  gap: 20px;
+}
+.fig-label strong {
+  color: rgba(215,232,233,.45);
+  font-weight: 500;
+}
+
+
+/* ── Chart container ───────────────────────────────────────── */
+/*   Extends the scroll-reveal rule already defined above.
+     Adds height placeholder so act doesn't collapse.
+     Margins create breathing room before and after each chart. */
+
+.chart-container {
+  width: 100%;
+  min-height: 300px;
+  margin-top: clamp(44px, 6vw, 76px);
+  margin-bottom: 0;   /* fig-label follows immediately */
+  /* DEBUG PLACEHOLDER — remove background/border when charts render */
+  opacity: 1 !important;
+  transform: none !important;
+  background: rgba(110, 92, 197, 0.07);
+  border: 1px dashed rgba(110, 92, 197, 0.22);
+  border-radius: 6px;
+}
+
+.chart-act1 { min-height: 460px; }
+.chart-act2 { min-height: 560px; }
+.chart-act3 { min-height: 520px; }
+
+
+/* ── Aside notes ───────────────────────────────────────────── */
+/*   Historical + legal fact annotations in the sidebar columns.
+     Scroll normally with the page — stagger via margin-top offsets
+     on the modifier classes for visual dynamism.                 */
+
+.aside-note {
+  align-self: start;
+  padding: 16px 0;
+  border-top: 1px solid rgba(215,232,233,.10);
+}
+
+/* Three offset heights — applied via HTML classes to stagger notes */
+.aside-note--anchor-high { margin-top: 0;     }
+.aside-note--anchor-mid  { margin-top: 180px; }
+.aside-note--anchor-low  { margin-top: 360px; }
+
+.aside-note--left  {
+  grid-column: aside-l-start / aside-l-end;
+}
+.aside-note--right {
+  grid-column: aside-r-start / aside-r-end;
+}
+
+/* Placeholder image inside an aside note */
+.aside-note__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  margin-bottom: 12px;
+  filter: grayscale(1) brightness(0.60);
+  border-radius: 4px;
+}
+
+.aside-note__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--emerald);
+  margin: 0 0 8px;
+}
+
+.aside-note__text {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.64;
+  color: rgba(215,232,233,.42);
+  margin: 0;
+}
+
+.aside-note__text + .aside-note__text {
+  margin-top: 10px;
+}
+
+/* Hide sidebars on narrow viewports — they'd overlap content */
+@media (max-width: 900px) {
+  .act {
+    grid-template-columns: 1fr;
+  }
+  .act > * {
+    grid-column: 1;
+  }
+  .act > .chart-container,
+  .act > .typology-grid {
+    grid-column: 1;
+  }
+  .aside-note { display: none; }
+}
+
+
+/* ── Typology cards (Act III) ──────────────────────────────── */
+
+.typology-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.5vw, 28px);
+  margin-top: clamp(40px, 6vw, 64px);
+}
+
+@media (max-width: 780px) {
+  .typology-grid { grid-template-columns: 1fr; }
+}
+
+.typology-card {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(215,232,233,.09);
+  border-radius: var(--r);
+  padding: clamp(18px, 2.5vw, 28px);
+  transition: border-color 0.25s ease;
+}
+
+.typology-card:hover {
+  border-color: rgba(110,92,197,.30);
+}
+
+.typology-country {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--fog);
+  margin-bottom: 4px;
+}
+
+.typology-label {
+  font-family: var(--font-mono);
+  font-size: 0.73rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--violet);
+  margin-bottom: 10px;
+}
+
+.typology-score {
+  font-family: var(--font-mono);
+  font-size: 0.80rem;
+  color: rgba(215,232,233,.38);
+  padding: 6px 0 14px;
+  border-bottom: 1px solid rgba(215,232,233,.08);
+  margin-bottom: 14px;
+}
+
+.typology-body {
+  font-size: 0.88rem;
+  line-height: 1.68;
+  color: rgba(215,232,233,.58);
+}
+
+
+/* ── Act IV flagship overrides ─────────────────────────────── */
+/*   The flagship section breaks out of the act grid.
+     Its scrollytelling layout is fully self-managed.            */
+
+.act--flagship {
+  display: block;
+  padding-left: 0;
+  padding-right: 0;
+  max-width: none;
+}
+
+.act--flagship .act-kicker,
+.act--flagship .act-title,
+.act--flagship .act-body--pre-flagship {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.flagship-wrapper {
+  position: relative;
+}
+
+.flagship-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.flagship-steps {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+  padding-bottom: 50vh;
+}
+
+.step {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--gutter);
   pointer-events: none;
 }
 
-.rq__inner { position: relative; display: grid; gap: 10px; }
-.rq__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-.rq__tag {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: rgba(215,232,233,.7);
-}
-.rq__arrow {
-  font-size: 1.2rem;
-  opacity: .8;
+.step-text {
+  max-width: 38ch;
+  pointer-events: none;
 }
 
-/* =========================================
-   Buttons / links
-   ========================================= */
-.btnrow { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(215,232,233,.18);
-  background: rgba(255,255,255,.03);
-  color: rgba(215,232,233,.92);
-  transition: transform .15s ease, border-color .15s ease, background .15s ease;
-}
-.btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(215,232,233,.28);
-  background: rgba(255,255,255,.05);
-  text-decoration: none;
-}
-.btn--primary {
-  border-color: rgba(120,83,230,.42);
-  background: linear-gradient(90deg, rgba(120,83,230,.25), rgba(42,164,120,.18));
-}
-.btn--primary:hover {
-  border-color: rgba(120,83,230,.62);
+.step-text p {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.0vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(215,232,233,.0);
+  background: rgba(15,17,22,.78);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r);
+  padding: 22px 28px;
+  transition: color 0.4s ease;
 }
 
-/* =========================================
-   Footer / sources
-   ========================================= */
-.sources {
-  display: grid;
-  gap: 10px;
-}
-.sources a {
-  color: rgba(215,232,233,.82);
-}
-.sources a:hover {
+.step.is-active .step-text p {
   color: var(--fog);
 }
 
-/* =========================================
-   Small print method note
-   ========================================= */
-.note {
-  border-left: 3px solid rgba(42,164,120,.65);
-  padding-left: 14px;
-  color: rgba(215,232,233,.80);
+
+/* ── Epilogue ───────────────────────────────────────────────── */
+
+.act--epilogue {
+  display: block;
+  max-width: 64ch;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  padding-top: var(--section-gap);
+  padding-bottom: clamp(100px, 18vw, 180px);
 }
-.note b { color: var(--fog); }
+
+.act--epilogue .act-body p {
+  max-width: none;
+}
+
+.methodology-note {
+  margin-top: clamp(48px, 7vw, 80px);
+  padding-top: 28px;
+  border-top: 1px solid rgba(215,232,233,.10);
+}
+
+.methodology-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-kicker);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(215,232,233,.28);
+  margin-bottom: 12px;
+}
+
+.methodology-note p {
+  font-size: 0.84rem;
+  line-height: 1.68;
+  color: rgba(215,232,233,.38);
+}
