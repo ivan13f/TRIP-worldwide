@@ -2,14 +2,12 @@
 export default {
   title: "Trans Rights Worldwide",
 
-  // Fonts: DM Sans (display + body, full weight range) + DM Mono (data labels/kickers)
-  // Syne kept in URL in case needed for fallback; DM Sans is now primary across all type.
-  // Favicon: replace observable.png with a custom icon when ready
+  // Fonts: Besley (headlines + long read), Inter (numbers, labels, UI)
   head: `
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="icon" href="observable.png" type="image/png" sizes="32x32">
+    <link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3'><rect width='5' height='3' fill='%235BCEFA'/><rect y='.6' width='5' height='1.8' fill='%23F5A9B8'/><rect y='1.2' width='5' height='.6' fill='%23FFFFFF'/></svg>">
   `,
 
   // All source files live in src/
@@ -22,6 +20,7 @@ export default {
   // Disable Observable's built-in theme — we use our own style.css entirely.
   // Without this, theme-air,near-midnight.css loads and overrides everything.
   theme: false,
+  globalStylesheets: [],
 
   // Single-scroll editorial story — no sidebar, no auto-generated ToC, no prev/next pager.
   // Navigation is handled by the page's own chapter anchors.

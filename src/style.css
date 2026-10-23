@@ -1,1126 +1,347 @@
-/* ============================================================
-   TRIP — Design System
-   Trans Rights Worldwide
-   Dark editorial. Grain texture. Purple → emerald color axis.
-   ============================================================ */
-
-/* ── Custom properties ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Uneven Ground · style.css · light editorial system v2
+   Tokens mirror src/lib/theme.js. See design-system/index.html for the spec.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* Neutrals */
+  --paper:   #F7F5F0;
+  --paper-2: #EFECE4;
+  --rule:    #D6D2C8;
+  --nodata:  #E7E3DA;
+  --ink:     #111111;
+  --ink-2:   #3D3D3A;
+  --ink-3:   #67655F;
 
-  /* --- Core palette ---
-     The piece lives on the purple → emerald axis (from the Accurat
-     Milan Design Week reference). Coral is the warm counter-accent
-     used for data highlights that signal tension or urgency.       */
-  --ink:     #0f1116;          /* near-black background              */
-  --slate:   #1e2130;          /* elevated surface (cards, panels)   */
-  --fog:     #d7e8e9;          /* primary text                       */
-  --muted:   #8a9aa0;          /* secondary text, axis labels        */
-  --stroke:  rgba(215,232,233,.13);  /* borders, dividers            */
+  /* Primary (indigo-violet) and accent */
+  --primary-50:  #ECEDFF;
+  --primary:     #5A37D1;
+  --primary-600: #4621AC;
+  --accent:      #FF4E00;
 
-  --violet:  #6e5cc5;          /* deep purple — low TRIP score end   */
-  --emerald: #35bf78;          /* saturated green — high score end   */
-  --coral:   #e68263;          /* warm accent — global average line  */
-  --rust:    #8f4636;          /* deep warm, secondary               */
-  --azure:   #2a8fd4;          /* cool blue, regime annotations      */
+  /* Type */
+  --serif: "Besley", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --t-display: clamp(3rem, 7vw, 5.5rem);
+  --t-h2:      clamp(2rem, 4vw, 2.75rem);
+  --t-h3:      1.625rem;
+  --t-lede:    clamp(1.25rem, 2vw, 1.5rem);
+  --t-body:    1.25rem;
+  --t-note:    0.9375rem;
+  --t-label:   0.8125rem;
+  --t-tick:    0.75rem;
 
-  /* --- Typography ---
-     DM Sans: warm humanist geometric — headings AND body prose.
-              Hierarchy via weight: display=800, h2=700, h3=600, body=400.
-     DM Mono: monospace — section kickers, figure labels, data captions. */
-  --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-body:    'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    'DM Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+  /* Space (4pt) */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 144px;
 
-  /* --- Type scale --- */
-  --text-hero:  clamp(3.0rem, 6.5vw, 6.0rem);
-  --text-h2:    clamp(1.5rem, 2.4vw, 2.2rem);
-  --text-h3:    clamp(1.1rem, 1.4vw, 1.3rem);
-  --text-body:  1rem;
-  --text-small: 0.88rem;
-  --text-kicker: 0.78rem;
+  /* Layout */
+  --w-text: 640px;
+  --w-note: 220px;
+  --w-gap:  56px;
+  --gutter: clamp(16px, 4vw, 48px);
 
-  /* --- Layout --- */
-  --max:      1120px;
-  --prose:    68ch;
-  --gutter:   clamp(20px, 4vw, 48px);
-  --section-gap: clamp(80px, 12vw, 130px);
-
-  /* --- Surfaces --- */
-  --r:     16px;
-  --r-lg:  24px;
-
-  /* --- Shadows --- */
-  --shadow-1: 0 16px 56px rgba(0,0,0,.42);
-  --shadow-2: 0 8px 28px rgba(0,0,0,.28);
-
-  /* --- Chart / data tokens --- */
-  --grid-line:  rgba(215,232,233,.09);
-  --axis-line:  rgba(215,232,233,.32);
-  --tick-label: rgba(215,232,233,.52);
+  /* Shape + motion */
+  --radius-s: 4px;
+  --dur-instant: 100ms;
+  --dur-fast:    150ms;
+  --dur-step:    600ms;
+  --dur-reveal:  900ms;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-instant: 0ms; --dur-fast: 0ms; --dur-step: 0ms; --dur-reveal: 0ms; }
 }
 
-
-/* ── Reset / base ───────────────────────────────────────────── */
-
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-}
-
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
-  min-height: 100vh;
-  background:
-    /* Purple bloom — upper left */
-    radial-gradient(900px 600px at 8% 12%,  rgba(110,92,197,.20), transparent 60%),
-    /* Emerald bloom — upper right */
-    radial-gradient(800px 500px at 78% 8%,  rgba(53,191,120,.16), transparent 55%),
-    /* Violet bleed — mid */
-    radial-gradient(600px 500px at 18% 55%, rgba(110,92,197,.10), transparent 60%),
-    /* Emerald bleed — lower right */
-    radial-gradient(700px 500px at 85% 80%, rgba(53,191,120,.10), transparent 60%),
-    /* Coral glow — very subtle lower left */
-    radial-gradient(500px 350px at 5% 92%,  rgba(230,130,99,.08), transparent 55%),
-    var(--ink);
-  color: var(--fog);
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  line-height: 1.62;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 var(--t-body)/1.6 var(--serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-
-/* ── Film grain overlay ─────────────────────────────────────── */
-/*   SVG feTurbulence rendered as a fixed pseudo-element overlay.
-     Subtle animation gives it the quality of analogue film grain.
-     Opacity is intentionally low — it adds texture, not noise.    */
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: -50%;
-  width: 200%;
-  height: 200%;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='250' height='250' filter='url(%23g)' opacity='1'/></svg>");
-  opacity: 0.072;
-  pointer-events: none;
-  z-index: 9999;
-  animation: grain 9s steps(8) infinite;
-}
-
-@keyframes grain {
-  0%   { transform: translate(0,   0)   }
-  12%  { transform: translate(-4%, -9%) }
-  25%  { transform: translate(-12%, 4%) }
-  37%  { transform: translate(6%, -22%) }
-  50%  { transform: translate(-4%, 22%) }
-  62%  { transform: translate(-13%, 8%) }
-  75%  { transform: translate(12%, 0%)  }
-  87%  { transform: translate(0%,  13%) }
-  100% { transform: translate(0,   0)   }
-}
-
-
-/* ── Typography — base elements ─────────────────────────────── */
-
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--fog);
-  line-height: 1.05;
-  letter-spacing: -0.022em;
-  margin: 0;
-}
-
-p {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  color: rgba(215,232,233,.80);
-  line-height: 1.72;
-  margin: 0;
-}
-p + p { margin-top: 1em; }
-
 a {
   color: inherit;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-line: underline;
+  text-decoration-color: var(--primary);
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
+  transition: background-color var(--dur-fast) var(--ease);
 }
+a:hover { background: var(--primary-50); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+button { font: inherit; color: inherit; }
 
-small {
-  font-size: var(--text-small);
-  color: rgba(215,232,233,.55);
+/* Observable Framework chrome off */
+#observablehq-header, #observablehq-footer, #observablehq-toc { display: none !important; }
+#observablehq-main, #observablehq-center, .observablehq, .observablehq-body, .observablehq--content {
+  max-width: none !important; margin: 0 !important; padding: 0 !important;
 }
+#observablehq-center { min-height: 100vh; }
+.observablehq h1, .observablehq h2, .observablehq h3, .observablehq p { max-width: none; }
 
-code, pre {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-}
-pre {
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--stroke);
-  border-radius: 12px;
-  padding: 14px 18px;
-  overflow-x: auto;
-}
-
-hr {
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(215,232,233,.16), transparent);
-  margin: 36px 0;
-}
-
-
-/* ── Page skeleton ──────────────────────────────────────────── */
-
-/* Observable Framework wraps content in its own container.
-   We max-width the story and handle all vertical rhythm here. */
-.observablehq-body,
-.observablehq--content {
-  max-width: none !important;
-  padding: 0 !important;
-}
-
-.trip-story {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 0 var(--gutter) 120px;
-}
-
-
-/* ── Page header ────────────────────────────────────────────── */
-
-.trip-header {
-  padding: clamp(60px, 10vw, 110px) 0 clamp(48px, 7vw, 80px);
-  max-width: 800px;
-}
-
-.trip-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-kicker);
-  color: rgba(215,232,233,.45);
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-/* Decorative line after kicker text */
-.trip-kicker::after {
-  content: "";
-  flex: 1;
-  max-width: 80px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(110,92,197,.55), transparent);
-}
-
-.trip-h1 {
-  font-family: var(--font-display);
-  font-size: var(--text-hero);
-  font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  color: var(--fog);
-  margin-bottom: 28px;
-}
-
-/* Gradient accent on the last word/phrase of the h1 — applied via <em> */
-.trip-h1 em {
-  font-style: normal;
-  background: linear-gradient(95deg, var(--violet) 0%, var(--emerald) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.trip-lede {
-  font-family: var(--font-body);
-  font-size: clamp(1.05rem, 1.7vw, 1.22rem);
-  color: rgba(215,232,233,.74);
-  max-width: 60ch;
-  line-height: 1.68;
-  margin-bottom: 28px;
-}
-
-.trip-byline {
-  font-family: var(--font-mono);
-  font-size: var(--text-small);
-  color: rgba(215,232,233,.38);
-  letter-spacing: .04em;
-}
-.trip-byline a:hover { color: rgba(215,232,233,.72); }
-
-
-/* ── Sections ───────────────────────────────────────────────── */
-
-.trip-section {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding-top: var(--section-gap);
-}
-
-/* Full-bleed section — breaks out of the max-width column.
-   Used for the flagship Act V graphic.                           */
-.trip-section--full {
-  max-width: none;
-  padding-left: 0;
-  padding-right: 0;
-}
-/* Re-constrain the text intro of a full-bleed section */
-.trip-section--full > *:not(#flagship-sticky) {
-  max-width: var(--max);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
-}
-
-.trip-section--footer {
-  border-top: 1px solid var(--stroke);
-  padding-top: clamp(48px, 7vw, 72px);
-  margin-top: var(--section-gap);
-}
-
-/* Act label — mono, upper-case, with extending rule line */
-.trip-section > .trip-kicker {
-  margin-bottom: 16px;
-}
-
-.trip-h2 {
-  font-family: var(--font-display);
-  font-size: var(--text-h2);
-  font-weight: 700;
-  color: var(--fog);
-  margin-bottom: 20px;
-}
-
-.trip-h3 {
-  font-family: var(--font-display);
-  font-size: var(--text-h3);
-  font-weight: 600;
-  color: rgba(215,232,233,.90);
-  margin-bottom: 14px;
-}
-
-/* Prose column — constrained to comfortable reading width */
-.trip-section > p,
-.trip-prose {
-  max-width: var(--prose);
-  font-size: 1.02rem;
-  line-height: 1.74;
-  color: rgba(215,232,233,.78);
-}
-
-
-/* ── Pull quote ─────────────────────────────────────────────── */
-
-.trip-pullquote {
-  border-left: 3px solid var(--coral);
-  padding: 6px 0 6px 24px;
-  font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.0vw, 1.48rem);
-  font-weight: 500;
-  line-height: 1.38;
-  color: var(--fog);
-  max-width: 52ch;
-  margin: 36px 0;
-}
-.trip-pullquote--violet { border-left-color: var(--violet); }
-.trip-pullquote--emerald { border-left-color: var(--emerald); }
-
-
-/* ── Stat callout ───────────────────────────────────────────── */
-
-.trip-stat-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  padding: 28px 0;
-  border-top: 1px solid var(--stroke);
-  border-bottom: 1px solid var(--stroke);
-  margin: 40px 0;
-}
-
-.trip-stat__num {
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 5vw, 4.2rem);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  line-height: 1;
-}
-.trip-stat__num--coral   { color: var(--coral); }
-.trip-stat__num--violet  { color: var(--violet); }
-.trip-stat__num--emerald { color: var(--emerald); }
-.trip-stat__num--muted   { color: rgba(215,232,233,.38); }
-
-.trip-stat__label {
-  font-family: var(--font-body);
-  font-size: var(--text-small);
-  color: rgba(215,232,233,.50);
-  max-width: 24ch;
-  margin-top: 10px;
-  line-height: 1.5;
-}
-
-
-/* ── Inline highlights ──────────────────────────────────────── */
-
-.hl            { font-weight: 600; color: var(--fog); }
-.hl--coral     { color: var(--coral);   font-weight: 600; }
-.hl--violet    { color: var(--violet);  font-weight: 600; }
-.hl--emerald   { color: var(--emerald); font-weight: 600; }
-
-
-/* ── Callout boxes ──────────────────────────────────────────── */
-
-.trip-callout {
-  background: rgba(110,92,197,.07);
-  border: 1px solid rgba(110,92,197,.22);
-  border-radius: var(--r);
-  padding: 18px 24px;
-  margin: 32px 0;
-}
-.trip-callout--emerald {
-  background: rgba(53,191,120,.06);
-  border-color: rgba(53,191,120,.20);
-}
-.trip-callout--coral {
-  background: rgba(230,130,99,.06);
-  border-color: rgba(230,130,99,.20);
-}
-
-.trip-callout__headline {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--violet);
-  margin-bottom: 8px;
-}
-.trip-callout--emerald .trip-callout__headline { color: var(--emerald); }
-.trip-callout--coral   .trip-callout__headline { color: var(--coral); }
-
-
-/* ── Chart figures ──────────────────────────────────────────── */
-
-.trip-figure {
-  margin-top: 36px;
-  overflow: hidden;
-}
-
-.trip-caption {
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  color: rgba(215,232,233,.38);
-  margin-top: 12px;
-  max-width: 70ch;
-  line-height: 1.55;
-  letter-spacing: .02em;
-}
-
-
-/* ── Scroll reveal ──────────────────────────────────────────── */
-/*   Charts start invisible and translate in when they scroll into
-     view. The .revealed class is added by lib/scroll.js via
-     IntersectionObserver (Level 2 interaction).                  */
-
-.chart-container {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.65s cubic-bezier(.22,.68,0,1.1),
-              transform 0.65s cubic-bezier(.22,.68,0,1.1);
-}
-.chart-container.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Stagger siblings when multiple charts reveal in sequence */
-.chart-container:nth-child(2) { transition-delay: 0.08s; }
-.chart-container:nth-child(3) { transition-delay: 0.16s; }
-
-/* ── Band reveal (distributionTrend.js) ─────────────────────── */
-/*   SVG paths with class .band--hidden start invisible.
-     initScroll() removes this class when the chart scrolls into
-     view, triggering the transition and revealing the percentile
-     bands and p25 annotation in Act I.                          */
-
-.band--hidden {
-  opacity: 0;
-  transition: opacity 0.8s ease 0.3s;
-}
-
-
-/* ── Chart placeholders ─────────────────────────────────────── */
-/*   Temporary containers while D3 charts are being built.
-     Remove this block once all charts are implemented.           */
-
-.chart-placeholder {
-  width: 100%;
-  min-height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(110,92,197,.04);
-  border: 1px dashed rgba(110,92,197,.20);
-  border-radius: var(--r);
-  color: rgba(215,232,233,.22);
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.chart-placeholder--flagship {
-  min-height: 70vh;
-  background: rgba(53,191,120,.03);
-  border-color: rgba(53,191,120,.14);
-}
-
-
-/* ── Flagship scrollytelling layout ────────────────────────── */
-/*   Act V uses Scrollama for step-based scroll interaction.
-     The graphic is sticky; the step text scrolls over it.        */
-
-#flagship-sticky {
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; height: 100svh; min-height: 520px; }
+.hero__text {
   position: relative;
-  /* Total scroll height = graphic stays sticky for ~4 × 100vh */
+  background: var(--primary); color: var(--paper);
+  padding: var(--s-8) clamp(24px, 5vw, 72px);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--s-5);
 }
-
-#flagship-graphic {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  /* Ensure the D3 SVG can go full-bleed */
-  z-index: 1;
+.hero__cue {
+  position: absolute; left: clamp(24px, 5vw, 72px); bottom: var(--s-6);
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  font: 500 var(--t-label)/1 var(--sans); letter-spacing: .04em;
+  color: var(--paper); text-decoration: none; padding: var(--s-2) 0;
 }
-
-#flagship-steps {
-  position: relative;
-  z-index: 10;
-  pointer-events: none;
-  /* Extra bottom padding so the last step can fully trigger */
-  padding-bottom: 50vh;
-}
-
-.step {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 var(--gutter);
-  pointer-events: none;
-}
-
-.step p {
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-  font-weight: 600;
-  line-height: 1.38;
-  color: rgba(215,232,233,.0);   /* invisible by default */
-  max-width: 36ch;
-  background: rgba(15,17,22,.72);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--stroke);
-  border-radius: var(--r);
-  padding: 22px 28px;
-  transition: color 0.35s ease, opacity 0.35s ease;
-}
-
-/* Scrollama adds .is-active to the current step */
-.step.is-active p {
-  color: var(--fog);
-}
-
-
-/* ── Layout utilities ───────────────────────────────────────── */
-
-.grid   { display: grid; gap: 18px; }
-.grid-2 { grid-template-columns: 1fr 1fr; }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.hero__cue:hover { background: none; text-decoration: underline; }
+.hero__arrow { display: inline-block; font-size: 1.25rem; animation: cue 1.6s var(--ease) infinite; }
+@keyframes cue { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .hero__arrow { animation: none; } }
+.hero__title { font: 600 var(--t-display)/0.98 var(--serif); letter-spacing: -0.02em; margin: 0; }
+.hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
+.hero__intro a { text-decoration-color: currentColor; }
+.hero__intro a:hover { background: rgba(255, 255, 255, .14); }
+.hero__art { background: var(--paper-2); }
 @media (max-width: 860px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; grid-template-rows: 1fr 30vh; }
 }
 
-.stack { display: grid; gap: 14px; }
-.cluster { display: flex; flex-wrap: wrap; gap: 10px; }
-
-
-/* ── Card surface ───────────────────────────────────────────── */
-
-.card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--stroke);
-  border-radius: var(--r);
-  padding: 20px;
-  box-shadow: var(--shadow-2);
-}
-.card--tight  { padding: 14px; }
-.card--violet { border-color: rgba(110,92,197,.28); background: rgba(110,92,197,.06); }
-.card--emerald{ border-color: rgba(53,191,120,.24); background: rgba(53,191,120,.05); }
-
-
-/* ── Sources / footer ───────────────────────────────────────── */
-
-.trip-sources {
-  max-width: var(--prose);
-}
-
-.trip-small {
-  font-family: var(--font-mono);
-  font-size: var(--text-small);
-  color: rgba(215,232,233,.38);
-  letter-spacing: .03em;
-  line-height: 1.6;
-}
-
-
-/* ── Observable Framework overrides ─────────────────────────── */
-/*   Suppress Framework's default heading/body styles so ours win. */
-
-.observablehq h1,
-.observablehq h2,
-.observablehq h3 {
-  font-family: var(--font-display) !important;
-}
-
-.observablehq p {
-  font-family: var(--font-body) !important;
-  max-width: none;
-}
-
-/* Hide Observable's default header bar */
-#observablehq-header { display: none; }
-
-
-/* ================================================================
-   PAGE STRUCTURE — index.md layout classes
-   These match the actual HTML in index.md. The .trip-* classes
-   above are design system primitives; these are the page layout.
-   ================================================================ */
-
-
-/* ── Hero ─────────────────────────────────────────────────────── */
-
-.hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 96vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: clamp(48px, 10vw, 120px) var(--gutter) clamp(60px, 8vw, 100px);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* Ensure text stack sits above the geometry block */
-.hero > *:not(.hero-geometry) {
-  position: relative;
-  z-index: 1;
-}
-
-
-/* ── Accurat-inspired color geometry ─────────────────────────
-   Two overlapping rectangles (violet / emerald) in the top-right
-   of the hero. Each half is 54% wide so they share a 4% bleed
-   at the centre — producing the additive teal blend from the
-   reference image. A hairline rule cuts across for detail.    */
-
-.hero-geometry {
-  position: absolute;
-  top: 4%;
-  right: -2%;
-  width: clamp(260px, 38vw, 540px);
-  height: 80%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.hg-violet {
-  position: absolute;
-  top: 0; left: 0;
-  width: 54%;
-  height: 100%;
-  background: rgba(110, 92, 197, 0.72);
-}
-
-.hg-emerald {
-  position: absolute;
-  top: 0; right: 0;
-  width: 54%;
-  height: 100%;
-  background: rgba(53, 191, 120, 0.65);
-}
-
-/* Horizontal rule across the geometry — Accurat detail */
-.hg-rule {
-  position: absolute;
-  top: 42%;
-  left: -6%;
-  width: 112%;
-  height: 1px;
-  background: rgba(15, 17, 22, 0.50);
-}
-
-
-/* ── Hero typography ──────────────────────────────────────── */
-
-.hero-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-kicker);
-  color: rgba(215,232,233,.38);
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  margin-bottom: 28px;
-}
-
-.hero-title {
-  font-family: var(--font-display);
-  /* Slightly smaller than the global hero scale */
-  font-size: clamp(2.6rem, 5.5vw, 5.2rem);
-  font-weight: 800;
-  letter-spacing: -0.034em;
-  line-height: 0.95;
-  margin: 0 0 18px;
-  /* Fog → emerald gradient */
-  background: linear-gradient(110deg,
-    var(--fog)     0%,
-    var(--fog)     52%,
-    var(--emerald) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-subtitle {
-  font-family: var(--font-body);
-  font-size: clamp(0.95rem, 1.5vw, 1.12rem);
-  color: rgba(215,232,233,.50);
-  margin: 0 0 18px;
-  line-height: 1.6;
-}
-
-/* Short intro paragraph — the human framing beneath the title line */
-.hero-intro {
-  font-family: var(--font-body);
-  font-size: clamp(0.88rem, 1.2vw, 1.0rem);
-  color: rgba(215,232,233,.38);
-  max-width: 52ch;
-  line-height: 1.72;
-  margin: 0 0 44px;
-}
-
-.hero-scroll-cue {
-  font-family: var(--font-mono);
-  font-size: 1.3rem;
-  color: rgba(215,232,233,.22);
-  display: inline-block;
-  animation: scrollPulse 2.4s ease-in-out infinite;
-}
-
-@keyframes scrollPulse {
-  0%, 100% { transform: translateY(0);   opacity: .22; }
-  50%       { transform: translateY(6px); opacity: .50; }
-}
-
-
-/* ── Act sections — 3-column grid ───────────────────────────── */
-/*   Center column holds narrative + charts.
-     Left/right columns hold aside annotations.
-     Charts span full width; prose stays in center.             */
-
+/* ── Article grid ─────────────────────────────────────────────────────────
+   Three columns: left note · main (text + every figure) · right note.
+   Scrollytelling step cards sit in the right column, like notes.          */
+.article { padding: 0 var(--gutter); }
 .act {
-  --aside-w: 200px;
-  --col-gap: clamp(24px, 3.5vw, 52px);
-
   display: grid;
-  grid-template-columns:
-    [full-start aside-l-start] var(--aside-w)
-    [aside-l-end body-start]   minmax(0, 760px)
-    [body-end aside-r-start]   var(--aside-w)
-    [aside-r-end full-end];
-  column-gap: var(--col-gap);
+  grid-template-columns: [left] minmax(140px, var(--w-note)) [main] minmax(0, var(--w-text)) [right] minmax(140px, var(--w-note));
+  column-gap: clamp(24px, 3vw, var(--w-gap));
   justify-content: center;
-
-  padding-top: var(--section-gap);
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
-  align-items: start;
+  padding: var(--s-10) 0 var(--s-8);
 }
-
-/* All children default to the center body column */
-.act > * {
-  grid-column: body-start / body-end;
-  min-width: 0;
+.act > * { grid-column: main; }
+.act + .act { border-top: 1px solid var(--rule); }
+.act__head { margin-bottom: var(--s-6); }
+.kicker {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  font: 600 var(--t-label)/1.2 var(--sans); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 var(--s-3);
 }
+.kicker::before { content: ""; width: 10px; height: 10px; background: var(--primary); }
+.act-title { font: 600 var(--t-h2)/1.1 var(--serif); letter-spacing: -0.01em; margin: 0; max-width: 28ch; text-wrap: balance; }
 
-/* Charts span the full 3-column width for maximum impact */
-.act > .chart-container {
-  grid-column: full-start / full-end;
+.prose p { margin: 0 0 1.1em; }
+.prose .lede { font-size: var(--t-lede); line-height: 1.45; }
+.prose strong { font-weight: 600; }
+.prose ul { margin: 0 0 1.1em; padding: 0; list-style: none; }
+.prose li { margin: 0 0 .6em; padding-left: var(--s-5); position: relative; }
+.prose li::before { content: ""; position: absolute; left: 0; top: .62em; width: 10px; height: 2px; background: var(--primary); }
+
+/* A row pairs a block of prose with an optional note on either side */
+.row { grid-column: left / -1; display: grid; grid-template-columns: subgrid; align-items: start; }
+.row > .prose { grid-column: main; grid-row: 1; }
+.note--left  { grid-column: left;  grid-row: 1; }
+.note--right { grid-column: right; grid-row: 1; }
+
+/* Margin note — supplementary; the prose never depends on it */
+.note { font: 400 var(--t-note)/1.55 var(--sans); color: var(--ink-2); border-top: 2px solid var(--ink); padding-top: var(--s-3); margin-top: .35em; }
+.note__label { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-2); }
+.note p { margin: 0; }
+
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* ── Scrollytelling ───────────────────────────────────────────────────────── */
+.scrolly { grid-column: left / -1; display: grid; grid-template-columns: subgrid; margin: var(--s-6) 0; }
+.scrolly__graphic {
+  grid-column: main; grid-row: 1;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
 }
-
-/* Typology grid also spans full width */
-.act > .typology-grid {
-  grid-column: full-start / full-end;
-}
-
-
-/* ── Act typography ────────────────────────────────────────── */
-
-.act-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-kicker);
-  color: rgba(215,232,233,.32);
-  letter-spacing: .20em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.act-kicker::after {
-  content: "";
-  flex: 1;
-  max-width: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(110,92,197,.45), transparent);
-}
-
-/* Section kicker — replaces act h2 titles.
-   DM Mono, small, muted. Appears just before body text.
-   Mirrors the "{B} WHAT WE DO" style from Accurat Tech. */
-.act-kicker {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: rgba(215,232,233,.32);
-  margin: 0 0 20px;
-}
-
-/* act-title kept in CSS but no longer used in HTML —
-   available if a section ever needs a proper h2 again. */
-.act-title {
-  font-family: var(--font-display);
-  font-size: var(--text-h2);
-  font-weight: 700;
-  color: var(--fog);
-  margin: 0 0 12px;
-  letter-spacing: -0.022em;
-}
-
-.act-body {
-  max-width: 64ch;
-}
-
-.act-body p {
-  font-size: 1.02rem;
-  line-height: 1.78;
-  color: rgba(215,232,233,.76);
-}
-
-.act-body--after-chart {
-  margin-top: clamp(36px, 5vw, 60px);
-}
-
-/* Figure label — monospace caption below each chart.
-   Styled like "FIG. 1" in the Accurat Tech reference.
-   Explicit .act > selector beats .act > * so grid-column sticks. */
-.act > .fig-label,
-.fig-label {
-  grid-column: full-start / full-end;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: .10em;
-  text-transform: uppercase;
-  color: rgba(215,232,233,.25);
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(215,232,233,.07);
-  display: flex;
-  gap: 20px;
-}
-.fig-label strong {
-  color: rgba(215,232,233,.45);
-  font-weight: 500;
-}
-
-
-/* ── Chart container ───────────────────────────────────────── */
-/*   Extends the scroll-reveal rule already defined above.
-     Adds height placeholder so act doesn't collapse.
-     Margins create breathing room before and after each chart. */
-
-.chart-container {
-  width: 100%;
-  min-height: 300px;
-  margin-top: clamp(44px, 6vw, 76px);
-  margin-bottom: 0;   /* fig-label follows immediately */
-  /* DEBUG PLACEHOLDER — remove background/border when charts render */
-  opacity: 1 !important;
-  transform: none !important;
-  background: rgba(110, 92, 197, 0.07);
-  border: 1px dashed rgba(110, 92, 197, 0.22);
-  border-radius: 6px;
-}
-
-.chart-act1 { min-height: 460px; }
-.chart-act2 { min-height: 560px; }
-.chart-act3 { min-height: 520px; }
-
-
-/* ── Aside notes ───────────────────────────────────────────── */
-/*   Historical + legal fact annotations in the sidebar columns.
-     Scroll normally with the page — stagger via margin-top offsets
-     on the modifier classes for visual dynamism.                 */
-
-.aside-note {
-  align-self: start;
-  padding: 16px 0;
-  border-top: 1px solid rgba(215,232,233,.10);
-}
-
-/* Three offset heights — applied via HTML classes to stagger notes */
-.aside-note--anchor-high { margin-top: 0;     }
-.aside-note--anchor-mid  { margin-top: 180px; }
-.aside-note--anchor-low  { margin-top: 360px; }
-
-.aside-note--left  {
-  grid-column: aside-l-start / aside-l-end;
-}
-.aside-note--right {
-  grid-column: aside-r-start / aside-r-end;
-}
-
-/* Placeholder image inside an aside note */
-.aside-note__img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  margin-bottom: 12px;
-  filter: grayscale(1) brightness(0.60);
-  border-radius: 4px;
-}
-
-.aside-note__label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--emerald);
-  margin: 0 0 8px;
-}
-
-.aside-note__text {
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  line-height: 1.64;
-  color: rgba(215,232,233,.42);
-  margin: 0;
-}
-
-.aside-note__text + .aside-note__text {
-  margin-top: 10px;
-}
-
-/* Hide sidebars on narrow viewports — they'd overlap content */
-@media (max-width: 900px) {
-  .act {
-    grid-template-columns: 1fr;
-  }
-  .act > * {
-    grid-column: 1;
-  }
-  .act > .chart-container,
-  .act > .typology-grid {
-    grid-column: 1;
-  }
-  .aside-note { display: none; }
-}
-
-
-/* ── Typology cards (Act III) ──────────────────────────────── */
-
-.typology-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(16px, 2.5vw, 28px);
-  margin-top: clamp(40px, 6vw, 64px);
-}
-
-@media (max-width: 780px) {
-  .typology-grid { grid-template-columns: 1fr; }
-}
-
-.typology-card {
-  background: rgba(255,255,255,.025);
-  border: 1px solid rgba(215,232,233,.09);
-  border-radius: var(--r);
-  padding: clamp(18px, 2.5vw, 28px);
-  transition: border-color 0.25s ease;
-}
-
-.typology-card:hover {
-  border-color: rgba(110,92,197,.30);
-}
-
-.typology-country {
-  font-family: var(--font-display);
-  font-size: 1.18rem;
-  font-weight: 700;
-  color: var(--fog);
-  margin-bottom: 4px;
-}
-
-.typology-label {
-  font-family: var(--font-mono);
-  font-size: 0.73rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--violet);
-  margin-bottom: 10px;
-}
-
-.typology-score {
-  font-family: var(--font-mono);
-  font-size: 0.80rem;
-  color: rgba(215,232,233,.38);
-  padding: 6px 0 14px;
-  border-bottom: 1px solid rgba(215,232,233,.08);
-  margin-bottom: 14px;
-}
-
-.typology-body {
-  font-size: 0.88rem;
-  line-height: 1.68;
-  color: rgba(215,232,233,.58);
-}
-
-
-/* ── Act IV flagship overrides ─────────────────────────────── */
-/*   The flagship section breaks out of the act grid.
-     Its scrollytelling layout is fully self-managed.            */
-
-.act--flagship {
-  display: block;
-  padding-left: 0;
-  padding-right: 0;
-  max-width: none;
-}
-
-.act--flagship .act-kicker,
-.act--flagship .act-title,
-.act--flagship .act-body--pre-flagship {
-  max-width: 760px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
-}
-
-.flagship-wrapper {
-  position: relative;
-}
-
-.flagship-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.flagship-steps {
-  position: relative;
-  z-index: 10;
-  pointer-events: none;
-  padding-bottom: 50vh;
-}
-
+.scrolly--wide .scrolly__graphic { grid-column: left / right; }
+.row--fig { margin: var(--s-7) 0; }
+.fig--main-right { grid-column: main / -1; grid-row: 1; }
+.row--fig > .note { margin-top: 0; }
+.carousel--full { grid-column: left / -1; }
+.scrolly__graphic--tall { height: auto; align-self: start; justify-content: flex-start; padding: var(--s-4) 0; }
+.scrolly__side { grid-column: left; grid-row: 1; position: sticky; top: var(--s-6); align-self: start; }
+.scrolly__steps { grid-column: right; grid-row: 1; padding: 50vh 0 45vh; position: relative; z-index: 2; }
 .step {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--gutter);
-  pointer-events: none;
+  background: var(--paper); border: 1px solid var(--ink);
+  padding: var(--s-3) var(--s-4); margin: 0 0 70vh;
+  font: 400 1rem/1.5 var(--serif);
+  opacity: .3; transition: opacity var(--dur-step) var(--ease);
+}
+.step:last-child { margin-bottom: 0; }
+.step.is-active { opacity: 1; }
+.step p { margin: 0; }
+.step strong { font-weight: 600; }
+
+/* ── Single column below 1080px: notes inline, step cards pass over the graphic */
+@media (max-width: 1080px) {
+  .act { grid-template-columns: [left main right] minmax(0, var(--w-text)); column-gap: 0; }
+  .row > *, .scrolly > * { grid-row: auto; }
+  .note { background: var(--paper-2); border-top: 0; border-left: 2px solid var(--ink); padding: var(--s-3) var(--s-4); margin: 0 0 var(--s-5); }
+  .scrolly__side { position: static; grid-row: 1; margin-bottom: var(--s-4); }
+  .scrolly__graphic, .scrolly__steps { grid-row: 2; }
+  .scrolly__graphic { justify-content: flex-start; padding-top: var(--s-4); }
+  .scrolly__steps { padding: 100vh var(--s-2) 40vh; pointer-events: none; }
+  .step { pointer-events: auto; margin-bottom: 85vh; opacity: .94; font-size: 1.0625rem; box-shadow: 4px 4px 0 rgba(17,17,17,.08); }
+  .step.is-active { opacity: 1; }
 }
 
-.step-text {
-  max-width: 38ch;
-  pointer-events: none;
+/* ── Figures ──────────────────────────────────────────────────────────────── */
+.fig { margin: 0; }
+.fig--static { margin: 0; }
+.fig__legend { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-2) var(--s-5); margin: 0 0 var(--s-4); font: 400 var(--t-label)/1.3 var(--sans); color: var(--ink-2); }
+.fig__plot { position: relative; }
+.fig svg { display: block; overflow: visible; font-family: var(--sans); }
+.fig__cap {
+  display: grid; grid-template-columns: auto 1fr; gap: 2px var(--s-3);
+  margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--rule);
+  font: 400 var(--t-note)/1.5 var(--sans); color: var(--ink-2); max-width: var(--w-text);
 }
+.fig__tag { font-weight: 600; color: var(--ink); }
+.fig__src { grid-column: 2; color: var(--ink-3); font-size: var(--t-label); }
 
-.step-text p {
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 2.0vw, 1.5rem);
-  font-weight: 600;
-  line-height: 1.4;
-  color: rgba(215,232,233,.0);
-  background: rgba(15,17,22,.78);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--stroke);
-  border-radius: var(--r);
-  padding: 22px 28px;
-  transition: color 0.4s ease;
+.key { display: inline-flex; align-items: center; gap: var(--s-2); }
+.key i { display: inline-block; flex: none; }
+.key--line i { width: 20px; height: 3px; }
+.key--band i { width: 16px; height: 12px; }
+.key--ring i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink-2); background: var(--paper); }
+.key--dot i { width: 10px; height: 10px; border-radius: 50%; }
+.key--hatch i { width: 16px; height: 12px; background: var(--nodata) repeating-linear-gradient(45deg, transparent 0 3px, var(--rule) 3px 4px); }
+
+.class-legend { width: min(100%, 300px); }
+.class-legend__title { font-size: var(--t-label); color: var(--ink-2); margin-bottom: var(--s-2); }
+.class-legend__row { display: flex; gap: 2px; }
+.class-legend__item { flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; font: 500 var(--t-tick)/1 var(--sans); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.class-legend__item i { width: 100%; height: 12px; display: block; }
+
+/* Fingerprint controls: legend + country search */
+.fingerprint__controls { display: flex; flex-direction: column; gap: var(--s-5); }
+.fingerprint__controls .fig__legend { margin: 0; }
+.search__label { display: block; font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s-2); }
+.search__input {
+  width: 100%; height: 44px; padding: 0 var(--s-3);
+  border: 1px solid var(--ink); border-radius: var(--radius-s); background: var(--paper);
+  font: 400 var(--t-note)/1 var(--sans); color: var(--ink);
 }
+.search__input::placeholder { color: var(--ink-3); }
+.search__input:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.search__result { margin: var(--s-2) 0 0; font: 400 var(--t-label)/1.5 var(--sans); color: var(--ink-2); min-height: 3em; font-variant-numeric: tabular-nums; }
+.search__result b { color: var(--ink); font-weight: 600; }
 
-.step.is-active .step-text p {
-  color: var(--fog);
+/* SVG parts */
+.grid-line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+.axis-line { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+.tick { fill: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.dlabel { fill: var(--ink); font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dlabel--strong { font-weight: 600; }
+.dlabel--muted { fill: var(--ink-3); font-weight: 400; }
+.group-label { fill: var(--ink-3); font-size: 12px; font-weight: 600; letter-spacing: .08em; }
+.halo { paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+
+/* Map */
+.map__plot { position: relative; }
+.fig svg.chart--map { overflow: hidden; touch-action: pan-y; cursor: grab; background: var(--paper); }
+.fig svg.chart--map:active { cursor: grabbing; }
+.nss { vector-effect: non-scaling-stroke; }
+.country { stroke: var(--paper); stroke-width: .6px; }
+.country.is-hover { stroke: var(--ink); stroke-width: 1.5px; }
+.micro { stroke: var(--ink); stroke-width: 1px; cursor: pointer; }
+.map__ctrl { position: absolute; top: var(--s-3); right: var(--s-3); display: flex; flex-direction: column; gap: var(--s-1); }
+.btn-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--ink); background: var(--paper); color: var(--ink);
+  display: grid; place-items: center; cursor: pointer; font: 400 1.125rem/1 var(--sans);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
+.btn-icon:hover { background: var(--ink); color: var(--paper); }
+.map__hint { margin: var(--s-2) 0 0; font: 400 var(--t-label)/1.4 var(--sans); color: var(--ink-3); }
 
+/* Annotation */
+.ann__dot { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.ann__leader { stroke: var(--ink); stroke-width: 1; }
+.ann__label { pointer-events: none; }
 
-/* ── Epilogue ───────────────────────────────────────────────── */
-
-.act--epilogue {
-  display: block;
-  max-width: 64ch;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
-  padding-top: var(--section-gap);
-  padding-bottom: clamp(100px, 18vw, 180px);
+/* Tooltip */
+.tt {
+  position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none; min-width: 150px;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-s);
+  padding: var(--s-2) var(--s-3); box-shadow: 4px 4px 0 rgba(17, 17, 17, .08);
+  font: 400 var(--t-label)/1.45 var(--sans); font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity var(--dur-instant) linear;
 }
+.tt.is-on { opacity: 1; }
+.tt__title { display: block; font-weight: 600; margin-bottom: 2px; }
+.tt__row { display: flex; justify-content: space-between; gap: var(--s-4); color: var(--ink-2); }
+.tt__row b { color: var(--ink); font-weight: 600; }
+.tt__row i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.tt__row i.ring { width: 9px; height: 9px; background: var(--paper); border: 2px solid var(--ink-2); }
 
-.act--epilogue .act-body p {
-  max-width: none;
+/* ── Typology carousel ────────────────────────────────────────────────────── */
+.carousel { margin-top: var(--s-7); }
+.carousel-viewport { overflow: hidden; }
+.carousel-track { display: flex; gap: var(--s-4); will-change: transform; }
+.typology-card {
+  flex: 0 0 min(360px, 85%);
+  background: var(--paper-2); padding: var(--s-5);
+  display: flex; flex-direction: column; gap: var(--s-2);
 }
+.typology-label { order: -1; font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.typology-country { font: 600 var(--t-h3)/1.15 var(--serif); }
+.typology-score { font: 600 var(--t-note)/1.3 var(--sans); font-variant-numeric: tabular-nums; padding-bottom: var(--s-2); border-bottom: 1px solid var(--rule); }
+.typology-body { margin: var(--s-2) 0 0; font: 400 var(--t-note)/1.55 var(--sans); color: var(--ink-2); }
+.carousel-controls { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-4); }
+.carousel-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: var(--paper);
+  display: grid; place-items: center; cursor: pointer; font: 400 1.25rem/1 var(--sans);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.carousel-btn:hover { background: var(--ink); color: var(--paper); }
+.carousel-dots { display: flex; }
+.carousel-dot { width: 24px; height: 44px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.carousel-dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--rule); transition: background-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+.carousel-dot.is-active::after { background: var(--ink); transform: scale(1.25); }
 
-.methodology-note {
-  margin-top: clamp(48px, 7vw, 80px);
-  padding-top: 28px;
-  border-top: 1px solid rgba(215,232,233,.10);
+/* ── Sources ──────────────────────────────────────────────────────────────── */
+.sources {
+  background: var(--paper-2); padding: var(--s-6); margin-top: var(--s-8);
+  font: 400 var(--t-note)/1.6 var(--sans); color: var(--ink-2); max-width: var(--w-text);
 }
+.sources__label { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-3); }
+.sources p { margin: 0; }
+.article-end { padding-bottom: var(--s-10); }
 
-.methodology-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-kicker);
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: rgba(215,232,233,.28);
-  margin-bottom: 12px;
-}
+/* ── Subheading inside a section ──────────────────────────────────────────── */
+.subhead { font: 600 var(--t-h3)/1.2 var(--serif); margin: var(--s-6) 0 var(--s-4); }
 
-.methodology-note p {
-  font-size: 0.84rem;
-  line-height: 1.68;
-  color: rgba(215,232,233,.38);
+/* ── "View the data" tables ───────────────────────────────────────────────── */
+.table-slot { margin: var(--s-4) 0 var(--s-6); }
+.data-table { font: 400 var(--t-label)/1.4 var(--sans); color: var(--ink-2); }
+.data-table summary {
+  cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; gap: var(--s-2);
+  font-weight: 600; color: var(--ink); list-style: none;
 }
+.data-table summary::-webkit-details-marker { display: none; }
+.data-table summary::before { content: "+"; display: inline-grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--ink); border-radius: 50%; font-weight: 400; }
+.data-table[open] summary::before { content: "−"; }
+.data-table__scroll { max-height: 420px; overflow: auto; border-top: 1px solid var(--ink); }
+.data-table table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.data-table th, .data-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.data-table th { position: sticky; top: 0; background: var(--paper); color: var(--ink); font-weight: 600; z-index: 1; }
+.data-table .num { text-align: right; }
+.data-table th button { all: unset; cursor: pointer; }
+.data-table th button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.data-table th[aria-sort="ascending"] button::after { content: " ↑"; }
+.data-table th[aria-sort="descending"] button::after { content: " ↓"; }
+.data-table__download { display: inline-block; margin-top: var(--s-3); }
+
+/* ── Credits ──────────────────────────────────────────────────────────────── */
+.credits { margin-top: var(--s-7); margin-bottom: var(--s-9); font: 400 var(--t-note)/1.6 var(--sans); color: var(--ink-2); }
+.credits p { margin: 0; }

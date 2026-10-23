@@ -1,299 +1,162 @@
-// lib/charts/flagship.js
-// ─────────────────────────────────────────────────────────────────────────────
-// ACT IV — The Divergence Fingerprint
+// lib/charts/flagship.js — ACT IV: the divergence fingerprint. Raw D3 only.
 //
-// The main event. All 173 countries × 22 years, colored by TRIP score.
-// Countries run top-to-bottom (y-axis), sorted by 2021 score descending.
-// Years run left-to-right (x-axis), 2000–2021.
-// Each cell is colored violet → emerald by score.
-//
-// Scroll is driven by Scrollama. Four steps annotate the image:
-//   Step 1: Highlight 2000 — the world was uniformly stuck.
-//   Step 2: Highlight 2000–2010 — a small group begins to separate.
-//   Step 3: Mark 2012 (Argentina) — the acceleration point.
-//   Step 4: Highlight bottom half — unchanged in 22 years.
-//
-// This file manages its own Scrollama instance. It does NOT use scroll.js.
-// It is built in raw D3 — no Observable Plot.
-//
-// Key D3 concepts:
-//   - d3.scaleBand() for both x (years) and y (countries)
-//   - d3.scaleSequential() for color encoding
-//   - Scrollama for step-triggered highlights
-//   - d3.select / .selectAll / .filter for targeting specific cells
-// ─────────────────────────────────────────────────────────────────────────────
+// 173 countries (rows, sorted by 2021 score) × 22 years (columns), each cell
+// coloured by TRIP score class. Returns the plot node with:
+//   node.step(i)   0 everything · 1 only 2000 · 2 2000–2011 · 3 the 2012 break · 4 the bottom quarter
+//   node.controls  legend + country search, for the page to place (aside column on desktop)
 
-import * as d3     from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import scrollama   from "https://cdn.jsdelivr.net/npm/scrollama@3/+esm";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import { tooltip, ttRow, pct } from "./tooltip.js";
+import { classLegend } from "./legend.js";
 
-// ── COUNTRY ANNOTATIONS ──────────────────────────────────────────────────────
-// Countries to label on the right edge of the fingerprint.
-// Sorted to match the visual from top (highest 2021 score) to bottom.
-const COUNTRY_LABELS = [
-  "ISL", "NOR", "ARG", "NLD", "MLT", "BEL", "DNK",
-  "PAK", "NPL", "IND",
-  "USA",
-  "BRA", "COL",
-  "AUT", "ZAF",
-  "NGA", "KEN", "UGA",
-  "IRN", "SAU",
-];
+const LABELS = ["URY", "PAK", "IND", "ARG", "USA", "AUT", "NPL", "IRN", "KEN", "UGA", "NGA"];
+const shortName = n => n === "United States of America" ? "United States" : n;
+const of13 = v => v == null ? "No data" : `${Math.round(v * 13)} of 13`;
 
-// Key event to annotate on the time axis
-const TIME_ANNOTATIONS = [
-  { year: 2012, label: "Argentina self-ID law", sublabel: "First in the world" },
-];
+export function flagship({ countries, years, cells }, { width = 640, rowHeight = 5, theme } = {}) {
+  const C = theme.colors;
+  const narrow = width < 560;
+  const m = { top: 30, right: narrow ? 88 : 110, bottom: 28, left: 0 };
+  const rh = rowHeight;
+  const innerH = rh * countries.length;
+  const height = Math.round(innerH + m.top + m.bottom);
 
-export function flagship({ countries, years, cells }, {
-  container = "#flagship-graphic",
-  steps     = ".flagship-steps .step",
-  theme,
-} = {}) {
+  const x = d3.scaleBand(years, [m.left, width - m.right]).paddingInner(0.12);
+  const rowOf = new Map(countries.map((c, i) => [c.iso3, i]));
+  const y = i => m.top + i * rh;
+  const scoreAt = new Map(cells.map(d => [`${d.iso3}|${d.year}`, d.score]));
+  const tt = tooltip();
 
-  // ── DIMENSIONS ─────────────────────────────────────────────────────────────
-  const containerEl = document.querySelector(container);
-  if (!containerEl) return;
-
-  const margin   = { top: 32, right: 160, bottom: 48, left: 16 };
-  const width    = containerEl.clientWidth;
-  const cellH    = Math.max(3, Math.floor((window.innerHeight * 0.75) / countries.length));
-  const height   = countries.length * cellH + margin.top + margin.bottom;
-  const innerW   = width - margin.left - margin.right;
-  const innerH   = countries.length * cellH;
-
-  // ── SCALES ─────────────────────────────────────────────────────────────────
-  const xScale = d3.scaleBand()
-    .domain(years)
-    .range([0, innerW])
-    .padding(0.05);
-
-  const yScale = d3.scaleBand()
-    .domain(countries.map(c => c.iso3))
-    .range([0, innerH])
-    .padding(0.02);
-
-  const colorScale = d3.scaleSequential()
-    .domain([0, 1])
-    .interpolator(d3.interpolateRgb(theme.colors.violet, theme.colors.emerald));
-
-  // p25 boundary: which country index sits at approximately the p25 boundary?
-  // We'll use this to draw the p25 line annotation in step 4.
-  const p25CountryIdx = Math.floor(countries.length * 0.75); // bottom 25%
-
-  // ── SVG ROOT ───────────────────────────────────────────────────────────────
   const svg = d3.create("svg")
-    .attr("width",   width)
-    .attr("height",  height)
-    .attr("class",   "chart chart--flagship")
-    .attr("viewBox", `0 0 ${width} ${height}`);
+    .attr("class", "chart chart--fingerprint")
+    .attr("width", width).attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", "Heatmap of 173 countries by 22 years. A small group at the top darkens after 2010. Most of the bottom quarter keeps the same score from 2000 to 2021.");
 
-  containerEl.appendChild(svg.node());
+  svg.append("rect").attr("x", m.left).attr("y", m.top).attr("width", width - m.left - m.right).attr("height", innerH).attr("fill", C.nodata);
+  svg.append("g").selectAll("rect").data(cells).join("rect")
+    .attr("x", d => x(d.year)).attr("y", d => y(rowOf.get(d.iso3)))
+    .attr("width", x.bandwidth()).attr("height", rh + 0.5)
+    .attr("fill", d => theme.scoreColor(d.score));
 
-  const g = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  // Column gaps in paper colour (the surface gap between fills)
+  svg.append("g").selectAll("rect").data(years.slice(1)).join("rect")
+    .attr("x", d => x(d) - x.step() * x.paddingInner()).attr("y", m.top - 1)
+    .attr("width", x.step() * x.paddingInner()).attr("height", innerH + 2).attr("fill", C.paper);
 
-  // ── CELLS ──────────────────────────────────────────────────────────────────
-  // Each cell is a rect colored by TRIP score.
-  // We give each cell a class with its year and country ISO for targeting.
-  const cellG = g.append("g").attr("class", "cells");
+  [years[0], 2005, 2010, 2015, years.at(-1)].forEach(yr =>
+    svg.append("text").attr("class", "tick").attr("x", x(yr) + x.bandwidth() / 2).attr("y", height - m.bottom + 18)
+      .attr("text-anchor", "middle").text(yr));
 
-  cellG.selectAll(".cell")
-    .data(cells)
-    .join("rect")
-    .attr("class",  d => `cell cell--${d.iso3} cell--y${d.year}`)
-    .attr("x",      d => xScale(d.year))
-    .attr("y",      d => yScale(d.iso3))
-    .attr("width",  xScale.bandwidth())
-    .attr("height", yScale.bandwidth())
-    .attr("fill",   d => colorScale(d.score))
-    .attr("rx",     0.5)
-    .append("title")
-      .text(d => `${d.name} ${d.year}: ${(d.score * 100).toFixed(0)}%`);
-
-  // ── X AXIS (years) ─────────────────────────────────────────────────────────
-  const xAxis = d3.axisBottom(xScale)
-    .tickValues([2000, 2005, 2010, 2015, 2021])
-    .tickFormat(d => d)
-    .tickSize(0);
-
-  g.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", `translate(0,${innerH + 8})`)
-    .call(xAxis)
-    .select(".domain").remove();
-
-  g.selectAll(".axis--x .tick text")
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "10px")
-    .style("font-family", theme.fonts.mono);
-
-  // ── TIME ANNOTATIONS ───────────────────────────────────────────────────────
-  TIME_ANNOTATIONS.forEach(ann => {
-    const x = xScale(ann.year) + xScale.bandwidth() / 2;
-
-    g.append("line")
-      .attr("class", "time-annotation-line")
-      .attr("x1", x).attr("x2", x)
-      .attr("y1", 0).attr("y2", innerH + 4)
-      .attr("stroke", theme.colors.coral)
-      .attr("stroke-width", 1)
-      .attr("stroke-dasharray", "3 3")
-      .attr("opacity", 0); // revealed in step 3
-
-    g.append("text")
-      .attr("class", "time-annotation-label")
-      .attr("x", x + 4)
-      .attr("y", -4)
-      .attr("fill", theme.colors.coral)
-      .style("font-size", "9px")
-      .style("font-family", theme.fonts.mono)
-      .attr("opacity", 0)
-      .text(ann.label);
+  const labels = svg.append("g").attr("transform", `translate(${width - m.right + 8},0)`);
+  countries.forEach((c, i) => {
+    if (!LABELS.includes(c.iso3)) return;
+    const g = labels.append("g").attr("class", "row-label").attr("data-iso", c.iso3)
+      .attr("transform", `translate(0,${y(i) + rh / 2})`);
+    g.append("line").attr("x1", -6).attr("x2", 0).attr("stroke", C.ink);
+    g.append("text").attr("class", "tick").attr("x", 4).attr("dy", "0.32em").text(shortName(c.name));
   });
 
-  // ── COUNTRY LABELS (right edge) ────────────────────────────────────────────
-  const labelCountries = countries.filter(c => COUNTRY_LABELS.includes(c.iso3));
+  // ── Story layers ───────────────────────────────────────────────────────────
+  const maskRight = svg.append("rect").attr("y", m.top - 1).attr("height", innerH + 2)
+    .attr("fill", C.paper).attr("opacity", 0).attr("pointer-events", "none");
+  const quarterRow = countries.length - Math.ceil(countries.length / 4);
+  const maskTop = svg.append("rect").attr("x", m.left).attr("y", m.top - 1).attr("width", width - m.left - m.right)
+    .attr("height", y(quarterRow) - m.top + 1).attr("fill", C.paper).attr("opacity", 0).attr("pointer-events", "none");
 
-  const labelsG = g.append("g")
-    .attr("class", "country-labels")
-    .attr("transform", `translate(${innerW + 6}, 0)`);
+  const x2012 = x(2012) + x.bandwidth() / 2;
+  const rule2012 = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  rule2012.append("line").attr("x1", x2012).attr("x2", x2012).attr("y1", m.top - 8).attr("y2", m.top + innerH)
+    .attr("stroke", C.accent).attr("stroke-width", 2.5);
+  rule2012.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", x2012 + 6).attr("y", m.top - 12)
+    .text("2012 · Argentina's self-ID law");
 
-  labelsG.selectAll(".country-label")
-    .data(labelCountries)
-    .join("g")
-    .attr("class", d => `country-label country-label--${d.iso3}`)
-    .attr("transform", d => `translate(0, ${yScale(d.iso3) + yScale.bandwidth() / 2})`)
-    .call(g => {
-      // Short leader tick
-      g.append("line")
-        .attr("x1", -4).attr("x2", 0)
-        .attr("y1", 0).attr("y2", 0)
-        .attr("stroke", theme.colors.muted)
-        .attr("stroke-width", 0.5);
+  const quarter = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  quarter.append("line").attr("x1", m.left).attr("x2", width - m.right).attr("y1", y(quarterRow)).attr("y2", y(quarterRow))
+    .attr("stroke", C.accent).attr("stroke-width", 2.5);
+  quarter.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", m.left + 4).attr("y", y(quarterRow) - 8)
+    .text(`Bottom quarter · ${countries.length - quarterRow} countries`);
 
-      // Country name
-      g.append("text")
-        .attr("x", 4).attr("dy", "0.35em")
-        .attr("fill", theme.colors.muted)
-        .style("font-size", "8.5px")
-        .style("font-family", theme.fonts.mono)
-        .text(d => d.name);
-    });
+  // ── Selected country (search) and hover outlines ───────────────────────────
+  const selected = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  const selRect = selected.append("rect").attr("x", m.left - 2).attr("width", width - m.right - m.left + 4).attr("height", rh + 4)
+    .attr("fill", "none").attr("stroke", C.ink).attr("stroke-width", 2);
+  const selLabel = selected.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", width - m.right + 12).attr("dy", "0.32em");
 
-  // ── HIGHLIGHT OVERLAYS ─────────────────────────────────────────────────────
-  // Semi-transparent overlays that dim everything EXCEPT the highlighted region.
-  // Shown/hidden by Scrollama step handlers below.
-
-  // Year-range highlight mask (used in steps 1 and 2)
-  const maskLeft = g.append("rect")
-    .attr("class", "highlight-mask mask--left")
-    .attr("x", 0).attr("y", 0)
-    .attr("height", innerH)
-    .attr("fill", theme.colors.ink)
-    .attr("opacity", 0)
-    .attr("pointer-events", "none");
-
-  const maskRight = g.append("rect")
-    .attr("class", "highlight-mask mask--right")
-    .attr("y", 0).attr("height", innerH)
-    .attr("fill", theme.colors.ink)
-    .attr("opacity", 0)
-    .attr("pointer-events", "none");
-
-  // Bottom-half mask (used in step 4 to highlight the bottom 25%)
-  const maskTop = g.append("rect")
-    .attr("class", "highlight-mask mask--top")
-    .attr("x", 0).attr("y", 0)
-    .attr("width", innerW)
-    .attr("fill", theme.colors.ink)
-    .attr("opacity", 0)
-    .attr("pointer-events", "none");
-
-  // p25 boundary line (step 4)
-  const p25Y = countries[p25CountryIdx]
-    ? yScale(countries[p25CountryIdx].iso3)
-    : innerH * 0.75;
-
-  const p25Line = g.append("line")
-    .attr("class", "p25-boundary")
-    .attr("x1", 0).attr("x2", innerW)
-    .attr("y1", p25Y).attr("y2", p25Y)
-    .attr("stroke", theme.colors.coral)
-    .attr("stroke-width", 1.5)
-    .attr("stroke-dasharray", "4 3")
-    .attr("opacity", 0);
-
-  // ── SCROLLAMA SETUP ────────────────────────────────────────────────────────
-  const scroller = scrollama();
-
-  scroller
-    .setup({
-      step:   steps,
-      offset: 0.6,   // trigger when step is 60% down the viewport
-      debug:  false,
+  const hover = svg.append("rect").attr("x", m.left - 1).attr("width", width - m.right - m.left + 2).attr("height", rh + 2)
+    .attr("fill", "none").attr("stroke", C.ink).attr("stroke-width", 1.5).attr("opacity", 0).attr("pointer-events", "none");
+  svg.append("rect").attr("x", m.left).attr("y", m.top).attr("width", width - m.left - m.right).attr("height", innerH)
+    .attr("fill", "transparent")
+    .on("pointermove", ev => {
+      const [px, py] = d3.pointer(ev);
+      const i = Math.max(0, Math.min(countries.length - 1, Math.floor((py - m.top) / rh)));
+      const yr = years[Math.max(0, Math.min(years.length - 1, Math.floor((px - m.left) / x.step())))];
+      const c = countries[i], v = scoreAt.get(`${c.iso3}|${yr}`);
+      hover.attr("y", y(i) - 1).attr("opacity", 1);
+      tt.show(`<span class="tt__title">${shortName(c.name)} · ${yr}</span>` +
+        ttRow("TRIP score", v == null ? "No data" : `${of13(v)} · ${pct(v)}`) +
+        ttRow("In 2021", `${of13(c.score2021)} · ${pct(c.score2021)}`), ev);
     })
-    .onStepEnter(({ index }) => handleStep(index + 1, "enter"))
-    .onStepExit(({ index, direction }) => {
-      if (direction === "up") handleStep(index, "exit");
-    });
+    .on("pointerleave", () => { hover.attr("opacity", 0); tt.hide(); });
 
-  // ── STEP HANDLERS ─────────────────────────────────────────────────────────
-  function handleStep(step, action) {
-    const DUR = 600; // transition duration in ms
-    const MASK_OPACITY = 0.72;
+  // ── Controls: legend + search ──────────────────────────────────────────────
+  const controls = document.createElement("div");
+  controls.className = "fingerprint__controls";
+  controls.appendChild(classLegend(theme, "TRIP score, out of 13 indicators"));
+  const listId = "fingerprint-countries";
+  const search = document.createElement("div");
+  search.className = "search";
+  search.innerHTML = `
+    <label class="search__label" for="fingerprint-search">Find a country</label>
+    <input class="search__input" id="fingerprint-search" type="search" list="${listId}" placeholder="e.g. Kenya" autocomplete="off">
+    <datalist id="${listId}">${countries.map(c => `<option value="${shortName(c.name)}"></option>`).join("")}</datalist>
+    <p class="search__result" aria-live="polite"></p>`;
+  controls.appendChild(search);
+  const input = search.querySelector("input"), result = search.querySelector(".search__result");
+  const byName = new Map(countries.map(c => [shortName(c.name).toLowerCase(), c]));
 
-    if (action === "exit") {
-      // Reset all highlights when scrolling back up
-      maskLeft.transition().duration(DUR).attr("opacity", 0);
-      maskRight.transition().duration(DUR).attr("opacity", 0);
-      maskTop.transition().duration(DUR).attr("opacity", 0);
-      p25Line.transition().duration(DUR).attr("opacity", 0);
-      g.selectAll(".time-annotation-line, .time-annotation-label")
-        .transition().duration(DUR).attr("opacity", 0);
+  const select = c => {
+    if (!c) {
+      selected.attr("opacity", 0);
+      labels.selectAll(".row-label").attr("opacity", 1);
+      result.textContent = "";
       return;
     }
+    const i = rowOf.get(c.iso3);
+    const s2000 = scoreAt.get(`${c.iso3}|${years[0]}`);
+    selRect.attr("y", y(i) - 2);
+    selLabel.attr("y", y(i) + rh / 2).text(shortName(c.name));
+    // Hide fixed labels that would collide with the selected one.
+    labels.selectAll(".row-label").attr("opacity", function () {
+      return Math.abs(rowOf.get(this.dataset.iso) - i) * rh < 14 ? 0 : 1;
+    });
+    selected.attr("opacity", 1);
+    result.innerHTML = `<b>${shortName(c.name)}</b> ranks ${i + 1} of ${countries.length} in 2021.<br>` +
+      `${years[0]}: ${of13(s2000)} · ${years.at(-1)}: ${of13(c.score2021)}`;
+  };
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    select(q ? byName.get(q) : null);
+    if (q && !byName.has(q)) result.textContent = "Pick a country from the list.";
+  });
 
-    if (step === 1) {
-      // Highlight only year 2000: dim everything after 2001
-      const x2000 = xScale(2000) + xScale.bandwidth();
-      maskLeft.attr("width", 0);
-      maskRight
-        .attr("x", x2000)
-        .attr("width", innerW - x2000)
-        .transition().duration(DUR).attr("opacity", MASK_OPACITY);
-      maskTop.transition().duration(DUR).attr("opacity", 0);
-    }
-
-    if (step === 2) {
-      // Highlight 2000–2010: dim everything after 2010
-      const x2010 = xScale(2010) + xScale.bandwidth() * 5;
-      maskLeft.attr("width", 0).attr("opacity", 0);
-      maskRight
-        .attr("x", x2010)
-        .attr("width", innerW - x2010)
-        .transition().duration(DUR).attr("opacity", MASK_OPACITY);
-      maskTop.transition().duration(DUR).attr("opacity", 0);
-    }
-
-    if (step === 3) {
-      // Show Argentina annotation at 2012, remove year mask
-      maskLeft.transition().duration(DUR).attr("opacity", 0);
-      maskRight.transition().duration(DUR).attr("opacity", 0);
-      maskTop.transition().duration(DUR).attr("opacity", 0);
-      g.selectAll(".time-annotation-line, .time-annotation-label")
-        .transition().duration(DUR).attr("opacity", 1);
-    }
-
-    if (step === 4) {
-      // Highlight bottom 25%: dim top 75%, show p25 line
-      maskLeft.transition().duration(DUR).attr("opacity", 0);
-      maskRight.transition().duration(DUR).attr("opacity", 0);
-      maskTop
-        .attr("height", p25Y)
-        .transition().duration(DUR).attr("opacity", MASK_OPACITY);
-      p25Line.transition().duration(DUR).attr("opacity", 1);
-      g.selectAll(".time-annotation-line, .time-annotation-label")
-        .transition().duration(DUR).attr("opacity", 0);
-    }
-  }
+  // ── Steps ──────────────────────────────────────────────────────────────────
+  const D = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600;
+  const end = yr => x(yr) + x.bandwidth() + 1;
+  let current = -1;
+  const node = svg.node();
+  node.step = i => {
+    if (i === current) return;
+    current = i;
+    const cut = i === 1 ? end(years[0]) : i === 2 ? end(2011) : null;
+    if (cut != null) maskRight.attr("x", cut).attr("width", width - m.right - cut);
+    maskRight.transition().duration(D).attr("opacity", cut != null ? 0.88 : 0);
+    maskTop.transition().duration(D).attr("opacity", i === 4 ? 0.88 : 0);
+    rule2012.transition().duration(D).attr("opacity", i === 3 ? 1 : 0);
+    quarter.transition().duration(D).attr("opacity", i === 4 ? 1 : 0);
+  };
+  node.controls = controls;
+  node.step(0);
+  return node;
 }
