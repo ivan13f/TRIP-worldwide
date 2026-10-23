@@ -1,276 +1,222 @@
-// lib/charts/choropleth.js
-// ─────────────────────────────────────────────────────────────────────────────
-// ACT II — The Map That Isn't There
+// lib/charts/choropleth.js — ACT II: the map, zoomable and scroll-driven.
 //
-// Annotated world map colored by TRIP score (2021).
-// Projection: Equal-Earth — preserves relative land area without distortion.
-// Annotations: ~10 countries with editorial leader lines and labels.
-//
-// Key D3 concepts:
-//   - d3.geoEqualEarth() → the map projection (math that converts lat/lon → px)
-//   - d3.geoPath() → converts GeoJSON features to SVG path strings
-//   - TopoJSON → compact geographic format; geo.js converts it to GeoJSON
-//   - d3.scaleSequential() + d3.interpolate → maps 0–1 score to color
-//
-// Geo data is loaded in index.md via FileAttachment and passed via geo.js.
-// ─────────────────────────────────────────────────────────────────────────────
+// Returns a wrapper node (legend + map + zoom controls) with node.step(i):
+// each step flies the map to a region and pins that region's annotations.
+// Readers can also zoom freely: buttons, double-click, pinch, or ⌘/Ctrl + scroll.
+// Plain scrolling always scrolls the article, never the map.
 
-import * as d3     from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import { loadGeo } from "../geo.js";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import { parseGeo } from "../geo.js";
+import { tooltip, ttRow, pct } from "./tooltip.js";
+import { classLegend } from "./legend.js";
 
-// ── EDITORIAL ANNOTATIONS ────────────────────────────────────────────────────
-// These are the 10 countries that get leader-line annotations on the map.
-// Coordinates are [longitude, latitude] in degrees (geographic, not pixel).
-// The label and sublabel are editorial copy — adjust tone in writing phase.
+// Countries too small to exist in the 110m map: drawn as fixed-size dots.
+const MICRO = {
+  BHR: [50.55, 26.07], BRB: [-59.54, 13.19], COM: [43.87, -11.88], CPV: [-23.6, 15.1],
+  MDV: [73.5, 3.2], MLT: [14.45, 35.9], MUS: [57.55, -20.25], SGP: [103.82, 1.35],
+  STP: [6.6, 0.25], SYC: [55.45, -4.68],
+};
 
-const ANNOTATIONS = [
-  {
-    iso3:     "ARG",
-    label:    "Argentina",
-    sublabel: "First self-ID law, 2012",
-    coords:   [-64, -34],
-    anchor:   "end",
-    offset:   [-10, 0],
-  },
-  {
-    iso3:     "PAK",
-    label:    "Pakistan",
-    sublabel: "84% TRIP · 0% LGB",
-    coords:   [70, 30],
-    anchor:   "start",
-    offset:   [10, 0],
-  },
-  {
-    iso3:     "USA",
-    label:    "United States",
-    sublabel: "No national gender recognition law",
-    coords:   [-100, 38],
-    anchor:   "middle",
-    offset:   [0, -16],
-  },
-  {
-    iso3:     "IRN",
-    label:    "Iran",
-    sublabel: "State-funded surgery since 1987",
-    coords:   [53, 32],
-    anchor:   "start",
-    offset:   [10, -8],
-  },
-  {
-    iso3:     "NOR",
-    label:    "Norway",
-    sublabel: "Expected leader",
-    coords:   [15, 65],
-    anchor:   "start",
-    offset:   [8, 0],
-  },
-  {
-    iso3:     "NGA",
-    label:    "Nigeria",
-    sublabel: "Colonial law, 1860",
-    coords:   [8, 9],
-    anchor:   "start",
-    offset:   [10, 4],
-  },
-  {
-    iso3:     "IND",
-    label:    "India",
-    sublabel: "Recognition, not protection",
-    coords:   [78, 22],
-    anchor:   "end",
-    offset:   [-10, 8],
-  },
-  {
-    iso3:     "AUT",
-    label:    "Austria",
-    sublabel: "82% LGB · 23% TRIP",
-    coords:   [14, 47],
-    anchor:   "middle",
-    offset:   [0, -14],
-  },
-  {
-    iso3:     "NPL",
-    label:    "Nepal",
-    sublabel: "Third gender since 2007",
-    coords:   [84, 28],
-    anchor:   "start",
-    offset:   [8, -8],
-  },
-  {
-    iso3:     "UGA",
-    label:    "Uganda",
-    sublabel: "Worsening after 2021",
-    coords:   [32, 1],
-    anchor:   "start",
-    offset:   [8, 4],
-  },
+// Label anchor points (lon, lat) for annotated countries.
+const AT = {
+  URY: [-56, -32.8], ARG: [-65, -35], BRA: [-50, -10],
+  PAK: [69.5, 29.5], IND: [78.5, 22], NPL: [84, 28.3], BGD: [90.3, 23.8],
+  MLT: MICRO.MLT, BEL: [4.6, 50.6], AUT: [14.5, 47.5], HUN: [19.4, 47.1],
+  NGA: [8, 9.5], UGA: [32.4, 1.3], KEN: [37.9, 0.3], ZAF: [24.5, -29.5], BWA: [24, -22.3],
+};
+
+// One entry per scroll step. bounds: [[west, south], [east, north]].
+export const MAP_STEPS = [
+  { bounds: null, notes: [] },
+  { bounds: [[-92, -56], [-30, 14]], notes: [
+    { iso3: "URY", note: "Highest score in 2021",          dx: 1,  dy: 0 },
+    { iso3: "ARG", note: "First self-ID law, 2012",          dx: -1, dy: 0 },
+    { iso3: "BRA", note: "Gender marker change since 2018",  dx: 1,  dy: 0 },
+  ]},
+  { bounds: [[60, 6], [96, 37]], notes: [
+    { iso3: "PAK", note: "Third gender recognized since 2009", dx: -1, dy: 0 },
+    { iso3: "IND", note: "Protections, but medical requirements", dx: -1, dy: 1 },
+    { iso3: "NPL", note: "Third gender marker since 2012",     dx: 1,  dy: -1 },
+    { iso3: "BGD", note: "Third gender marker since 2014",     dx: 1,  dy: 1 },
+  ]},
+  { bounds: [[-10, 34], [30, 58]], notes: [
+    { iso3: "MLT", note: "Protection in the constitution",     dx: 1,  dy: 0 },
+    { iso3: "BEL", note: "Among Europe's highest",             dx: -1, dy: 0 },
+    { iso3: "AUT", note: "Strong LGB rights, weak trans rights", dx: -1, dy: 1 },
+    { iso3: "HUN", note: "No legal gender change in 2021",     dx: 1,  dy: -1 },
+  ]},
+  { bounds: [[-18, -35], [50, 22]], notes: [
+    { iso3: "NGA", note: "Direct criminalization",             dx: -1, dy: 0 },
+    { iso3: "UGA", note: "Colonial-era penal code",            dx: -1, dy: -1 },
+    { iso3: "KEN", note: "Colonial-era penal code",            dx: 1,  dy: 0 },
+    { iso3: "ZAF", note: "Gender marker change since 2003",    dx: 1,  dy: 0 },
+  ]},
+  { bounds: null, notes: [] },
 ];
 
-export async function choropleth(data, { width = 960, theme } = {}) {
-
-  // ── GEO DATA ───────────────────────────────────────────────────────────────
-  // loadGeo() fetches world-110m.json and converts TopoJSON → GeoJSON.
-  // Returns: { countries: GeoJSON FeatureCollection, graticule: GeoJSON }
-  const geo = await loadGeo();
-
-  // Build a lookup: ISO3 code → TRIP score
-  const scoreByIso = new Map(data.map(d => [d.iso3, d.score]));
-
-  // ── DIMENSIONS ─────────────────────────────────────────────────────────────
-  const height = Math.round(width * 0.5);
-
-  // ── PROJECTION ─────────────────────────────────────────────────────────────
-  // Equal-Earth projection preserves area. .fitSize() scales and centers it
-  // to fill the given [width, height] for the world GeoJSON.
-  const projection = d3.geoEqualEarth()
-    .fitSize([width, height], geo.countries);
-
-  // geoPath converts GeoJSON feature → SVG path string, using the projection.
-  const path = d3.geoPath(projection);
-
-  // ── COLOR SCALE ────────────────────────────────────────────────────────────
-  // Maps 0–1 (TRIP percent) to a color between violet and emerald.
-  // d3.interpolateRgb() smoothly interpolates between two hex colors.
-  const colorScale = d3.scaleSequential()
-    .domain([0, 1])
-    .interpolator(d3.interpolateRgb(theme.colors.violet, theme.colors.emerald));
-
-  // ── SVG ROOT ───────────────────────────────────────────────────────────────
-  const svg = d3.create("svg")
-    .attr("width",   width)
-    .attr("height",  height)
-    .attr("class",   "chart chart--choropleth")
-    .attr("viewBox", `0 0 ${width} ${height}`);
-
-  // ── GRATICULE (background grid lines) ──────────────────────────────────────
-  svg.append("path")
-    .datum(d3.geoGraticule()())
-    .attr("class", "graticule")
-    .attr("fill",         "none")
-    .attr("stroke",       theme.colors.muted)
-    .attr("stroke-width", 0.3)
-    .attr("stroke-opacity", 0.4)
-    .attr("d", path);
-
-  // ── COUNTRIES ──────────────────────────────────────────────────────────────
-  // geo.countries.features is an array of GeoJSON features (one per country).
-  // For each, we look up the TRIP score and fill with the color scale.
-  svg.selectAll(".country")
-    .data(geo.countries.features)
-    .join("path")
-    .attr("class", d => `country country--${d.properties.iso3 ?? "unknown"}`)
-    .attr("fill", d => {
-      const score = scoreByIso.get(d.properties.iso3);
-      return score != null
-        ? colorScale(score)
-        : theme.colors.muted + "40"; // no-data countries: muted + transparency
-    })
-    .attr("stroke",       theme.colors.ink)
-    .attr("stroke-width", 0.4)
-    .attr("d", path)
-    .append("title")
-      .text(d => {
-        const score = scoreByIso.get(d.properties.iso3);
-        return score != null
-          ? `${d.properties.name}: ${(score * 100).toFixed(1)}%`
-          : `${d.properties.name}: no data`;
-      });
-
-  // ── ANNOTATIONS ────────────────────────────────────────────────────────────
-  // For each annotation, project the geographic coordinates to pixel position,
-  // then draw a leader line from the country centroid to the label.
-
-  const annotationG = svg.append("g").attr("class", "annotations");
-
-  ANNOTATIONS.forEach(ann => {
-    // Project lat/lon to pixel x, y
-    const [px, py] = projection(ann.coords);
-    if (!px || !py) return; // skip if projection fails
-
-    const labelX = px + ann.offset[0];
-    const labelY = py + ann.offset[1];
-
-    // Leader line: short line from country point to label
-    annotationG.append("line")
-      .attr("class", "annotation-line")
-      .attr("x1", px).attr("y1", py)
-      .attr("x2", labelX).attr("y2", labelY)
-      .attr("stroke",       theme.colors.muted)
-      .attr("stroke-width", 0.8)
-      .attr("opacity",      0.7);
-
-    // Dot at country location
-    annotationG.append("circle")
-      .attr("cx", px).attr("cy", py).attr("r", 2.5)
-      .attr("fill", theme.colors.fog)
-      .attr("opacity", 0.9);
-
-    // Label text
-    const labelG = annotationG.append("g")
-      .attr("transform", `translate(${labelX},${labelY})`);
-
-    labelG.append("text")
-      .attr("class", "annotation-label")
-      .attr("text-anchor", ann.anchor)
-      .attr("dy", "-0.15em")
-      .attr("fill", theme.colors.fog)
-      .style("font-size", "10px")
-      .style("font-family", theme.fonts.mono)
-      .style("font-weight", "600")
-      .text(ann.label);
-
-    labelG.append("text")
-      .attr("class", "annotation-sublabel")
-      .attr("text-anchor", ann.anchor)
-      .attr("dy", "0.85em")
-      .attr("fill", theme.colors.muted)
-      .style("font-size", "8.5px")
-      .style("font-family", theme.fonts.mono)
-      .text(ann.sublabel);
+export function choropleth(data, { width = 960, height, theme, topoJson } = {}) {
+  const C = theme.colors;
+  const geo = parseGeo(topoJson);
+  geo.countries.features.forEach(f => {
+    if (!f.properties.iso3 && f.properties.name === "Kosovo") f.properties.iso3 = "XKX";
   });
+  geo.countries.features = geo.countries.features.filter(f => f.properties.iso3 !== "ATA");
+  const byIso = new Map(data.map(d => [d.iso3, d]));
+  height ??= Math.round(width * 0.5);
+  const compact = width < 600;
 
-  // ── COLOR LEGEND ───────────────────────────────────────────────────────────
-  // Small horizontal gradient legend at the bottom-left.
-  const legendW = 120, legendH = 8;
-  const legendX = 24, legendY = height - 32;
+  const proj = d3.geoEqualEarth().fitExtent([[2, 2], [width - 2, height - 2]], { type: "Sphere" });
+  const path = d3.geoPath(proj);
+  const fill = d => theme.scoreColor(d?.score) ?? "url(#map-hatch)";
+  const tt = tooltip();
+  const showCountry = (ev, iso3, fallbackName) => {
+    const d = byIso.get(iso3);
+    tt.show(`<span class="tt__title">${d?.name ?? fallbackName ?? "Unknown"}</span>` +
+      ttRow("TRIP score 2021", pct(d?.score)) +
+      (d ? ttRow("Indicators", `${Math.round(d.score * 13)} of 13`) : ""), ev);
+  };
 
-  const defs = svg.append("defs");
-  const gradId = "trip-score-gradient";
+  // ── DOM ────────────────────────────────────────────────────────────────────
+  const wrap = document.createElement("div");
+  wrap.className = "map";
+  wrap.appendChild(classLegend(theme, "TRIP score 2021, out of 13 indicators", { noData: true }));
+  const plot = wrap.appendChild(document.createElement("div"));
+  plot.className = "map__plot";
 
-  const grad = defs.append("linearGradient")
-    .attr("id", gradId)
-    .attr("x1", "0%").attr("x2", "100%");
+  const svg = d3.select(plot).append("svg")
+    .attr("class", "chart chart--map")
+    .attr("width", width).attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", "World map of 2021 TRIP scores. Uruguay scores highest at 12 of 13. Most of Africa, the Middle East and Central Asia score 0 to 2.");
 
-  grad.append("stop").attr("offset", "0%").attr("stop-color", theme.colors.violet);
-  grad.append("stop").attr("offset", "100%").attr("stop-color", theme.colors.emerald);
+  const pat = svg.append("defs").append("pattern").attr("id", "map-hatch")
+    .attr("width", 5).attr("height", 5).attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
+  pat.append("rect").attr("width", 5).attr("height", 5).attr("fill", C.nodata);
+  pat.append("line").attr("y2", 5).attr("stroke", C.rule).attr("stroke-width", 1.5);
 
-  svg.append("rect")
-    .attr("x", legendX).attr("y", legendY)
-    .attr("width", legendW).attr("height", legendH)
-    .attr("rx", 2)
-    .attr("fill", `url(#${gradId})`);
+  const mapG = svg.append("g");
+  mapG.append("path").datum({ type: "Sphere" }).attr("d", path)
+    .attr("fill", "none").attr("stroke", C.rule).attr("class", "nss");
 
-  svg.append("text")
-    .attr("x", legendX).attr("y", legendY - 4)
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "8px")
-    .style("font-family", theme.fonts.mono)
-    .text("TRIP score 2021");
+  mapG.append("g").selectAll("path").data(geo.countries.features).join("path")
+    .attr("class", "country nss")
+    .attr("d", path)
+    .attr("fill", f => fill(byIso.get(f.properties.iso3)))
+    .on("pointermove pointerdown", function (ev, f) {
+      d3.select(this).classed("is-hover", true).raise();
+      showCountry(ev, f.properties.iso3, f.properties.name);
+    })
+    .on("pointerleave", function () { d3.select(this).classed("is-hover", false); tt.hide(); });
 
-  svg.append("text")
-    .attr("x", legendX).attr("y", legendY + legendH + 10)
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "8px")
-    .style("font-family", theme.fonts.mono)
-    .text("0%");
+  // Overlays live in screen space so dots and labels keep their size when zoomed.
+  const overlay = svg.append("g");
+  const micro = overlay.append("g").selectAll("circle")
+    .data(Object.entries(MICRO).filter(([iso3]) => byIso.has(iso3)))
+    .join("circle")
+    .attr("class", "micro")
+    .attr("r", 4.5)
+    .attr("fill", ([iso3]) => fill(byIso.get(iso3)))
+    .on("pointermove pointerdown", (ev, [iso3]) => showCountry(ev, iso3))
+    .on("pointerleave", () => tt.hide());
 
-  svg.append("text")
-    .attr("x", legendX + legendW).attr("y", legendY + legendH + 10)
-    .attr("text-anchor", "end")
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "8px")
-    .style("font-family", theme.fonts.mono)
-    .text("100%");
+  const annG = overlay.append("g");
+  let annotations = [];
 
-  return svg.node();
+  // ── Zoom ───────────────────────────────────────────────────────────────────
+  let t = d3.zoomIdentity;
+  const place = () => {
+    micro.attr("transform", ([, ll]) => `translate(${t.apply(proj(ll))})`);
+    annotations.forEach(a => {
+      const [px, py] = t.apply(proj(AT[a.iso3]));
+      a.g.attr("transform", `translate(${px},${py})`);
+      // Flip the label to the other side when it would run off the frame.
+      let s = a.side;
+      if (s > 0 && px + 30 + a.w > width - 4) s = -1;
+      else if (s < 0 && px - 30 - a.w < 4) s = 1;
+      a.layout(s);
+    });
+  };
+  const zoom = d3.zoom()
+    .scaleExtent([1, 14])
+    .translateExtent([[0, 0], [width, height]])
+    .filter(ev => {
+      if (ev.type === "wheel") return ev.ctrlKey || ev.metaKey;
+      if (ev.type.startsWith("touch")) return ev.touches.length > 1;
+      return !ev.button;
+    })
+    .on("zoom", ev => { t = ev.transform; mapG.attr("transform", t); place(); });
+  svg.call(zoom);
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fly = (target, ms = 1200) => svg.transition().duration(reduced ? 0 : ms).ease(d3.easeCubicInOut).call(zoom.transform, target);
+
+  const fit = bounds => {
+    if (!bounds) return d3.zoomIdentity;
+    const [[w, s], [e, n]] = bounds, pts = [];
+    for (let i = 0; i <= 4; i++) for (let j = 0; j <= 4; j++) pts.push(proj([w + (e - w) * i / 4, s + (n - s) * j / 4]));
+    const [x0, x1] = d3.extent(pts, p => p[0]), [y0, y1] = d3.extent(pts, p => p[1]);
+    const k = Math.min(14, 0.88 / Math.max((x1 - x0) / width, (y1 - y0) / height));
+    return d3.zoomIdentity.translate(width / 2 - k * (x0 + x1) / 2, height / 2 - k * (y0 + y1) / 2).scale(k);
+  };
+
+  // ── Controls ───────────────────────────────────────────────────────────────
+  const ctrl = plot.appendChild(document.createElement("div"));
+  ctrl.className = "map__ctrl";
+  ctrl.innerHTML = `
+    <button type="button" class="btn-icon" data-z="in" aria-label="Zoom in">+</button>
+    <button type="button" class="btn-icon" data-z="out" aria-label="Zoom out">−</button>
+    <button type="button" class="btn-icon" data-z="reset" aria-label="Show the whole world">⤢</button>`;
+  ctrl.addEventListener("click", e => {
+    const z = e.target.closest("button")?.dataset.z;
+    if (z === "in") svg.transition().duration(reduced ? 0 : 300).call(zoom.scaleBy, 1.8);
+    if (z === "out") svg.transition().duration(reduced ? 0 : 300).call(zoom.scaleBy, 1 / 1.8);
+    if (z === "reset") fly(d3.zoomIdentity, 600);
+  });
+  const hint = plot.appendChild(document.createElement("p"));
+  hint.className = "map__hint";
+  hint.textContent = matchMedia("(pointer: coarse)").matches
+    ? "Pinch with two fingers to zoom · tap a country for its score"
+    : "Drag to pan · ⌘/Ctrl + scroll or the buttons to zoom · hover for scores";
+
+  // ── Annotations for a step ─────────────────────────────────────────────────
+  const drawNotes = notes => {
+    annG.selectAll("*").remove();
+    annotations = notes.filter(n => byIso.has(n.iso3)).map(n => {
+      const d = byIso.get(n.iso3), ly = 18 * (n.dy ?? 0);
+      const g = annG.append("g").attr("class", "ann is-pinned");
+      const leader = g.append("line").attr("class", "ann__leader");
+      g.append("circle").attr("class", "ann__dot").attr("r", 4);
+      const label = g.append("g").attr("class", "ann__label");
+      const name = d.name === "United States of America" ? "United States" : d.name;
+      const n13 = Math.round(d.score * 13);
+      const t1 = label.append("text").attr("class", "dlabel dlabel--strong halo")
+        .attr("y", compact ? ly : ly - 3).attr("dy", compact ? "0.32em" : null)
+        .text(compact ? `${name} ${n13}/13` : `${name} · ${n13} of 13`);
+      const t2 = label.append("text").attr("class", "dlabel dlabel--muted halo").attr("y", ly + 13).text(compact ? "" : n.note);
+      const w = Math.max(t1.node().getComputedTextLength(), t2.node().getComputedTextLength());
+      const layout = s => {
+        const lx = 26 * s;
+        leader.attr("x1", 5 * s).attr("y1", ly * 0.25).attr("x2", lx - 3 * s).attr("y2", ly);
+        label.attr("text-anchor", s < 0 ? "end" : "start");
+        t1.attr("x", lx); t2.attr("x", lx);
+      };
+      return { iso3: n.iso3, g, w, side: n.dx < 0 ? -1 : 1, layout };
+    });
+    place();
+  };
+
+  let current = -1;
+  wrap.step = i => {
+    if (i === current) return;
+    current = i;
+    const s = MAP_STEPS[Math.max(0, Math.min(MAP_STEPS.length - 1, i))];
+    annG.transition().duration(reduced ? 0 : 200).attr("opacity", 0).end().catch(() => {}).then(() => {
+      drawNotes(s.notes);
+      annG.transition().delay(reduced ? 0 : 900).duration(reduced ? 0 : 300).attr("opacity", 1);
+    });
+    fly(fit(s.bounds));
+  };
+  place();
+  return wrap;
 }

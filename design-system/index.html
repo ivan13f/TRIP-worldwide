@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uneven Ground · Design System</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3'><rect width='5' height='3' fill='%235BCEFA'/><rect y='.6' width='5' height='1.8' fill='%23F5A9B8'/><rect y='1.2' width='5' height='.6' fill='%23FFFFFF'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOKENS — the whole system. Everything below this block consumes these.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Neutrals */
+  --paper:    #FFFFFF;   /* page + chart surface */
+  --paper-2:  #F5F4EF;   /* notes, cards, graphic slot */
+  --rule:     #D9D9D3;   /* hairlines, gridlines */
+  --nodata:   #ECECE7;   /* missing data fill (+ hatch) */
+  --ink:      #111111;   /* primary text, annotation dots */
+  --ink-2:    #3D3D3A;   /* secondary text, "2000" ring */
+  --ink-3:    #6B6B66;   /* captions, ticks, kickers (5.4:1) */
+
+  /* Score — one hue, light → dark. The TRIP signature. */
+  --score-50:  #E7F0FF;  /* UI tint only, never data */
+  --score-100: #92B4FF;  /* 0%   */
+  --score-200: #719BFF;
+  --score-300: #4E7CFE;
+  --score-400: #325EF5;
+  --score-500: #1D40E7;  /* series colour: mean, gain, brand */
+  --score-600: #1125C3;  /* links */
+  --score-700: #0A1891;  /* 100% */
+
+  /* Accent — reserved for the finding: the bottom quarter, loss, the 2012 break */
+  --accent:    #FF4E00;
+
+  /* Type */
+  --serif: "Besley", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --t-display: clamp(3rem, 7vw, 5.5rem);    /* 88 */
+  --t-h2:      clamp(2rem, 4vw, 2.75rem);   /* 44 */
+  --t-h3:      1.625rem;                    /* 26 */
+  --t-lede:    clamp(1.25rem, 2vw, 1.5rem); /* 24 */
+  --t-body:    1.25rem;                     /* 20 */
+  --t-note:    0.9375rem;                   /* 15 */
+  --t-label:   0.8125rem;                   /* 13 */
+  --t-tick:    0.75rem;                     /* 12 */
+  --t-figure:  clamp(3rem, 6vw, 4.5rem);    /* hero number */
+
+  /* Space — 4pt base */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 144px;
+
+  /* Layout */
+  --w-text: 640px;   /* ~64ch of body serif */
+  --w-note: 220px;
+  --w-gap:  56px;    /* text ↔ margin note */
+  --w-wide: 1080px;
+  --gutter: clamp(16px, 4vw, 48px);
+
+  /* Shape */
+  --radius-s: 4px;   /* data ends, tooltip */
+  --radius-pill: 999px;
+
+  /* Motion */
+  --dur-instant: 100ms;  /* tooltip */
+  --dur-fast:    150ms;  /* hover */
+  --dur-step:    600ms;  /* scrolly step */
+  --dur-reveal:  900ms;  /* chart / note reveal */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-instant: 0ms; --dur-fast: 0ms; --dur-step: 0ms; --dur-reveal: 0ms; }
+}
+
+/* ═══ Base ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--t-body)/1.6 var(--serif);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration-line: underline; text-decoration-color: var(--score-500);
+    text-decoration-thickness: 1.5px; text-underline-offset: 3px;
+    transition: background-color var(--dur-fast) var(--ease); }
+a:hover { background: var(--score-50); }
+:focus-visible { outline: 2px solid var(--score-500); outline-offset: 2px; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.8125rem; }
+.num  { font-variant-numeric: tabular-nums; }
+
+/* ═══ Doc chrome (this page only, not part of the article) ═══════════════ */
+.doc-bar { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4);
+  padding: var(--s-4) var(--gutter); border-bottom: 1px solid var(--ink);
+  font: 500 var(--t-note)/1.3 var(--sans); position: sticky; top: 0; background: var(--paper); z-index: 50; }
+.doc-bar nav { display: flex; gap: var(--s-5); flex-wrap: wrap; }
+.doc-bar nav a { text-decoration: none; padding: var(--s-1) 0; }
+.doc-bar nav a:hover { background: none; text-decoration: underline; text-decoration-color: var(--score-500); }
+.doc { max-width: calc(var(--w-wide) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
+.doc-sec { padding: var(--s-9) 0 var(--s-8); border-bottom: 1px solid var(--rule); }
+.doc-sec > header { display: grid; grid-template-columns: 200px 1fr; gap: var(--s-6); margin-bottom: var(--s-7); }
+.doc-sec > header .idx { font: 600 var(--t-label)/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); padding-top: .9em; }
+.doc-sec h2 { font: 600 var(--t-h2)/1.1 var(--serif); margin: 0 0 var(--s-3); letter-spacing: -.01em; }
+.doc-sec header p { margin: 0; max-width: 60ch; color: var(--ink-2); font-size: 1.0625rem; }
+.doc h3 { font: 600 var(--t-label)/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: var(--s-7) 0 var(--s-4); }
+.spec { font: 400 var(--t-note)/1.5 var(--sans); color: var(--ink-2); overflow-x: auto; }
+.spec table { width: 100%; border-collapse: collapse; }
+.spec th, .spec td { text-align: left; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.spec th { font-weight: 600; color: var(--ink); font-size: var(--t-label); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--s-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--s-6); }
+@media (max-width: 860px) {
+  .doc-sec > header { grid-template-columns: 1fr; gap: var(--s-2); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .doc-bar nav { display: none; }
+}
+
+/* Swatches */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s-4); }
+.sw { font: 400 var(--t-label)/1.45 var(--sans); }
+.sw .chip { height: 88px; border-radius: 0; margin-bottom: var(--s-2); box-shadow: inset 0 0 0 1px rgba(17,17,17,.08); }
+.sw b { display: block; font-weight: 600; color: var(--ink); }
+.sw span { color: var(--ink-3); display: block; }
+.ramp { display: grid; grid-template-columns: repeat(7, 1fr); }
+.ramp .sw .chip { height: 120px; margin-bottom: var(--s-2); box-shadow: none; }
+.ramp .sw { padding-right: var(--s-2); }
+.ramp-axis { display: flex; justify-content: space-between; font: 500 var(--t-tick)/1 var(--sans); color: var(--ink-3); margin-top: var(--s-2); border-top: 1px solid var(--ink); padding-top: var(--s-2); }
+@media (max-width: 700px) { .ramp { grid-template-columns: repeat(4, 1fr); row-gap: var(--s-4); } }
+
+.check { display: inline-flex; align-items: center; gap: 6px; font: 600 var(--t-tick)/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; }
+.check::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M4 7.2l2 2 4-4.4' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat; }
+
+/* Type specimens */
+.type-row { display: grid; grid-template-columns: 200px 1fr; gap: var(--s-6); padding: var(--s-5) 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.type-row .meta { font: 400 var(--t-label)/1.5 var(--sans); color: var(--ink-3); }
+.type-row .meta b { color: var(--ink); font-weight: 600; display: block; }
+@media (max-width: 860px) { .type-row { grid-template-columns: 1fr; gap: var(--s-2); } }
+
+/* Space scale */
+.space-row { display: grid; grid-template-columns: 90px 60px 1fr; align-items: center; gap: var(--s-4); font: 400 var(--t-label)/1 var(--sans); padding: 6px 0; }
+.space-row i { display: block; height: 12px; background: var(--score-500); }
+
+/* Layout diagram */
+.layout-demo { background: var(--paper-2); padding: var(--s-6) var(--s-4); font: 500 var(--t-tick)/1.3 var(--sans); color: var(--ink-2); }
+.layout-demo .row { display: flex; justify-content: center; gap: 0; margin: 0 auto var(--s-3); }
+.layout-demo .blk { border: 1px solid var(--ink); padding: var(--s-3); background: var(--paper); text-align: center; }
+.layout-demo .gap { width: 56px; display: grid; place-items: center; color: var(--ink-3); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARTICLE COMPONENTS — these are the system. Ship these classes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hero — split block, flat colour, no overlap */
+.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: min(88vh, 760px); }
+.hero__text { background: var(--score-500); color: var(--paper); padding: var(--s-8) clamp(24px, 5vw, 72px);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--s-5); }
+.hero__title { font: 600 var(--t-display)/0.98 var(--serif); letter-spacing: -.02em; margin: 0; }
+.hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 30ch; }
+.hero__byline { font: 500 var(--t-label)/1.4 var(--sans); letter-spacing: .02em; margin: 0; opacity: .92; }
+.hero__slot { background: var(--paper-2); display: grid; place-items: center; color: var(--ink-3);
+  font: 500 var(--t-label)/1.4 var(--sans); text-align: center; padding: var(--s-6);
+  background-image: repeating-linear-gradient(45deg, transparent 0 11px, var(--rule) 11px 12px); }
+.hero__slot span { background: var(--paper-2); padding: var(--s-2) var(--s-3); }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .hero__slot { min-height: 50vw; } }
+
+/* Act header */
+.kicker { display: inline-flex; align-items: center; gap: var(--s-2); font: 600 var(--t-label)/1.2 var(--sans);
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-3); }
+.kicker::before { content: ""; width: 10px; height: 10px; background: var(--score-500); }
+.act-title { font: 600 var(--t-h2)/1.1 var(--serif); letter-spacing: -.01em; margin: 0 0 var(--s-5); max-width: 22ch; }
+
+/* Body */
+.prose { max-width: var(--w-text); }
+.prose p { margin: 0 0 1.1em; }
+.prose .lede { font-size: var(--t-lede); line-height: 1.45; }
+.prose strong { font-weight: 600; }
+
+/* Text + margin note layout */
+.with-note { display: grid; grid-template-columns: minmax(0, var(--w-text)) var(--w-note); gap: var(--w-gap); align-items: start; }
+@media (max-width: 960px) { .with-note { grid-template-columns: 1fr; gap: var(--s-4); } }
+
+/* Margin note — supplementary, never load-bearing */
+.note { font: 400 var(--t-note)/1.55 var(--sans); color: var(--ink-2); border-top: 2px solid var(--ink); padding-top: var(--s-3); }
+.note__label { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-2); }
+.note p { margin: 0; }
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease); }
+.reveal.is-in { opacity: 1; transform: none; }
+@media (max-width: 960px) { .note { background: var(--paper-2); border-top: 0; border-left: 2px solid var(--ink); padding: var(--s-3) var(--s-4); } }
+
+/* Stat callout — exactly one per article */
+.stat { display: grid; grid-template-columns: auto auto auto; align-items: end; justify-content: start; column-gap: var(--s-5); row-gap: var(--s-2); }
+.stat__fig { font: 600 var(--t-figure)/1 var(--sans); letter-spacing: -.02em; }
+.stat__arrow { font: 400 2rem/1 var(--sans); color: var(--ink-3); padding-bottom: .5rem; }
+.stat__yr { font: 500 var(--t-label)/1 var(--sans); color: var(--ink-3); }
+.stat__key { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s-2); font: 400 var(--t-note)/1.4 var(--sans); color: var(--ink-2); margin-top: var(--s-3); }
+.stat__key i { width: 24px; height: 2px; background: var(--accent); flex: none; }
+
+/* Figure */
+.fig { margin: 0; }
+.fig__legend { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); margin: 0 0 var(--s-4); font: 400 var(--t-label)/1.3 var(--sans); color: var(--ink-2); }
+.key { display: inline-flex; align-items: center; gap: var(--s-2); }
+.key--line i { width: 20px; height: 2px; }
+.key--band i { width: 16px; height: 12px; }
+.key--ring i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink-2); background: var(--paper); }
+.key--dot i { width: 10px; height: 10px; border-radius: 50%; }
+.key--hatch i { width: 16px; height: 12px; background: var(--nodata) repeating-linear-gradient(45deg, transparent 0 3px, var(--rule) 3px 4px); }
+.scale-legend { display: inline-grid; gap: var(--s-1); font: 400 var(--t-tick)/1 var(--sans); color: var(--ink-3); }
+.scale-legend__bar { display: grid; grid-template-columns: repeat(14, 14px); gap: 2px; }
+.scale-legend__bar i { height: 12px; }
+.scale-legend__ends { display: flex; justify-content: space-between; }
+.scale-legend__title { color: var(--ink-2); font-size: var(--t-label); margin-bottom: 2px; }
+.fig__plot { position: relative; }
+.fig__plot svg { display: block; overflow: visible; font-family: var(--sans); }
+.fig__cap { display: grid; grid-template-columns: auto 1fr; gap: var(--s-3); margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--rule);
+  font: 400 var(--t-note)/1.5 var(--sans); color: var(--ink-2); max-width: var(--w-text); }
+.fig__tag { font-weight: 600; color: var(--ink); }
+.fig__src { grid-column: 2; color: var(--ink-3); font-size: var(--t-label); }
+.fig details { margin-top: var(--s-3); font: 400 var(--t-label)/1.4 var(--sans); max-width: var(--w-text); }
+.fig summary { cursor: pointer; color: var(--ink-2); padding: var(--s-2) 0; min-height: 44px; display: flex; align-items: center; }
+.fig details table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.fig details th, .fig details td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+.fig details th:first-child, .fig details td:first-child { text-align: left; }
+.fig details .scroll { max-height: 320px; overflow: auto; }
+
+/* SVG chart parts */
+.grid-line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+.axis-line { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+.tick { fill: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.dlabel { fill: var(--ink); font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dlabel--strong { font-weight: 600; }
+.dlabel--muted { fill: var(--ink-3); font-weight: 400; }
+.halo { paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+
+/* Tooltip */
+.tt { position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none; min-width: 140px;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-s);
+  padding: var(--s-2) var(--s-3); font: 400 var(--t-label)/1.45 var(--sans); font-variant-numeric: tabular-nums;
+  box-shadow: 4px 4px 0 rgba(17,17,17,.08);
+  opacity: 0; transition: opacity var(--dur-instant) linear; }
+.tt.is-on { opacity: 1; }
+.tt__title { font-weight: 600; display: block; margin-bottom: 2px; }
+.tt__row { display: flex; justify-content: space-between; gap: var(--s-4); color: var(--ink-2); }
+.tt__row b { color: var(--ink); font-weight: 600; }
+.tt__row i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+
+/* Annotation (map / heatmap) */
+.ann { cursor: pointer; outline: none; }
+.ann__dot { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.ann__label { opacity: 0; transition: opacity var(--dur-fast) var(--ease); pointer-events: none; }
+.ann:hover .ann__label, .ann:focus-visible .ann__label, .ann.is-pinned .ann__label { opacity: 1; }
+.ann:focus-visible .ann__dot { stroke: var(--score-500); stroke-width: 3; }
+
+/* Scrolly step card */
+.step { max-width: 340px; background: var(--paper); border: 1px solid var(--ink); padding: var(--s-4) var(--s-5);
+  font: 400 1.0625rem/1.5 var(--serif); opacity: .35; transition: opacity var(--dur-step) var(--ease); }
+.step.is-active { opacity: 1; }
+.step__n { display: block; font: 600 var(--t-tick)/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s-2); }
+.step p { margin: 0; }
+
+/* Segmented control (demo of steps; also usable as a non-scroll fallback) */
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: var(--radius-pill); padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { font: 500 var(--t-label)/1 var(--sans); color: var(--ink); background: transparent; border: 0; border-radius: var(--radius-pill);
+  min-height: 36px; padding: 0 var(--s-4); cursor: pointer; transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
+.seg button:hover { background: var(--paper-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* Typology card + carousel */
+.card { background: var(--paper-2); padding: var(--s-5); display: flex; flex-direction: column; gap: var(--s-3); min-height: 300px; }
+.card__type { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+.card__country { font: 600 var(--t-h3)/1.15 var(--serif); margin: 0; }
+.card__score { display: flex; align-items: baseline; gap: var(--s-2); font: 600 2rem/1 var(--sans); font-variant-numeric: tabular-nums; }
+.card__score small { font: 400 var(--t-label)/1 var(--sans); color: var(--ink-3); }
+.card__dots { display: flex; gap: 4px; }
+.card__dots i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--score-500); }
+.card__dots i.on { background: var(--score-500); }
+.card__body { font: 400 var(--t-note)/1.55 var(--sans); color: var(--ink-2); margin: 0; }
+.carousel__ctrl { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-4); }
+.btn-round { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: var(--paper); color: var(--ink);
+  display: grid; place-items: center; cursor: pointer; font: 400 1.125rem/1 var(--sans); transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
+.btn-round:hover { background: var(--ink); color: var(--paper); }
+.btn-round:disabled { opacity: .3; cursor: default; background: var(--paper); color: var(--ink); }
+.dots { display: flex; }
+.dots button { width: 28px; height: 44px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.dots button::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--rule); transition: background-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+.dots button[aria-current="true"]::after { background: var(--ink); transform: scale(1.25); }
+
+/* Sources / methodology */
+.sources { background: var(--paper-2); padding: var(--s-6); font: 400 var(--t-note)/1.6 var(--sans); color: var(--ink-2); max-width: var(--w-text); }
+.sources h4 { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-3); }
+.sources ol { margin: 0; padding-left: 1.2em; }
+
+/* Don't / do */
+.dd { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); }
+.dd > div { padding: var(--s-4); font: 400 var(--t-note)/1.5 var(--sans); }
+.dd .do { border-top: 3px solid var(--score-500); background: var(--paper-2); }
+.dd .dont { border-top: 3px solid var(--ink); background: var(--paper-2); }
+.dd b { display: block; font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; margin-bottom: var(--s-2); }
+@media (max-width: 700px) { .dd { grid-template-columns: 1fr; } }
+
+.law { display: grid; grid-template-columns: 220px 1fr; gap: var(--s-5); padding: var(--s-4) 0; border-bottom: 1px solid var(--rule); font: 400 var(--t-note)/1.55 var(--sans); }
+.law b { font: 600 1.0625rem/1.3 var(--serif); }
+.law span { color: var(--ink-2); }
+@media (max-width: 700px) { .law { grid-template-columns: 1fr; gap: var(--s-1); } }
+</style>
+</head>
+<body>
+
+<div class="doc-bar">
+  <span><b>Uneven Ground</b> · Design system v2 · light</span>
+  <nav aria-label="Sections">
+    <a href="#principles">Principles</a><a href="#color">Colour</a><a href="#type">Type</a><a href="#space">Space</a>
+    <a href="#components">Components</a><a href="#charts">Charts</a><a href="#laws">Laws</a>
+  </nav>
+</div>
+
+<!-- ═══ HERO SPECIMEN ═══ -->
+<section class="hero" aria-label="Hero specimen">
+  <div class="hero__text">
+    <h1 class="hero__title">Uneven Ground</h1>
+    <p class="hero__intro">Twenty-one years of trans rights law in 173 countries. The average doubled. The bottom quarter never moved.</p>
+    <p class="hero__byline">Data: Trans Rights Indicator Project, Myles Williamson (2024)</p>
+  </div>
+  <div class="hero__slot"><span>Graphic slot · your artwork goes here<br>Flat colour from the palette only</span></div>
+</section>
+
+<main class="doc">
+
+<!-- ═══ PRINCIPLES ═══ -->
+<section class="doc-sec" id="principles">
+  <header><div class="idx">00 · Principles</div><div>
+    <h2>Two colours, one meaning each</h2>
+    <p>Uneven Ground is an article, not a dashboard. The system is deliberately small: a page of white paper and black ink, one blue that means <em>rights in law</em>, and one vermilion that means <em>look here, this didn't move</em>. Everything else is type and space.</p>
+  </div></header>
+  <div class="grid-3 spec">
+    <div><h3 style="margin-top:0">1 · Colour is a sentence</h3>Blue always means score or gain. Vermilion always means the bottom quarter, a loss, or the 2012 break. A reader who learns this in Fig. 1 can read Fig. 4 without a legend.</div>
+    <div><h3 style="margin-top:0">2 · Prose carries the argument</h3>Every claim lives in the body text. Margin notes, tooltips and annotations add depth but are never required to follow the story.</div>
+    <div><h3 style="margin-top:0">3 · Data is the only loud thing</h3>Flat colour blocks belong to the hero. Inside a chart, gridlines are hairlines, text is ink and the only saturated ink is data.</div>
+  </div>
+</section>
+
+<!-- ═══ COLOUR ═══ -->
+<section class="doc-sec" id="color">
+  <header><div class="idx">01 · Colour</div><div>
+    <h2>Ten values, three jobs</h2>
+    <p>The four charts need exactly three kinds of colour: a <b>sequential</b> scale for score (map, heatmap), one <b>series</b> pair for "rose" against "stayed / fell" (bands, dot plot), and <b>neutrals</b> for everything that isn't data. No categorical palette exists because no chart needs one. Regions and indicator families are told apart by position and labels, not hue.</p>
+  </div></header>
+
+  <h3>Score scale · sequential, single hue, light → dark</h3>
+  <div class="ramp" id="ramp"></div>
+  <div class="ramp-axis"><span>0% · no protections in law</span><span>TRIP score</span><span>100% · all 13 indicators</span></div>
+  <p class="spec" style="margin-top:var(--s-4);max-width:70ch">The palest step is 2.06:1 against white, so a country scoring 0% is still visible on the map and in the heatmap. Missing data is never a ramp colour; it gets <code class="mono">--nodata</code> plus a 45° hatch. TRIP is a count from 0 to 13, so legends show 14 discrete swatches, not a smooth gradient that implies values that don't exist.</p>
+
+  <h3>Series · the two colours that do the talking</h3>
+  <div class="swatches" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">
+    <div class="sw"><div class="chip" style="background:var(--score-500)"></div><b>--score-500 · #1D40E7</b><span>Average line · gain · 2021 dot · brand block</span><span>7.14:1 on paper · white text on it 7.14:1</span></div>
+    <div class="sw"><div class="chip" style="background:var(--accent)"></div><b>--accent · #FF4E00</b><span>Bottom quarter (p25) · loss · 2012 break · p25 boundary</span><span>3.31:1 on paper. Marks only, never text</span></div>
+  </div>
+
+  <h3>Neutrals</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--paper)"></div><b>--paper · #FFFFFF</b><span>Page, chart surface, dot rings</span></div>
+    <div class="sw"><div class="chip" style="background:var(--paper-2)"></div><b>--paper-2 · #F5F4EF</b><span>Cards, notes on mobile, sources</span></div>
+    <div class="sw"><div class="chip" style="background:var(--rule)"></div><b>--rule · #D9D9D3</b><span>Gridlines, hairlines</span></div>
+    <div class="sw"><div class="chip" style="background:var(--nodata);background-image:repeating-linear-gradient(45deg,transparent 0 5px,var(--rule) 5px 6px)"></div><b>--nodata · #ECECE7</b><span>Missing data, always hatched</span></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-3)"></div><b>--ink-3 · #6B6B66</b><span>Captions, ticks, kickers · 5.36:1</span></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-2)"></div><b>--ink-2 · #3D3D3A</b><span>Secondary text, 2000 ring · 10.9:1</span></div>
+    <div class="sw"><div class="chip" style="background:var(--ink)"></div><b>--ink · #111111</b><span>Body, headings, data labels · 18.9:1</span></div>
+    <div class="sw"><div class="chip" style="background:var(--score-50)"></div><b>--score-50 · #E7F0FF</b><span>Link hover tint. UI only, never data</span></div>
+  </div>
+
+  <h3>One encoding, every chart</h3>
+  <div class="spec"><table>
+    <thead><tr><th>Meaning</th><th>Token</th><th>Fig. 1 Distribution</th><th>Fig. 2 Map</th><th>Fig. 3 Indicators</th><th>Fig. 4 Fingerprint</th></tr></thead>
+    <tbody>
+      <tr><td>Score / magnitude</td><td class="mono">--score-100…700</td><td>n/a</td><td>Country fill</td><td>n/a</td><td>Cell fill</td></tr>
+      <tr><td>Average, gain, "rose"</td><td class="mono">--score-500</td><td>Mean line, bands (wash)</td><td>n/a</td><td>2021 dot + connector when up</td><td>n/a</td></tr>
+      <tr><td>The finding: didn't move / fell</td><td class="mono">--accent</td><td>p25 line</td><td>n/a</td><td>2021 dot + connector when down</td><td>p25 boundary, 2012 rule</td></tr>
+      <tr><td>Baseline year</td><td class="mono">--ink-2</td><td>n/a</td><td>n/a</td><td>Hollow 2000 ring</td><td>n/a</td></tr>
+      <tr><td>Point of interest</td><td class="mono">--ink</td><td>n/a</td><td>Annotation dot</td><td>n/a</td><td>Label tick</td></tr>
+      <tr><td>No data</td><td class="mono">--nodata + hatch</td><td>n/a</td><td>Country fill</td><td>n/a</td><td>Empty cell</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Validation · computed, not eyeballed</h3>
+  <div class="spec"><table>
+    <thead><tr><th>Test</th><th>Colours</th><th>Result</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Ordinal ramp</td><td>score 100→700</td><td><span class="check">Pass</span></td><td>Lightness monotone, every step ≥ 0.06 ΔL, hue spread 1°, light end 2.06:1 on paper</td></tr>
+      <tr><td>Series pair, all pairs</td><td>score-500 · accent</td><td><span class="check">Pass</span></td><td>OKLCH L inside 0.43–0.77, chroma ≥ 0.10, both ≥ 3:1 on paper and paper-2</td></tr>
+      <tr><td>Colour-blind separation</td><td>score-500 · accent</td><td><span class="check">Pass</span></td><td>ΔE 33.5 protan / deutan, 36.5 tritan (target ≥ 8). Normal vision ΔE 47</td></tr>
+      <tr><td>Text contrast (WCAG AA)</td><td>ink · ink-2 · ink-3</td><td><span class="check">Pass</span></td><td>18.9 · 10.9 · 5.36 to 1. The smallest text in the system (12px ticks) uses ink-3 at 5.36:1</td></tr>
+      <tr><td>Hero block</td><td>paper on score-500</td><td><span class="check">Pass</span></td><td>7.14:1, AAA for large text</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Rules</h3>
+  <div class="dd">
+    <div class="do"><b>Do</b>Use vermilion for one idea per chart. If two things are vermilion, they must mean the same thing.</div>
+    <div class="dont"><b>Don't</b>Colour text with a data colour. Labels stay ink. Identity comes from the swatch, line key or dot beside the text.</div>
+    <div class="do"><b>Do</b>Use the same 14-step legend in Fig. 2 and Fig. 4. Same scale, same swatches, same position above the plot.</div>
+    <div class="dont"><b>Don't</b>Add a third hue for regions or indicator families. Group with headings and position instead.</div>
+  </div>
+</section>
+
+<!-- ═══ TYPE ═══ -->
+<section class="doc-sec" id="type">
+  <header><div class="idx">02 · Typography</div><div>
+    <h2>A serif to read, a sans to measure</h2>
+    <p><b>Besley</b> carries the voice: headlines and the long read. Its wide, open shapes at 20px give a calm, bookish page. <b>Inter</b> carries every number, label and UI element, with tabular figures so axis ticks line up. Two families, nothing else.</p>
+  </div></header>
+  <div class="type-row"><div class="meta"><b>Display</b>Besley 600 · 88/0.98 · −2%</div><div style="font:600 var(--t-display)/.98 var(--serif);letter-spacing:-.02em">Uneven Ground</div></div>
+  <div class="type-row"><div class="meta"><b>Act title</b>Besley 600 · 44/1.1 · −1%</div><div style="font:600 var(--t-h2)/1.1 var(--serif);letter-spacing:-.01em">The map that isn't there</div></div>
+  <div class="type-row"><div class="meta"><b>Card title</b>Besley 600 · 26/1.15</div><div style="font:600 var(--t-h3)/1.15 var(--serif)">Argentina</div></div>
+  <div class="type-row"><div class="meta"><b>Lede</b>Besley 400 · 24/1.45</div><div style="font:400 var(--t-lede)/1.45 var(--serif);max-width:var(--w-text)">In 2000, the bottom quarter of countries scored 7.7%. In 2021, they still did.</div></div>
+  <div class="type-row"><div class="meta"><b>Body</b>Besley 400 · 20/1.6 · max 640px (~64ch)</div><div class="prose"><p style="margin:0">Myles Williamson's Trans Rights Indicator Project scores every country on thirteen legal questions, from whether trans people are criminalized to whether the constitution protects them. <a href="#">Read the methodology</a>.</p></div></div>
+  <div class="type-row"><div class="meta"><b>Hero figure</b>Inter 600 · 72/1 · one per article</div><div style="font:600 var(--t-figure)/1 var(--sans);letter-spacing:-.02em">7.7%</div></div>
+  <div class="type-row"><div class="meta"><b>Note / caption</b>Inter 400 · 15/1.55</div><div style="font:400 var(--t-note)/1.55 var(--sans);color:var(--ink-2);max-width:48ch">Pakistan's 2018 Transgender Persons Act allowed self-identification years before most of Europe.</div></div>
+  <div class="type-row"><div class="meta"><b>Kicker</b>Inter 600 · 13 · +8% · caps</div><div><p class="kicker" style="margin:0">Act II · Where</p></div></div>
+  <div class="type-row"><div class="meta"><b>Data label</b>Inter 500 · 13 · tabular</div><div style="font:500 13px/1 var(--sans);font-variant-numeric:tabular-nums">Average 23.5% · Bottom quarter 7.7%</div></div>
+  <div class="type-row"><div class="meta"><b>Tick</b>Inter 400 · 12 · ink-3 · tabular · floor size</div><div style="font:400 12px/1 var(--sans);color:var(--ink-3);font-variant-numeric:tabular-nums">0%&nbsp;&nbsp;&nbsp;20%&nbsp;&nbsp;&nbsp;40%&nbsp;&nbsp;&nbsp;60%&nbsp;&nbsp;&nbsp;2000&nbsp;&nbsp;&nbsp;2005&nbsp;&nbsp;&nbsp;2010</div></div>
+</section>
+
+<!-- ═══ SPACE & LAYOUT ═══ -->
+<section class="doc-sec" id="space">
+  <header><div class="idx">03 · Space, layout, motion</div><div>
+    <h2>A reading column with room to breathe</h2>
+    <p>A 4-point scale. Text sits in a 640px column; margin notes sit 56px away so they read as a separate voice. Charts break out of the column to wide or full-bleed, because data needs width more than prose does.</p>
+  </div></header>
+  <div class="grid-2">
+    <div id="space-scale"></div>
+    <div class="layout-demo" aria-label="Layout widths">
+      <div class="row"><div class="blk" style="flex:0 1 640px">Text · 640</div><div class="gap">56</div><div class="blk" style="flex:0 0 160px;background:var(--paper-2)">Note · 220</div></div>
+      <div class="row"><div class="blk" style="flex:0 1 100%">Wide figure · 1080 · Fig. 1, Fig. 3</div></div>
+      <div class="row" style="margin-bottom:0"><div class="blk" style="flex:1;background:var(--ink);color:var(--paper);border-color:var(--ink)">Full bleed · 100vw · Fig. 2 map, Fig. 4 fingerprint</div></div>
+      <p style="margin:var(--s-4) 0 0">Under 960px: notes drop inline below their paragraph (tinted, left rule). Under 860px: hero stacks; figures go edge to edge with a 16px gutter.</p>
+    </div>
+  </div>
+  <h3>Motion</h3>
+  <div class="spec"><table>
+    <thead><tr><th>Token</th><th>Value</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">--dur-instant</td><td>100ms linear</td><td>Tooltip fade. Feedback must land under the 400ms Doherty threshold.</td></tr>
+      <tr><td class="mono">--dur-fast</td><td>150ms</td><td>Hover states, annotation label reveal</td></tr>
+      <tr><td class="mono">--dur-step</td><td>600ms</td><td>Scrolly step transitions in Fig. 4 (masks, rules)</td></tr>
+      <tr><td class="mono">--dur-reveal</td><td>900ms</td><td>Chart entrance (bands fan out from the mean), margin notes rising in</td></tr>
+      <tr><td class="mono">--ease</td><td>cubic-bezier(.2,.7,.2,1)</td><td>One ease-out for everything. Things arrive fast and settle.</td></tr>
+      <tr><td>Reduced motion</td><td>all → 0ms</td><td>Final state shown immediately. No content depends on animation.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══ COMPONENTS ═══ -->
+<section class="doc-sec" id="components">
+  <header><div class="idx">04 · Components</div><div>
+    <h2>Only what the article uses</h2>
+    <p>Ten pieces: hero, act header, body, margin note, stat callout, figure (legend, plot, caption, data table), tooltip, annotation, step card, typology card with carousel, sources. Nothing else gets built.</p>
+  </div></header>
+
+  <h3>Act header + body + margin note</h3>
+  <div class="with-note">
+    <div class="prose">
+      <p class="kicker">Act I · The headline and the trap</p>
+      <h2 class="act-title">The average rose. The floor did not.</h2>
+      <p class="lede">Between 2000 and 2021 the world's average TRIP score more than doubled, from 10.9% to 23.5%.</p>
+      <p>That is the headline most reports would print. It is also misleading. Averages hide distributions, and this distribution came apart: a small group of countries raced ahead while the bottom quarter stayed exactly where it started.</p>
+    </div>
+    <aside class="note reveal">
+      <p class="note__label">How TRIP is scored</p>
+      <p>Thirteen yes/no legal indicators, summed and divided by 13. A country with only "no direct criminalization" scores 1 / 13 = 7.7%.</p>
+    </aside>
+  </div>
+
+  <h3>Stat callout · the single hero number</h3>
+  <div class="stat" role="group" aria-label="Bottom quarter score, 2000 and 2021">
+    <div><div class="stat__yr">2000</div><div class="stat__fig">7.7%</div></div>
+    <div class="stat__arrow" aria-hidden="true">→</div>
+    <div><div class="stat__yr">2021</div><div class="stat__fig">7.7%</div></div>
+    <div class="stat__key"><i></i>Bottom quarter of countries (25th percentile). The same line, in the same colour, in Fig. 1 and Fig. 4.</div>
+  </div>
+
+  <div class="grid-2" style="margin-top:var(--s-7)">
+    <div>
+      <h3 style="margin-top:0">Tooltip</h3>
+      <div class="tt is-on" style="position:static;display:inline-block;box-shadow:4px 4px 0 rgba(17,17,17,.08)">
+        <span class="tt__title">Argentina · 2021</span>
+        <span class="tt__row"><span>TRIP score</span><b>46.2%</b></span>
+        <span class="tt__row"><span>Indicators</span><b>6 of 13</b></span>
+      </div>
+      <p class="spec">Ink border, white fill, hard 4px offset shadow (flat, like the reference). Title in 600, values right-aligned and tabular. Appears in 100ms with no delay, follows the pointer, flips at viewport edges.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Annotation</h3>
+      <svg width="260" height="70" style="overflow:visible;font-family:var(--sans)" aria-hidden="true">
+        <g class="ann is-pinned" transform="translate(20,40)">
+          <circle class="ann__dot" r="4"></circle>
+          <g class="ann__label"><line x1="6" x2="26" stroke="var(--ink)"></line><text x="30" y="-2" class="dlabel dlabel--strong halo">Argentina 46.2%</text><text x="30" y="14" class="dlabel dlabel--muted halo">First self-ID law, 2012</text></g>
+        </g>
+      </svg>
+      <p class="spec">Ink dot (r 4) with a 2px paper ring stays visible. The label appears on hover <em>or keyboard focus</em>, with a paper halo so it reads over any fill. Hit area 28px.</p>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:var(--s-5)">
+    <div>
+      <h3>Step card · Fig. 4 scrollytelling</h3>
+      <div style="display:grid;gap:var(--s-4)">
+        <div class="step"><span class="step__n">Step 1 of 4</span><p>In 2000, almost every row is the same pale blue.</p></div>
+        <div class="step is-active"><span class="step__n">Step 2 of 4</span><p>In 2012, Argentina lets people change their legal gender by simply declaring it.</p></div>
+      </div>
+      <p class="spec">340px max, ink hairline, serif text at 17px. Inactive cards fade to 35%. One idea per card, under 30 words.</p>
+    </div>
+    <div>
+      <h3>Typology card + carousel</h3>
+      <div class="card" id="card">
+        <p class="card__type">Closest to complete</p>
+        <p class="card__country">Uruguay</p>
+        <div class="card__score">92% <small>12 of 13 indicators</small></div>
+        <div class="card__dots" aria-hidden="true"></div>
+        <p class="card__body">The highest score in the dataset in 2021. No country holds all thirteen protections.</p>
+      </div>
+      <div class="carousel__ctrl">
+        <button class="btn-round" id="prev" aria-label="Previous country">←</button>
+        <div class="dots" role="group" aria-label="Choose country" id="dots"></div>
+        <button class="btn-round" id="next" aria-label="Next country">→</button>
+      </div>
+      <p class="spec">13 dots = 13 indicators, filled for each one held: the score as a countable shape. Buttons 44px, dots 28 × 44px hit area. Arrow keys work when focused.</p>
+    </div>
+  </div>
+
+  <h3>Sources</h3>
+  <div class="sources">
+    <h4>Data and method</h4>
+    <ol>
+      <li>Williamson, M. (2024). Trans Rights Indicator Project. <i>Perspectives on Politics</i> 22(3), Cambridge University Press.</li>
+      <li>ILGA World (2020). State-Sponsored Homophobia Report.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ CHARTS ═══ -->
+<section class="doc-sec" id="charts">
+  <header><div class="idx">05 · Charts</div><div>
+    <h2>The four figures, on real data</h2>
+    <p>Marks follow one spec everywhere: 2px lines, dots ≥ 8px with a 2px paper ring, area washes at 10–24%, hairline gridlines, legend above the plot, direct labels on the one or two values the story is about, everything else in the tooltip and the data table.</p>
+  </div></header>
+
+  <div class="spec"><table>
+    <thead><tr><th>Mark</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr><td>Line</td><td>2px, round cap and join</td></tr>
+      <tr><td>Dot</td><td>r 5 (10px), 2px paper ring; hollow variant = paper fill, 2px ink-2 stroke</td></tr>
+      <tr><td>Area band</td><td>score-500 at 10% (outer) and 24% (inner). A wash, never a block</td></tr>
+      <tr><td>Cell</td><td>2px paper gap between columns; rows touch</td></tr>
+      <tr><td>Grid / axis</td><td>1px --rule, solid, horizontal only; baseline 1px ink</td></tr>
+      <tr><td>Hover target</td><td>Whole row or column band, never just the mark (Fitts)</td></tr>
+    </tbody>
+  </table></div>
+
+  <!-- FIG 1 -->
+  <h3>Fig. 1 · Distribution trend</h3>
+  <figure class="fig" id="fig1">
+    <div class="fig__legend">
+      <span class="key key--line"><i style="background:var(--score-500)"></i>Average</span>
+      <span class="key key--line"><i style="background:var(--accent)"></i>Bottom quarter (25th percentile)</span>
+      <span class="key key--band"><i style="background:rgba(29,64,231,.24)"></i>Middle half of countries</span>
+      <span class="key key--band"><i style="background:rgba(29,64,231,.10)"></i>80% of countries</span>
+    </div>
+    <div class="fig__plot"></div>
+    <figcaption class="fig__cap"><span class="fig__tag">Fig. 1</span><span>Average TRIP score and spread across countries, 2000–2021. The bands widen upward only: the floor stayed at 7.7%.</span><span class="fig__src">Source: Trans Rights Indicator Project (Williamson, 2024). 170–173 countries per year.</span></figcaption>
+    <details><summary>View the data</summary><div class="scroll"><table id="t1"></table></div></details>
+  </figure>
+
+  <!-- FIG 2 -->
+  <h3>Fig. 2 · Choropleth</h3>
+  <figure class="fig" id="fig2">
+    <div class="fig__legend" style="align-items:flex-end;gap:var(--s-6)">
+      <div class="scale-legend" data-scale><div class="scale-legend__title">TRIP score, 2021</div><div class="scale-legend__bar"></div><div class="scale-legend__ends"><span>0%</span><span>100%</span></div></div>
+      <span class="key key--hatch"><i></i>No data</span>
+      <span class="key key--dot"><i style="background:var(--ink)"></i>Hover a dot for the story</span>
+    </div>
+    <div class="fig__plot"></div>
+    <figcaption class="fig__cap"><span class="fig__tag">Fig. 2</span><span>TRIP score by country, 2021. Progress does not follow wealth or region.</span><span class="fig__src">Equal Earth projection. Source: TRIP (Williamson, 2024).</span></figcaption>
+  </figure>
+
+  <!-- FIG 3 -->
+  <h3>Fig. 3 · Indicator dot plot</h3>
+  <figure class="fig" id="fig3">
+    <div class="fig__legend">
+      <span class="key key--ring"><i></i>2000</span>
+      <span class="key key--dot"><i style="background:var(--score-500)"></i>2021, rose</span>
+      <span class="key key--dot"><i style="background:var(--accent)"></i>2021, fell</span>
+    </div>
+    <div class="fig__plot"></div>
+    <figcaption class="fig__cap"><span class="fig__tag">Fig. 3</span><span>Share of countries with each protection in law, 2000 and 2021. Recognition grew fastest; constitutional protection barely moved; fewer countries are free of direct criminalization than in 2000.</span><span class="fig__src">Source: TRIP (Williamson, 2024). Four gender-marker requirement indicators omitted here pending a coding check.</span></figcaption>
+    <details><summary>View the data</summary><table id="t3"></table></details>
+  </figure>
+
+  <!-- FIG 4 -->
+  <h3>Fig. 4 · The divergence fingerprint</h3>
+  <figure class="fig" id="fig4">
+    <div class="fig__legend" style="align-items:flex-end;justify-content:space-between;gap:var(--s-5)">
+      <div class="scale-legend" data-scale><div class="scale-legend__title">TRIP score</div><div class="scale-legend__bar"></div><div class="scale-legend__ends"><span>0%</span><span>100%</span></div></div>
+      <div class="seg" role="group" aria-label="Story step">
+        <button aria-pressed="true" data-step="0">All years</button>
+        <button aria-pressed="false" data-step="1">2000</button>
+        <button aria-pressed="false" data-step="2">2012</button>
+        <button aria-pressed="false" data-step="3">Bottom quarter</button>
+      </div>
+    </div>
+    <div class="fig__plot"></div>
+    <figcaption class="fig__cap"><span class="fig__tag">Fig. 4</span><span>Every country, every year. Rows are countries sorted by their 2021 score; columns are years. In the article, scroll steps drive the states shown by the buttons above.</span><span class="fig__src">Source: TRIP (Williamson, 2024). 173 countries × 22 years.</span></figcaption>
+    <details><summary>View the data (2021 scores)</summary><div class="scroll"><table id="t4"></table></div></details>
+  </figure>
+</section>
+
+<!-- ═══ LAWS ═══ -->
+<section class="doc-sec" id="laws" style="border-bottom:0">
+  <header><div class="idx">06 · Why it works</div><div>
+    <h2>Laws, and the decision each one made</h2>
+    <p>Every rule above traces back to a known principle of interface design or graphical perception.</p>
+  </div></header>
+  <div class="law"><b>Von Restorff (isolation)</b><span>The one thing that differs is remembered. Vermilion appears only on the finding (the flat bottom quarter, losses, the 2012 break), so the eye goes there first in every chart.</span></div>
+  <div class="law"><b>Gestalt: similarity</b><span>Same colour = same meaning across all four figures. Fig. 2 and Fig. 4 share an identical 14-step legend in the same position.</span></div>
+  <div class="law"><b>Gestalt: proximity</b><span>Legends sit directly above their plot; direct labels sit at the line ends; margin notes sit 56px from the text, far enough to read as asides and close enough to stay linked.</span></div>
+  <div class="law"><b>Cleveland &amp; McGill</b><span>Position beats colour for precise comparison. The indicator chart is a dot plot on a shared axis. Colour encodes magnitude only where position is already used for geography or time (map, heatmap).</span></div>
+  <div class="law"><b>Data-ink (Tufte)</b><span>No chart borders, no vertical gridlines, no 3D, no gradients on marks. Gridlines are 1px #D9D9D3. Ink goes to data.</span></div>
+  <div class="law"><b>Single-hue sequential</b><span>Lightness is read as quantity; hue is not. The score scale is one blue, light to dark, validated monotone, and it stays readable in greyscale and for all colour-vision types.</span></div>
+  <div class="law"><b>Fitts's law</b><span>Hover targets are whole rows, columns or 28px circles, never 3px cells. Buttons are 44px; carousel dots have 28 × 44px hit areas.</span></div>
+  <div class="law"><b>Hick's law</b><span>One interaction per chart (hover), no filters, no toggles in the article. The fewer choices, the faster the reading.</span></div>
+  <div class="law"><b>Doherty threshold</b><span>Tooltips appear in 100ms with no delay; nothing a reader triggers waits longer than 400ms.</span></div>
+  <div class="law"><b>Jakob's law</b><span>Links look like links (underlined), carousels look like carousels (arrows + dots), data tables sit behind a familiar "View the data" disclosure.</span></div>
+  <div class="law"><b>Accessible by default</b><span>Text never wears a data colour; all text clears WCAG AA; every chart has an aria label and a data table; annotations open on keyboard focus; reduced motion shows the final state.</span></div>
+</section>
+
+</main>
+
+<div class="tt" id="tt" role="status" aria-live="polite"></div>
+
+<script id="data" type="application/json">{"yearly":[{"year":2000,"mean":0.1086,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.1538},{"year":2001,"mean":0.1086,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.1538},{"year":2002,"mean":0.1095,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.1538},{"year":2003,"mean":0.1122,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2004,"mean":0.1158,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2005,"mean":0.1176,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2006,"mean":0.121,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2007,"mean":0.1224,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2008,"mean":0.1284,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2009,"mean":0.1377,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.2308},{"year":2010,"mean":0.1476,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.3},{"year":2011,"mean":0.149,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.3077},{"year":2012,"mean":0.157,"p10":0.0769,"p25":0.0769,"p75":0.1538,"p90":0.3077},{"year":2013,"mean":0.1632,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.3692},{"year":2014,"mean":0.1747,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.4462},{"year":2015,"mean":0.185,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.4615},{"year":2016,"mean":0.1979,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.5231},{"year":2017,"mean":0.2054,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.5385},{"year":2018,"mean":0.2241,"p10":0.0769,"p25":0.0769,"p75":0.2308,"p90":0.6154},{"year":2019,"mean":0.2308,"p10":0.0769,"p25":0.0769,"p75":0.3077,"p90":0.6154},{"year":2020,"mean":0.2334,"p10":0.0769,"p25":0.0769,"p75":0.3077,"p90":0.6154},{"year":2021,"mean":0.2348,"p10":0.0769,"p25":0.0769,"p75":0.3077,"p90":0.6154}],"adoption":[{"label":"No direct criminalization","group":"Criminalization","r2000":0.9529,"r2021":0.9306},{"label":"No indirect criminalization","group":"Criminalization","r2000":0.3373,"r2021":0.3953},{"label":"Legal gender marker change","group":"Recognition","r2000":0.1065,"r2021":0.3488},{"label":"Nonbinary or third gender marker","group":"Recognition","r2000":0.0,"r2021":0.0462},{"label":"Protection in employment","group":"Protection","r2000":0.0,"r2021":0.2023},{"label":"Protection in education","group":"Protection","r2000":0.0,"r2021":0.1734},{"label":"Protection in healthcare","group":"Protection","r2000":0.0,"r2021":0.1676},{"label":"Protection in housing","group":"Protection","r2000":0.0,"r2021":0.1676},{"label":"Constitutional protection","group":"Protection","r2000":0.0,"r2021":0.0289}],"countries":[{"iso3":"URY","name":"Uruguay","s":"222222222666666666cccc"},{"iso3":"BEL","name":"Belgium","s":"222222244444449999bbbb"},{"iso3":"FRA","name":"France","s":"22222222222277777bbbbb"},{"iso3":"LUX","name":"Luxembourg","s":"222222222222222222bbbb"},{"iso3":"MLT","name":"Malta","s":"222233333333557aabbbbb"},{"iso3":"NOR","name":"Norway","s":"2222222222222777bbbbbb"},{"iso3":"PAK","name":"Pakistan","s":"111111111222222222bbbb"},{"iso3":"DEU","name":"Germany","s":"33333388899aaaaaaaaaaa"},{"iso3":"GBR","name":"United Kingdom","s":"22224444449999999999aa"},{"iso3":"GRC","name":"Greece","s":"22222222223322337aaaaa"},{"iso3":"NLD","name":"Netherlands","s":"4444444444444455555aaa"},{"iso3":"PRT","name":"Portugal","s":"222222222224555666aaaa"},{"iso3":"SWE","name":"Sweden","s":"3333333338888aaaaaaaaa"},{"iso3":"BOL","name":"Bolivia","s":"1111111112777777999999"},{"iso3":"HRV","name":"Croatia","s":"2222222277777799999999"},{"iso3":"ISL","name":"Iceland","s":"2222222222224455556999"},{"iso3":"BIH","name":"Bosnia and Herzegovina","s":"1112222222223333888888"},{"iso3":"CZE","name":"Czechia","s":"3333333338888888888888"},{"iso3":"IND","name":"India","s":"1111111111111144444488"},{"iso3":"MNE","name":"Montenegro","s":"......2233888888888888"},{"iso3":"SVK","name":"Slovakia","s":"3333333388888888888888"},{"iso3":"SVN","name":"Slovenia","s":"2222233333333333888888"},{"iso3":"AUS","name":"Australia","s":"2222222222222777777777"},{"iso3":"FIN","name":"Finland","s":"2223333333333336677777"},{"iso3":"HUN","name":"Hungary","s":"2222777777777777778877"},{"iso3":"MKD","name":"North Macedonia","s":"2222222222222222222777"},{"iso3":"SRB","name":"Serbia","s":"2222222227777777666777"},{"iso3":"XKX","name":"Kosovo","s":"........22222227777777"},{"iso3":"ARG","name":"Argentina","s":"1111111111115555555556"},{"iso3":"BRA","name":"Brazil","s":"2221222222222122226666"},{"iso3":"CAN","name":"Canada","s":"2222222222222222266666"},{"iso3":"CHL","name":"Chile","s":"1111111111113333333666"},{"iso3":"CRI","name":"Costa Rica","s":"1111111111112222226666"},{"iso3":"DNK","name":"Denmark","s":"3333333333333366666666"},{"iso3":"ECU","name":"Ecuador","s":"1112222233333322666666"},{"iso3":"GEO","name":"Georgia","s":"1111111111111166666666"},{"iso3":"IRL","name":"Ireland","s":"2222222222222226666666"},{"iso3":"ALB","name":"Albania","s":"1111111111555555555555"},{"iso3":"COL","name":"Colombia","s":"1111111111111115555555"},{"iso3":"NZL","name":"New Zealand","s":"4444444444444455555555"},{"iso3":"UKR","name":"Ukraine","s":"3333333333332344555455"},{"iso3":"USA","name":"United States of America","s":"1111111111111111111125"},{"iso3":"BLR","name":"Belarus","s":"2222222222444444444444"},{"iso3":"ESP","name":"Spain","s":"2222222444444444444444"},{"iso3":"ISR","name":"Israel","s":"4444444444444444444444"},{"iso3":"AUT","name":"Austria","s":"2222222222222222333333"},{"iso3":"BGD","name":"Bangladesh","s":"1111111111111133333333"},{"iso3":"CHE","name":"Switzerland","s":"3333333333333333333333"},{"iso3":"CUB","name":"Cuba","s":"1111111122222222222333"},{"iso3":"EST","name":"Estonia","s":"2233333333333333333333"},{"iso3":"FJI","name":"Fiji","s":"1111111111111223333333"},{"iso3":"ITA","name":"Italy","s":"3333333333333333333333"},{"iso3":"JPN","name":"Japan","s":"2223333333333333333333"},{"iso3":"KAZ","name":"Kazakhstan","s":"2223333333333332333333"},{"iso3":"LVA","name":"Latvia","s":"2222222222222333333333"},{"iso3":"MNG","name":"Mongolia","s":"2222222212333333333233"},{"iso3":"NPL","name":"Nepal","s":"1111111111113333333333"},{"iso3":"ROU","name":"Romania","s":"2333333333333333333333"},{"iso3":"RUS","name":"Russia","s":"2222222222222222223333"},{"iso3":"VNM","name":"Vietnam","s":"2222222222222222233333"},{"iso3":"ZAF","name":"South Africa","s":"1113333333333333333333"},{"iso3":"AGO","name":"Angola","s":"1111111111111111111112"},{"iso3":"BGR","name":"Bulgaria","s":"2233333333333333333332"},{"iso3":"BTN","name":"Bhutan","s":"1111111111111111111112"},{"iso3":"BWA","name":"Botswana","s":"1111111111111111122222"},{"iso3":"CHN","name":"China","s":"1122222222222222222222"},{"iso3":"COG","name":"Republic of the Congo","s":"2222222222222222222222"},{"iso3":"CPV","name":"Cape Verde","s":"1111122222222222222222"},{"iso3":"GNB","name":"Guinea-Bissau","s":"2222222222222222222222"},{"iso3":"HND","name":"Honduras","s":"2111111111111222222222"},{"iso3":"HTI","name":"Haiti","s":"2222222221121122222222"},{"iso3":"IRN","name":"Iran","s":"2222222222222222222222"},{"iso3":"KGZ","name":"Kyrgyzstan","s":"2222133322222223344332"},{"iso3":"KOR","name":"South Korea","s":"1111112222222222222222"},{"iso3":"LAO","name":"Laos","s":"2222222222222222222222"},{"iso3":"LTU","name":"Lithuania","s":"2222222222222222222222"},{"iso3":"MDA","name":"Moldova","s":"2222222222222222222222"},{"iso3":"MDG","name":"Madagascar","s":"2222222222222222222222"},{"iso3":"MEX","name":"Mexico","s":"1111111111111111122222"},{"iso3":"MOZ","name":"Mozambique","s":"1111111111111112222222"},{"iso3":"NAM","name":"Namibia","s":"2222222222222222222222"},{"iso3":"NER","name":"Niger","s":"2222222222222222222222"},{"iso3":"NIC","name":"Nicaragua","s":"1111111122222222222222"},{"iso3":"PAN","name":"Panama","s":"1111112233333332333322"},{"iso3":"POL","name":"Poland","s":"2222222222222222222222"},{"iso3":"PRY","name":"Paraguay","s":"2222222221122222222222"},{"iso3":"STP","name":"Sao Tome and Principe","s":"1111111111112222222222"},{"iso3":"SUR","name":"Suriname","s":"2222222222222211222222"},{"iso3":"SYC","name":"Seychelles","s":"1111111111111111222222"},{"iso3":"THA","name":"Thailand","s":"1111111111111112222222"},{"iso3":"TLS","name":"Timor-Leste","s":"2222222222222222222222"},{"iso3":"TTO","name":"Trinidad and Tobago","s":"1111111111111111112222"},{"iso3":"TUR","name":"Turkey","s":"2222222222222222222222"},{"iso3":"UZB","name":"Uzbekistan","s":"2222222222222222222222"},{"iso3":"VUT","name":"Vanuatu","s":"2222222222222222222222"},{"iso3":"AFG","name":"Afghanistan","s":"1111111111111111111111"},{"iso3":"ARM","name":"Armenia","s":"1111111111111111111111"},{"iso3":"AZE","name":"Azerbaijan","s":"1111111111111111111111"},{"iso3":"BDI","name":"Burundi","s":"1111111111111111111111"},{"iso3":"BEN","name":"Benin","s":"1111111111111111111111"},{"iso3":"BFA","name":"Burkina Faso","s":"1111111111111111111111"},{"iso3":"BHR","name":"Bahrain","s":"1111111111111111111111"},{"iso3":"BRB","name":"Barbados","s":"1111111111111111111111"},{"iso3":"CAF","name":"Central African Republic","s":"1111111111111111111111"},{"iso3":"CIV","name":"Ivory Coast","s":"1111111111111111111111"},{"iso3":"CMR","name":"Cameroon","s":"1111111111111111111111"},{"iso3":"COD","name":"Democratic Republic of the Congo","s":"1111111111111111111111"},{"iso3":"COM","name":"Comoros","s":"1111111111111111111111"},{"iso3":"CYP","name":"Cyprus","s":"1111111111111111111111"},{"iso3":"DJI","name":"Djibouti","s":"1111111111111111111111"},{"iso3":"DOM","name":"Dominican Republic","s":"1111111111111111111111"},{"iso3":"DZA","name":"Algeria","s":"1111111111111111111111"},{"iso3":"EGY","name":"Egypt","s":"1111111111111111111111"},{"iso3":"ERI","name":"Eritrea","s":"1111111111111111111111"},{"iso3":"ETH","name":"Ethiopia","s":"1111111111111111111111"},{"iso3":"GAB","name":"Gabon","s":"1111111111111111111111"},{"iso3":"GHA","name":"Ghana","s":"1111111111111111111111"},{"iso3":"GIN","name":"Guinea","s":"1111111111111111111111"},{"iso3":"GNQ","name":"Equatorial Guinea","s":"2222222222222212222221"},{"iso3":"GTM","name":"Guatemala","s":"1111111111111111111111"},{"iso3":"GUY","name":"Guyana","s":"0000000000000000001111"},{"iso3":"IRQ","name":"Iraq","s":"1111111111111111111111"},{"iso3":"JAM","name":"Jamaica","s":"1111111111111111111111"},{"iso3":"KEN","name":"Kenya","s":"1111111111111111111111"},{"iso3":"KHM","name":"Cambodia","s":"2222222222111111111111"},{"iso3":"LBR","name":"Liberia","s":"1111111111111111111111"},{"iso3":"LBY","name":"Libya","s":"1111111111111111111111"},{"iso3":"LKA","name":"Sri Lanka","s":"1111111111111111111111"},{"iso3":"LSO","name":"Lesotho","s":"1111111111111111111111"},{"iso3":"MAR","name":"Morocco","s":"1111111111111111111111"},{"iso3":"MDV","name":"Maldives","s":"1111111111111111111111"},{"iso3":"MLI","name":"Mali","s":"1111111111111111111111"},{"iso3":"MMR","name":"Burma/Myanmar","s":"1111111111111111111111"},{"iso3":"MRT","name":"Mauritania","s":"1111111111111111111111"},{"iso3":"MUS","name":"Mauritius","s":"1111111111111111111111"},{"iso3":"PER","name":"Peru","s":"1111111111111111111111"},{"iso3":"PHL","name":"Philippines","s":"1111111111111111111111"},{"iso3":"PNG","name":"Papua New Guinea","s":"1111111111111111111111"},{"iso3":"PRK","name":"North Korea","s":"1111111111111111111111"},{"iso3":"QAT","name":"Qatar","s":"1111111111111111111111"},{"iso3":"RWA","name":"Rwanda","s":"1111111111111111111111"},{"iso3":"SDN","name":"Sudan","s":"1111111111111111111111"},{"iso3":"SEN","name":"Senegal","s":"1111111111111111111111"},{"iso3":"SGP","name":"Singapore","s":"1111111111111111111111"},{"iso3":"SLB","name":"Solomon Islands","s":"1111111111111111111111"},{"iso3":"SLE","name":"Sierra Leone","s":"1111111111111111111111"},{"iso3":"SLV","name":"El Salvador","s":"1111111111111111111111"},{"iso3":"SOM","name":"Somalia","s":"1111111111111111111111"},{"iso3":"SWZ","name":"Eswatini","s":"1111111111111111111111"},{"iso3":"SYR","name":"Syria","s":"1111111111111111111111"},{"iso3":"TCD","name":"Chad","s":"1111111111111111111111"},{"iso3":"TGO","name":"Togo","s":"1111111111111111111111"},{"iso3":"TJK","name":"Tajikistan","s":"1111111111111111111111"},{"iso3":"TKM","name":"Turkmenistan","s":"1111111111111111111111"},{"iso3":"TUN","name":"Tunisia","s":"1111111111111111111111"},{"iso3":"TZA","name":"Tanzania","s":"1111111111111111111111"},{"iso3":"UGA","name":"Uganda","s":"1111111111111111111111"},{"iso3":"VEN","name":"Venezuela","s":"1111111111111111111111"},{"iso3":"YEM","name":"Yemen","s":"1111111111111111111111"},{"iso3":"ZMB","name":"Zambia","s":"1111111111111111111111"},{"iso3":"ZWE","name":"Zimbabwe","s":"1111111111111111111111"},{"iso3":"ARE","name":"United Arab Emirates","s":"0000000000000000000000"},{"iso3":"GMB","name":"The Gambia","s":"1111111111111000000000"},{"iso3":"IDN","name":"Indonesia","s":"1100000000000000000000"},{"iso3":"JOR","name":"Jordan","s":"0000000000000000000000"},{"iso3":"KWT","name":"Kuwait","s":"1111111000000000000000"},{"iso3":"LBN","name":"Lebanon","s":"0000000000000000000000"},{"iso3":"MWI","name":"Malawi","s":"0000000000000000000000"},{"iso3":"MYS","name":"Malaysia","s":"0000000000000000000000"},{"iso3":"NGA","name":"Nigeria","s":"0000000000000000000000"},{"iso3":"OMN","name":"Oman","s":"1111111111111111110000"},{"iso3":"SAU","name":"Saudi Arabia","s":"0000000000000000000000"},{"iso3":"SSD","name":"South Sudan","s":"...........00000000000"}],"num2iso":{"004":"AFG","008":"ALB","010":"ATA","012":"DZA","024":"AGO","031":"AZE","032":"ARG","036":"AUS","040":"AUT","044":"BHS","050":"BGD","051":"ARM","056":"BEL","064":"BTN","068":"BOL","070":"BIH","072":"BWA","076":"BRA","084":"BLZ","090":"SLB","096":"BRN","100":"BGR","104":"MMR","108":"BDI","112":"BLR","116":"KHM","120":"CMR","124":"CAN","140":"CAF","144":"LKA","148":"TCD","152":"CHL","156":"CHN","158":"TWN","170":"COL","178":"COG","180":"COD","188":"CRI","191":"HRV","192":"CUB","196":"CYP","203":"CZE","204":"BEN","208":"DNK","214":"DOM","218":"ECU","222":"SLV","226":"GNQ","231":"ETH","232":"ERI","233":"EST","238":"FLK","242":"FJI","246":"FIN","250":"FRA","260":"ATF","262":"DJI","266":"GAB","268":"GEO","270":"GMB","275":"PSE","276":"DEU","288":"GHA","300":"GRC","304":"GRL","320":"GTM","324":"GIN","328":"GUY","332":"HTI","340":"HND","348":"HUN","352":"ISL","356":"IND","360":"IDN","364":"IRN","368":"IRQ","372":"IRL","376":"ISR","380":"ITA","384":"CIV","388":"JAM","392":"JPN","398":"KAZ","400":"JOR","404":"KEN","408":"PRK","410":"KOR","414":"KWT","417":"KGZ","418":"LAO","422":"LBN","426":"LSO","428":"LVA","430":"LBR","434":"LBY","440":"LTU","442":"LUX","450":"MDG","454":"MWI","458":"MYS","466":"MLI","478":"MRT","484":"MEX","496":"MNG","498":"MDA","499":"MNE","504":"MAR","508":"MOZ","512":"OMN","516":"NAM","524":"NPL","528":"NLD","540":"NCL","548":"VUT","554":"NZL","558":"NIC","562":"NER","566":"NGA","578":"NOR","586":"PAK","591":"PAN","598":"PNG","600":"PRY","604":"PER","608":"PHL","616":"POL","620":"PRT","624":"GNB","626":"TLS","630":"PRI","634":"QAT","642":"ROU","643":"RUS","646":"RWA","682":"SAU","686":"SEN","688":"SRB","694":"SLE","703":"SVK","704":"VNM","705":"SVN","706":"SOM","710":"ZAF","716":"ZWE","724":"ESP","728":"SSD","729":"SDN","732":"ESH","740":"SUR","748":"SWZ","752":"SWE","756":"CHE","760":"SYR","762":"TJK","764":"THA","768":"TGO","780":"TTO","784":"ARE","788":"TUN","792":"TUR","795":"TKM","800":"UGA","804":"UKR","807":"MKD","818":"EGY","826":"GBR","834":"TZA","840":"USA","854":"BFA","858":"URY","860":"UZB","862":"VEN","887":"YEM","894":"ZMB"}}</script>
+<script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import * as topojson from "https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/+esm";
+
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const css = getComputedStyle(document.documentElement);
+const tok = n => css.getPropertyValue(n).trim();
+const C = {
+  paper: tok("--paper"), paper2: tok("--paper-2"), rule: tok("--rule"), nodata: tok("--nodata"),
+  ink: tok("--ink"), ink2: tok("--ink-2"), ink3: tok("--ink-3"),
+  s500: tok("--score-500"), accent: tok("--accent"),
+};
+const RAMP = [100,200,300,400,500,600,700].map(s => tok(`--score-${s}`));
+const scoreColor = d3.scaleSequential(d3.piecewise(d3.interpolateLab, RAMP)).domain([0, 1]);
+const pct = (v, d = 1) => v == null ? "No data" : `${(v * 100).toFixed(d).replace(/\.0$/, "")}%`;
+const YEARS = d3.range(2000, 2022);
+const dec = ch => ch === "." ? null : parseInt(ch, 16) / 13;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ── Ramp swatches + space scale + scale legends ────────────────────────────
+document.getElementById("ramp").innerHTML = RAMP.map((h, i) =>
+  `<div class="sw"><div class="chip" style="background:${h}"></div><b>--score-${(i+1)*100}</b><span>${h}</span></div>`).join("");
+document.getElementById("space-scale").innerHTML = [["--s-1",4],["--s-2",8],["--s-3",12],["--s-4",16],["--s-5",24],["--s-6",32],["--s-7",48],["--s-8",64],["--s-9",96],["--s-10",144]]
+  .map(([n, v]) => `<div class="space-row"><span class="mono">${n}</span><span class="num">${v}px</span><i style="width:${v}px"></i></div>`).join("");
+document.querySelectorAll("[data-scale] .scale-legend__bar").forEach(el =>
+  el.innerHTML = d3.range(14).map(k => `<i style="background:${scoreColor(k/13)}" title="${k} of 13 · ${pct(k/13)}"></i>`).join(""));
+
+// ── Tooltip ────────────────────────────────────────────────────────────────
+const tt = document.getElementById("tt");
+function showTT(html, ev) {
+  tt.innerHTML = html; tt.classList.add("is-on");
+  const r = tt.getBoundingClientRect();
+  let x = ev.clientX + 16, y = ev.clientY + 16;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 16;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 16;
+  tt.style.transform = `translate(${x}px,${y}px)`;
+}
+const hideTT = () => tt.classList.remove("is-on");
+const row = (k, v, dot) => `<span class="tt__row"><span>${dot ? `<i style="background:${dot}"></i>` : ""}${k}</span><b>${v}</b></span>`;
+
+// ── Reveal on scroll ───────────────────────────────────────────────────────
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("is-in"); e.target.dispatchEvent(new Event("reveal")); io.unobserve(e.target); }
+}), { threshold: 0.25 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+// ═══ FIG 1 · DISTRIBUTION ═════════════════════════════════════════════════
+function fig1() {
+  const fig = document.getElementById("fig1"), el = fig.querySelector(".fig__plot");
+  el.innerHTML = "";
+  const data = DATA.yearly, W = el.clientWidth, narrow = W < 600;
+  const H = narrow ? 300 : 380, m = { t: 12, r: narrow ? 96 : 150, b: 32, l: 40 };
+  const x = d3.scaleLinear([2000, 2021], [m.l, W - m.r]);
+  const y = d3.scaleLinear([0, 0.7], [H - m.b, m.t]);
+  const svg = d3.select(el).append("svg").attr("width", W).attr("height", H)
+    .attr("role", "img").attr("aria-label", "Line chart. The average TRIP score rose from 10.9% in 2000 to 23.5% in 2021. The 25th percentile stayed at 7.7%. The 90th percentile rose from 15% to 62%.");
+  const yt = [0, .2, .4, .6];
+  svg.append("g").selectAll("line").data(yt.slice(1)).join("line").attr("class", "grid-line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  svg.append("line").attr("class", "axis-line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0));
+  svg.append("g").selectAll("text").data(yt).join("text").attr("class", "tick").attr("x", m.l - 8).attr("y", y).attr("dy", "0.32em").attr("text-anchor", "end").text(d => `${d * 100}%`);
+  svg.append("g").selectAll("text").data([2000, 2005, 2010, 2015, 2021]).join("text").attr("class", "tick").attr("x", x).attr("y", H - m.b + 20).attr("text-anchor", "middle").text(d => d);
+
+  const area = (lo, hi) => d3.area().x(d => x(d.year)).y0(d => y(d[lo])).y1(d => y(d[hi])).curve(d3.curveMonotoneX);
+  const collapsed = d3.area().x(d => x(d.year)).y0(d => y(d.mean)).y1(d => y(d.mean)).curve(d3.curveMonotoneX);
+  const line = k => d3.line().x(d => x(d.year)).y(d => y(d[k])).curve(d3.curveMonotoneX);
+
+  const outer = svg.append("path").datum(data).attr("fill", C.s500).attr("fill-opacity", .10).attr("d", collapsed);
+  const inner = svg.append("path").datum(data).attr("fill", C.s500).attr("fill-opacity", .24).attr("d", collapsed);
+  svg.append("path").datum(data).attr("fill", "none").attr("stroke", C.s500).attr("stroke-width", 2).attr("stroke-linecap", "round").attr("d", line("mean"));
+  const p25 = svg.append("path").datum(data).attr("fill", "none").attr("stroke", C.accent).attr("stroke-width", 2).attr("stroke-linecap", "round").attr("d", line("p25"));
+  const len = p25.node().getTotalLength();
+  p25.attr("stroke-dasharray", `${len} ${len}`).attr("stroke-dashoffset", len);
+
+  const last = data.at(-1), first = data[0];
+  const endG = svg.append("g").attr("opacity", 0);
+  const endLabel = (yv, name, val) => {
+    const g = endG.append("g").attr("transform", `translate(${x(2021) + 10},${y(yv)})`);
+    g.append("text").attr("class", "dlabel dlabel--muted").attr("dy", "-0.25em").text(name);
+    g.append("text").attr("class", "dlabel dlabel--strong").attr("dy", "1em").text(val);
+  };
+  endLabel(last.mean, "Average", pct(last.mean));
+  endLabel(last.p25, narrow ? "Bottom ¼" : "Bottom quarter", pct(last.p25));
+  const top = endG.append("text").attr("class", "dlabel dlabel--muted").attr("x", x(2021) + 10).attr("y", y(last.p90));
+  top.append("tspan").attr("dy", "-0.25em").text("Top 10%");
+  top.append("tspan").attr("x", x(2021) + 10).attr("dy", "1.25em").text(`from ${pct(last.p90)}`);
+  endG.append("text").attr("class", "dlabel halo").attr("x", x(2000)).attr("y", y(first.mean) - 10).text(pct(first.mean));
+  endG.append("text").attr("class", "dlabel halo").attr("x", x(2000)).attr("y", y(first.p25) + 18).text(pct(first.p25));
+
+  // reveal: inner band fans out, then outer, then the p25 line draws, then labels
+  const run = () => {
+    const t = (d) => d3.transition().duration(reduced ? 0 : 900).delay(reduced ? 0 : d).ease(d3.easeCubicOut);
+    inner.transition(t(0)).attr("d", area("p25", "p75"));
+    outer.transition(t(350)).attr("d", area("p10", "p90"));
+    p25.transition(t(800)).attr("stroke-dashoffset", 0);
+    endG.transition(t(1300)).attr("opacity", 1);
+  };
+  const ob = new IntersectionObserver(([e]) => { if (e.isIntersecting) { run(); ob.disconnect(); } }, { threshold: .4 });
+  ob.observe(el);
+
+  // hover: crosshair + tooltip
+  const cross = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  cross.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", C.ink).attr("stroke-width", 1);
+  const cm = cross.append("circle").attr("r", 5).attr("fill", C.s500).attr("stroke", C.paper).attr("stroke-width", 2);
+  const cp = cross.append("circle").attr("r", 5).attr("fill", C.accent).attr("stroke", C.paper).attr("stroke-width", 2);
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", ev => {
+      const yr = Math.round(x.invert(d3.pointer(ev)[0])), d = data.find(r => r.year === yr); if (!d) return;
+      cross.attr("opacity", 1).attr("transform", `translate(${x(yr)},0)`);
+      cm.attr("cy", y(d.mean)); cp.attr("cy", y(d.p25));
+      showTT(`<span class="tt__title">${yr}</span>${row("Top 10% from", pct(d.p90))}${row("Average", pct(d.mean), C.s500)}${row("Middle half", `${pct(d.p25)}–${pct(d.p75)}`)}${row("Bottom quarter", pct(d.p25), C.accent)}`, ev);
+    })
+    .on("pointerleave", () => { cross.attr("opacity", 0); hideTT(); });
+
+  document.getElementById("t1").innerHTML = `<thead><tr><th>Year</th><th>10th pct</th><th>25th pct</th><th>Average</th><th>75th pct</th><th>90th pct</th></tr></thead><tbody>${
+    data.map(d => `<tr><td>${d.year}</td><td>${pct(d.p10)}</td><td>${pct(d.p25)}</td><td>${pct(d.mean)}</td><td>${pct(d.p75)}</td><td>${pct(d.p90)}</td></tr>`).join("")}</tbody>`;
+}
+
+// ═══ FIG 2 · CHOROPLETH ═══════════════════════════════════════════════════
+const ANN = [
+  { iso3: "ARG", note: "First self-ID law, 2012", at: [-64, -36], side: "end" },
+  { iso3: "IND", note: "Recognition without protection", at: [79, 21], side: "start" },
+  { iso3: "AUT", note: "Strong on LGB rights, weak on trans", at: [14.5, 47.5], side: "start" },
+  { iso3: "USA", note: "No federal gender recognition law", at: [-99, 39], side: "start" },
+];
+let topo;
+async function fig2() {
+  const fig = document.getElementById("fig2"), el = fig.querySelector(".fig__plot");
+  topo ??= await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json");
+  el.innerHTML = "";
+  const fc = topojson.feature(topo, topo.objects.countries);
+  fc.features = fc.features.filter(f => f.id !== "010");
+  const byIso = new Map(DATA.countries.map(c => [c.iso3, { name: c.name, v: dec(c.s[21]) }]));
+  const W = el.clientWidth, H = Math.round(W * 0.487);
+  const proj = d3.geoEqualEarth().fitExtent([[1, 1], [W - 1, H - 1]], { type: "Sphere" }), path = d3.geoPath(proj);
+  const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).attr("role", "img")
+    .attr("aria-label", "World map of 2021 TRIP scores. Highest scores in parts of Western Europe and Latin America, including Argentina at 100%. Most of Africa, the Middle East and Central Asia score under 10%.");
+  const defs = svg.append("defs");
+  const pat = defs.append("pattern").attr("id", "hatch").attr("width", 5).attr("height", 5).attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
+  pat.append("rect").attr("width", 5).attr("height", 5).attr("fill", C.nodata);
+  pat.append("line").attr("x1", 0).attr("x2", 0).attr("y1", 0).attr("y2", 5).attr("stroke", C.rule).attr("stroke-width", 1.5);
+  svg.append("path").datum({ type: "Sphere" }).attr("d", path).attr("fill", "none").attr("stroke", C.rule);
+  const iso = f => DATA.num2iso[f.id];
+  svg.append("g").selectAll("path").data(fc.features).join("path")
+    .attr("d", path)
+    .attr("fill", f => { const r = byIso.get(iso(f)); return r && r.v != null ? scoreColor(r.v) : "url(#hatch)"; })
+    .attr("stroke", C.paper).attr("stroke-width", 0.6)
+    .on("pointermove", function (ev, f) {
+      d3.select(this).attr("stroke", C.ink).attr("stroke-width", 1.2).raise();
+      const r = byIso.get(iso(f));
+      showTT(`<span class="tt__title">${r?.name ?? f.properties.name}</span>${row("TRIP score 2021", pct(r?.v))}${r?.v != null ? row("Indicators", `${Math.round(r.v * 13)} of 13`) : ""}`, ev);
+    })
+    .on("pointerleave", function () { d3.select(this).attr("stroke", C.paper).attr("stroke-width", 0.6); hideTT(); });
+  const ag = svg.append("g");
+  ANN.forEach(a => {
+    const [px, py] = proj(a.at), r = byIso.get(a.iso3), s = a.side === "end" ? -1 : 1;
+    const g = ag.append("g").attr("class", "ann").attr("tabindex", 0).attr("role", "button")
+      .attr("aria-label", `${r.name}, ${pct(r.v)}. ${a.note}`).attr("transform", `translate(${px},${py})`);
+    g.append("circle").attr("r", 14).attr("fill", "transparent");
+    g.append("circle").attr("class", "ann__dot").attr("r", 4);
+    const l = g.append("g").attr("class", "ann__label");
+    l.append("line").attr("x1", 6 * s).attr("x2", 22 * s).attr("stroke", C.ink);
+    const ta = a.side;
+    l.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", 26 * s).attr("y", -2).attr("text-anchor", ta).text(`${r.name === "United States of America" ? "United States" : r.name} ${pct(r.v)}`);
+    l.append("text").attr("class", "dlabel dlabel--muted halo").attr("x", 26 * s).attr("y", 14).attr("text-anchor", ta).text(a.note);
+  });
+}
+
+// ═══ FIG 3 · DOT PLOT ═════════════════════════════════════════════════════
+function fig3() {
+  const fig = document.getElementById("fig3"), el = fig.querySelector(".fig__plot");
+  el.innerHTML = "";
+  const data = DATA.adoption, groups = d3.groups(data, d => d.group);
+  const W = el.clientWidth, m = { t: 24, r: 56, b: 8, l: 56 }, rowH = 52, headH = 36;
+  const H = m.t + m.b + data.length * rowH + groups.length * headH;
+  const x = d3.scaleLinear([0, 1], [m.l, W - m.r]);
+  const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).attr("role", "img")
+    .attr("aria-label", "Dot plot of nine legal protections, share of countries in 2000 versus 2021. Legal gender marker change rose from 11% to 35%. Employment protection rose from 0% to 20%. No direct criminalization fell from 95% to 93%.");
+  [0, .25, .5, .75, 1].forEach(t => {
+    svg.append("line").attr("class", "grid-line").attr("x1", x(t)).attr("x2", x(t)).attr("y1", m.t - 6).attr("y2", H - m.b);
+    svg.append("text").attr("class", "tick").attr("x", x(t)).attr("y", m.t - 12).attr("text-anchor", "middle").text(`${t * 100}%`);
+  });
+  let yy = m.t;
+  groups.forEach(([g, rows]) => {
+    svg.append("text").attr("class", "halo").attr("x", 0).attr("y", yy + 26).attr("fill", C.ink3).attr("font-size", 12).attr("font-weight", 600).attr("letter-spacing", ".08em").text(g.toUpperCase());
+    yy += headH;
+    rows.forEach(d => {
+      const cy = yy + 34, up = d.r2021 >= d.r2000, col = up ? C.s500 : C.accent;
+      const gR = svg.append("g");
+      const hl = gR.append("rect").attr("x", 0).attr("y", yy).attr("width", W).attr("height", rowH).attr("fill", C.paper2).attr("opacity", 0);
+      gR.append("text").attr("class", "dlabel halo").attr("x", m.l).attr("y", yy + 14).text(d.label);
+      gR.append("line").attr("x1", x(d.r2000)).attr("x2", x(d.r2021)).attr("y1", cy).attr("y2", cy).attr("stroke", col).attr("stroke-width", 2);
+      gR.append("circle").attr("cx", x(d.r2000)).attr("cy", cy).attr("r", 5).attr("fill", C.paper).attr("stroke", C.ink2).attr("stroke-width", 2);
+      gR.append("circle").attr("cx", x(d.r2021)).attr("cy", cy).attr("r", 6).attr("fill", col).attr("stroke", C.paper).attr("stroke-width", 2);
+      const lo = Math.min(d.r2000, d.r2021), hi = Math.max(d.r2000, d.r2021);
+      const loIs2000 = d.r2000 <= d.r2021;
+      gR.append("text").attr("class", `dlabel ${loIs2000 ? "dlabel--muted" : "dlabel--strong"}`).attr("x", x(lo) - 12).attr("y", cy).attr("dy", "0.32em").attr("text-anchor", "end").text(pct(lo, 0));
+      gR.append("text").attr("class", `dlabel ${loIs2000 ? "dlabel--strong" : "dlabel--muted"}`).attr("x", x(hi) + 12).attr("y", cy).attr("dy", "0.32em").text(pct(hi, 0));
+      gR.append("rect").attr("x", 0).attr("y", yy).attr("width", W).attr("height", rowH).attr("fill", "transparent")
+        .on("pointermove", ev => { hl.attr("opacity", 1); const dp = (d.r2021 - d.r2000) * 100;
+          showTT(`<span class="tt__title">${d.label}</span>${row("2000", pct(d.r2000))}${row("2021", pct(d.r2021), col)}${row("Change", `${dp >= 0 ? "+" : "−"}${Math.abs(dp).toFixed(1)} pts`)}`, ev); })
+        .on("pointerleave", () => { hl.attr("opacity", 0); hideTT(); });
+      gR.lower(); hl.lower();
+      yy += rowH;
+    });
+  });
+  document.getElementById("t3").innerHTML = `<thead><tr><th>Indicator</th><th>2000</th><th>2021</th><th>Change</th></tr></thead><tbody>${
+    data.map(d => `<tr><td>${d.label}</td><td>${pct(d.r2000)}</td><td>${pct(d.r2021)}</td><td>${((d.r2021 - d.r2000) * 100).toFixed(1)} pts</td></tr>`).join("")}</tbody>`;
+}
+
+// ═══ FIG 4 · FINGERPRINT ══════════════════════════════════════════════════
+const LABELS = ["ARG", "NOR", "IND", "USA", "AUT", "IRN", "NGA", "UGA"];
+let setStep = () => {};
+function fig4() {
+  const fig = document.getElementById("fig4"), el = fig.querySelector(".fig__plot");
+  el.innerHTML = "";
+  const cs = DATA.countries, W = el.clientWidth, narrow = W < 600;
+  const m = { t: 28, r: narrow ? 84 : 130, b: 28, l: 0 }, rh = 4;
+  const H = m.t + m.b + cs.length * rh;
+  const x = d3.scaleBand(YEARS, [m.l, W - m.r]).paddingInner(0.12);
+  const y = i => m.t + i * rh;
+  const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).attr("role", "img")
+    .attr("aria-label", "Heatmap of 173 countries by 22 years. A small group at the top turns dark blue after 2010. The bottom quarter stays pale through 2021.");
+  const cells = svg.append("g");
+  cs.forEach((c, i) => [...c.s].forEach((ch, j) => {
+    const v = dec(ch);
+    cells.append("rect").attr("x", x(YEARS[j])).attr("y", y(i)).attr("width", x.bandwidth()).attr("height", rh)
+      .attr("fill", v == null ? C.nodata : scoreColor(v));
+  }));
+  [2000, 2005, 2010, 2015, 2021].forEach(yr => svg.append("text").attr("class", "tick").attr("x", x(yr) + x.bandwidth() / 2).attr("y", H - m.b + 18).attr("text-anchor", "middle").text(yr));
+  // masks & story marks
+  const maskR = svg.append("rect").attr("y", m.t).attr("height", cs.length * rh).attr("fill", C.paper).attr("opacity", 0).attr("pointer-events", "none");
+  const maskT = svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.r - m.l).attr("fill", C.paper).attr("opacity", 0).attr("pointer-events", "none");
+  const x12 = x(2012) + x.bandwidth() / 2;
+  const rule12 = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  rule12.append("line").attr("x1", x12).attr("x2", x12).attr("y1", m.t - 6).attr("y2", H - m.b).attr("stroke", C.accent).attr("stroke-width", 2);
+  rule12.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", x12 + 6).attr("y", m.t - 10).text("2012 · Argentina self-ID law");
+  const qIdx = cs.length - Math.ceil(cs.length / 4);
+  const q = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
+  q.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(qIdx)).attr("y2", y(qIdx)).attr("stroke", C.accent).attr("stroke-width", 2);
+  q.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", m.l + 4).attr("y", y(qIdx) - 8).text("Bottom quarter · 7.7% in 2000 and 2021");
+  // row labels
+  const lab = svg.append("g").attr("transform", `translate(${W - m.r + 8},0)`);
+  cs.forEach((c, i) => { if (!LABELS.includes(c.iso3)) return;
+    const g = lab.append("g").attr("transform", `translate(0,${y(i) + rh / 2})`);
+    g.append("line").attr("x1", -6).attr("x2", 0).attr("stroke", C.ink);
+    g.append("text").attr("class", "tick").attr("x", 4).attr("dy", "0.32em").text(c.name === "United States of America" ? "United States" : c.name);
+  });
+  // hover: row outline + tooltip from pointer position
+  const hov = svg.append("rect").attr("x", m.l - 1).attr("width", W - m.r - m.l + 2).attr("height", rh + 2).attr("fill", "none").attr("stroke", C.ink).attr("stroke-width", 1).attr("opacity", 0).attr("pointer-events", "none");
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.r - m.l).attr("height", cs.length * rh).attr("fill", "transparent")
+    .on("pointermove", ev => {
+      const [px, py] = d3.pointer(ev), i = Math.max(0, Math.min(cs.length - 1, Math.floor((py - m.t) / rh)));
+      const j = Math.max(0, Math.min(21, Math.floor((px - m.l) / x.step()))), c = cs[i], v = dec(c.s[j]);
+      hov.attr("y", y(i) - 1).attr("opacity", 1);
+      showTT(`<span class="tt__title">${c.name} · ${YEARS[j]}</span>${row("TRIP score", pct(v))}${row("Score in 2021", pct(dec(c.s[21])))}`, ev);
+    })
+    .on("pointerleave", () => { hov.attr("opacity", 0); hideTT(); });
+
+  const D = reduced ? 0 : 600;
+  setStep = s => {
+    const xEnd = s === 1 ? x(2000) + x.bandwidth() + 1 : s === 2 ? x(2012) + x.bandwidth() + 1 : W - m.r;
+    maskR.attr("x", xEnd).attr("width", Math.max(0, W - m.r - xEnd)).transition().duration(D).attr("opacity", s === 1 || s === 2 ? .85 : 0);
+    maskT.attr("height", y(qIdx) - m.t).transition().duration(D).attr("opacity", s === 3 ? .85 : 0);
+    rule12.transition().duration(D).attr("opacity", s === 2 ? 1 : 0);
+    q.transition().duration(D).attr("opacity", s === 3 ? 1 : 0);
+  };
+  const cur = +(fig.querySelector('.seg [aria-pressed="true"]')?.dataset.step ?? 0); setStep(cur);
+
+  document.getElementById("t4").innerHTML = `<thead><tr><th>Country</th><th>2000</th><th>2021</th></tr></thead><tbody>${
+    cs.map(c => `<tr><td>${c.name}</td><td>${pct(dec(c.s[0]))}</td><td>${pct(dec(c.s[21]))}</td></tr>`).join("")}</tbody>`;
+}
+document.querySelectorAll("#fig4 .seg button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#fig4 .seg button").forEach(o => o.setAttribute("aria-pressed", o === b));
+  setStep(+b.dataset.step);
+}));
+
+// ═══ Typology carousel ════════════════════════════════════════════════════
+const CARDS = [
+  { type: "Closest to complete", country: "Uruguay", n: 12, body: "The highest score in the dataset in 2021. No country holds all thirteen protections." },
+  { type: "Recognition without protection", country: "India", n: 8, body: "A 2014 Supreme Court ruling recognised a third gender, but anti-discrimination protections remain thin." },
+  { type: "The progressive exception", country: "Austria", n: 3, body: "Strong on LGB rights, yet trans people still face medical gatekeeping to change their legal gender." },
+];
+let ci = 0;
+const dotsEl = document.getElementById("dots");
+dotsEl.innerHTML = CARDS.map((c, i) => `<button aria-label="${c.country}"></button>`).join("");
+function renderCard() {
+  const c = CARDS[ci], el = document.getElementById("card");
+  el.querySelector(".card__type").textContent = c.type;
+  el.querySelector(".card__country").textContent = c.country;
+  el.querySelector(".card__score").innerHTML = `${pct(c.n / 13, 0)} <small>${c.n} of 13 indicators</small>`;
+  el.querySelector(".card__dots").innerHTML = d3.range(13).map(k => `<i class="${k < c.n ? "on" : ""}"></i>`).join("");
+  el.querySelector(".card__body").textContent = c.body;
+  dotsEl.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-current", i === ci));
+  document.getElementById("prev").disabled = ci === 0;
+  document.getElementById("next").disabled = ci === CARDS.length - 1;
+}
+document.getElementById("prev").onclick = () => { ci = Math.max(0, ci - 1); renderCard(); };
+document.getElementById("next").onclick = () => { ci = Math.min(CARDS.length - 1, ci + 1); renderCard(); };
+dotsEl.querySelectorAll("button").forEach((b, i) => b.onclick = () => { ci = i; renderCard(); });
+document.querySelector(".carousel__ctrl").addEventListener("keydown", e => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  e.preventDefault();
+  ci = Math.max(0, Math.min(CARDS.length - 1, ci + (e.key === "ArrowRight" ? 1 : -1)));
+  renderCard();
+  dotsEl.querySelectorAll("button")[ci].focus();
+});
+renderCard();
+
+// ═══ Render + resize ══════════════════════════════════════════════════════
+function renderAll() { fig1(); fig2(); fig3(); fig4(); }
+renderAll();
+let lastW = innerWidth, rt;
+addEventListener("resize", () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(renderAll, 200); });
+</script>
+</body>
+</html>

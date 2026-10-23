@@ -31,23 +31,24 @@ function groupBy(arr, keyFn) {
   return map;
 }
 
-// The 13 indicator columns that make up the TRIP score,
-// along with their human-readable labels and category.
-// Column names match the actual CSV output of trip_clean.csv.py.
+// The 13 indicators that sum to trip_score (verified: reproduces trip_score
+// for all 3,781 country-years). `held` = the value meaning the right is in law:
+// crim columns are 1 = criminalized; gmcphys/psych/div are 1 = requirement
+// exists, 2 = not applicable (no gender marker change at all).
 export const INDICATORS = [
-  { col: "dir_crim",         label: "No direct criminalization",          category: "criminalization" },
-  { col: "ind_crim",         label: "No indirect criminalization",        category: "criminalization" },
-  { col: "gmc",              label: "Gender marker change possible",      category: "recognition"    },
-  { col: "gmcpr",            label: "GMC — self-ID / no procedure",       category: "recognition"    },
-  { col: "gmcphys",          label: "GMC — no physical requirement",      category: "recognition"    },
-  { col: "gmcpsych",         label: "GMC — no psychiatric requirement",   category: "recognition"    },
-  { col: "gmcdiv",           label: "GMC — no divorce requirement",       category: "recognition"    },
-  { col: "nb3g",             label: "Nonbinary / third gender marker",    category: "recognition"    },
-  { col: "adp_employment",   label: "Anti-discrim: employment",           category: "protection"     },
-  { col: "adp_education",    label: "Anti-discrim: education",            category: "protection"     },
-  { col: "adp_healthcare",   label: "Anti-discrim: healthcare",           category: "protection"     },
-  { col: "adp_housing",      label: "Anti-discrim: housing",              category: "protection"     },
-  { col: "adp_constitution", label: "Anti-discrim: constitutional",       category: "protection"     },
+  { col: "dir_crim",         held: 0, label: "No direct criminalization",          category: "Criminalization" },
+  { col: "ind_crim",         held: 0, label: "No indirect criminalization",        category: "Criminalization" },
+  { col: "gmc",              held: 1, label: "Legal gender marker change",         category: "Recognition"     },
+  { col: "gmcphys",          held: 0, label: "No surgery or physical requirement", category: "Recognition"     },
+  { col: "gmcpsych",         held: 0, label: "No psychiatric diagnosis required",  category: "Recognition"     },
+  { col: "gmcdiv",           held: 0, label: "No divorce requirement",             category: "Recognition"     },
+  { col: "nb3g",             held: 1, label: "Nonbinary or third gender marker",   category: "Recognition"     },
+  { col: "adp_general",      held: 1, label: "General anti-discrimination law",    category: "Protection"      },
+  { col: "adp_employment",   held: 1, label: "Protection in employment",           category: "Protection"      },
+  { col: "adp_education",    held: 1, label: "Protection in education",            category: "Protection"      },
+  { col: "adp_healthcare",   held: 1, label: "Protection in healthcare",           category: "Protection"      },
+  { col: "adp_housing",      held: 1, label: "Protection in housing",              category: "Protection"      },
+  { col: "adp_constitution", held: 1, label: "Constitutional protection",          category: "Protection"      },
 ];
 
 // Region labels — readable versions of V-Dem region codes.
@@ -124,11 +125,14 @@ export function indicatorAdoption(raw) {
   const y2000 = raw.filter(d => d.year === 2000);
   const y2021 = raw.filter(d => d.year === 2021);
 
+  const share = (rows, ind) => {
+    const valid = rows.filter(d => d[ind.col] != null && !Number.isNaN(d[ind.col]));
+    return valid.filter(d => d[ind.col] === ind.held).length / valid.length;
+  };
+
   const adoption = INDICATORS.map(ind => {
-    const rate2000 = y2000.filter(d => d[ind.col] != null)
-      .reduce((s, d, _, a) => s + d[ind.col] / a.length, 0);
-    const rate2021 = y2021.filter(d => d[ind.col] != null)
-      .reduce((s, d, _, a) => s + d[ind.col] / a.length, 0);
+    const rate2000 = share(y2000, ind);
+    const rate2021 = share(y2021, ind);
 
     return {
       col:       ind.col,
@@ -140,8 +144,10 @@ export function indicatorAdoption(raw) {
     };
   });
 
-  // Sort by 2021 adoption rate descending
-  return adoption.sort((a, b) => b.rate2021 - a.rate2021);
+  // Grouped by category (order of INDICATORS), then by 2021 rate within group
+  const order = [...new Set(INDICATORS.map(d => d.category))];
+  return adoption.sort((a, b) =>
+    order.indexOf(a.category) - order.indexOf(b.category) || b.rate2021 - a.rate2021);
 }
 
 
@@ -194,7 +200,7 @@ export function fingerprintMatrix(raw) {
 // Returns full indicator breakdown for a set of named countries.
 // Used to populate the typology cards in index.md (not a chart — just data).
 
-export function countryProfiles(raw, isos = ["ARG", "IND", "AUT"]) {
+export function countryProfiles(raw, isos = ["ARG", "IND", "AUT", "PAK", "IRN", "USA"]) {
   const y2021 = raw.filter(d => d.year === 2021 && isos.includes(d.iso3));
 
   return y2021.map(d => ({

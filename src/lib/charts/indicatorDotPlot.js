@@ -1,198 +1,62 @@
-// lib/charts/indicatorDotPlot.js
-// ─────────────────────────────────────────────────────────────────────────────
-// ACT III — What Changed, and What Didn't
-//
-// A 13-row horizontal dot plot. Each row = one TRIP indicator.
-// Two marks per row:
-//   - Hollow circle: adoption rate in 2000
-//   - Filled circle: adoption rate in 2021
-//   - Connecting line between them (emerald if delta > 0, coral if < 0)
-//
-// Rows are sorted by 2021 adoption rate, descending (most adopted = top).
-//
-// Key D3 concepts:
-//   - d3.scaleBand() → maps categorical values (indicator names) to y positions
-//   - d3.scaleLinear() → maps 0–1 proportion to x pixel position
-//   - SVG <circle> → the dots
-//   - SVG <line> → the connector between dots
-//   - d3.axisTop() → horizontal axis at top of chart
-// ─────────────────────────────────────────────────────────────────────────────
+// lib/charts/indicatorDotPlot.js — ACT III: share of countries holding each right, 2000 vs 2021.
+// Hollow ring = 2000, filled dot = 2021; dot and connector are primary when the
+// share rose and accent when it fell. Rows grouped by indicator family.
 
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import { tooltip, ttRow, pct } from "./tooltip.js";
 
-export function indicatorDotPlot(data, { width = 700, theme } = {}) {
+export function indicatorDotPlot(data, { width = 900, theme } = {}) {
+  const C = theme.colors;
+  const groups = d3.groups(data, d => d.category);
+  const m = { top: 24, right: 56, bottom: 8, left: 56 }, rowH = 52, headH = 40;
+  const height = m.top + m.bottom + data.length * rowH + groups.length * headH;
+  const x = d3.scaleLinear([0, 1], [m.left, width - m.right]);
+  const tt = tooltip();
 
-  // ── DIMENSIONS ─────────────────────────────────────────────────────────────
-  const margin = { top: 36, right: 80, bottom: 16, left: 220 };
-  const rowH   = 36; // height per indicator row
-  const height = data.length * rowH + margin.top + margin.bottom;
-  const innerW = width - margin.left - margin.right;
-  const innerH = height - margin.top - margin.bottom;
-
-  // ── SCALES ─────────────────────────────────────────────────────────────────
-  // xScale: 0%–100% proportion → pixel x position
-  const xScale = d3.scaleLinear()
-    .domain([0, 1])
-    .range([0, innerW]);
-
-  // yScale: indicator label → pixel y position (centered in row)
-  // d3.scaleBand() divides a range into equal bands, one per category.
-  // .padding() adds space between bands.
-  const yScale = d3.scaleBand()
-    .domain(data.map(d => d.label))
-    .range([0, innerH])
-    .padding(0.3);
-
-  // ── SVG ROOT ───────────────────────────────────────────────────────────────
   const svg = d3.create("svg")
-    .attr("width",   width)
-    .attr("height",  height)
-    .attr("class",   "chart chart--indicator-dot-plot")
-    .attr("viewBox", `0 0 ${width} ${height}`);
+    .attr("class", "chart chart--dotplot")
+    .attr("width", width).attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", "Dot plot of the 13 TRIP indicators, share of countries in 2000 and 2021. " +
+      data.map(d => `${d.label}: ${pct(d.rate2000, 0)} to ${pct(d.rate2021, 0)}`).join(". "));
 
-  const g = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  [0, 0.25, 0.5, 0.75, 1].forEach(v => {
+    svg.append("line").attr("class", "grid-line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", m.top - 6).attr("y2", height - m.bottom);
+    svg.append("text").attr("class", "tick").attr("x", x(v)).attr("y", m.top - 12).attr("text-anchor", "middle").text(`${v * 100}%`);
+  });
 
-  // ── BACKGROUND ROWS (alternating) ──────────────────────────────────────────
-  // Subtle alternating stripes to help the eye track across each row.
-  g.selectAll(".row-bg")
-    .data(data)
-    .join("rect")
-    .attr("class", "row-bg")
-    .attr("x",       -margin.left)
-    .attr("y",       d => yScale(d.label))
-    .attr("width",   width)
-    .attr("height",  yScale.bandwidth())
-    .attr("fill",    (d, i) => i % 2 === 0 ? theme.colors.ink + "00" : theme.colors.fog + "08");
-
-  // ── ZERO LINE ──────────────────────────────────────────────────────────────
-  g.append("line")
-    .attr("x1", 0).attr("x2", 0)
-    .attr("y1", 0).attr("y2", innerH)
-    .attr("stroke",       theme.colors.muted)
-    .attr("stroke-width", 0.5)
-    .attr("opacity",      0.5);
-
-  // ── CONNECTOR LINES ────────────────────────────────────────────────────────
-  // A line between the 2000 dot and the 2021 dot.
-  // Color encodes direction: emerald = growth, coral = regression.
-  g.selectAll(".connector")
-    .data(data)
-    .join("line")
-    .attr("class", "connector")
-    .attr("x1", d => xScale(d.rate2000))
-    .attr("x2", d => xScale(d.rate2021))
-    .attr("y1", d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("y2", d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("stroke", d => d.delta >= 0 ? theme.colors.emerald : theme.colors.coral)
-    .attr("stroke-width", 2)
-    .attr("opacity", 0.7);
-
-  // ── 2000 DOTS (hollow) ─────────────────────────────────────────────────────
-  g.selectAll(".dot-2000")
-    .data(data)
-    .join("circle")
-    .attr("class",  "dot dot-2000")
-    .attr("cx",     d => xScale(d.rate2000))
-    .attr("cy",     d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("r",      5)
-    .attr("fill",   "none")
-    .attr("stroke", theme.colors.muted)
-    .attr("stroke-width", 1.5)
-    .append("title")
-      .text(d => `${d.label} — 2000: ${(d.rate2000 * 100).toFixed(0)}%`);
-
-  // ── 2021 DOTS (filled) ─────────────────────────────────────────────────────
-  g.selectAll(".dot-2021")
-    .data(data)
-    .join("circle")
-    .attr("class", "dot dot-2021")
-    .attr("cx",    d => xScale(d.rate2021))
-    .attr("cy",    d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("r",     6)
-    .attr("fill",  d => d.delta >= 0 ? theme.colors.emerald : theme.colors.coral)
-    .attr("opacity", 0.9)
-    .append("title")
-      .text(d => `${d.label} — 2021: ${(d.rate2021 * 100).toFixed(0)}%`);
-
-  // ── 2021 VALUE LABELS ──────────────────────────────────────────────────────
-  // Show the 2021 percentage to the right of the filled dot.
-  g.selectAll(".label-2021")
-    .data(data)
-    .join("text")
-    .attr("class", "label label-2021")
-    .attr("x",  d => xScale(d.rate2021) + 10)
-    .attr("y",  d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("dy", "0.35em")
-    .attr("fill", theme.colors.fog)
-    .style("font-size",   "10px")
-    .style("font-family", theme.fonts.mono)
-    .text(d => `${(d.rate2021 * 100).toFixed(0)}%`);
-
-  // ── CATEGORY LABELS (left side) ────────────────────────────────────────────
-  // The indicator name, left-aligned outside the chart area.
-  g.selectAll(".label-indicator")
-    .data(data)
-    .join("text")
-    .attr("class", "label label-indicator")
-    .attr("x",  -8)
-    .attr("y",  d => yScale(d.label) + yScale.bandwidth() / 2)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "end")
-    .attr("fill", d => d.delta < 0 ? theme.colors.coral : theme.colors.fog)
-    .style("font-size",   "11px")
-    .style("font-family", theme.fonts.mono)
-    .text(d => d.label);
-
-  // ── AXIS ───────────────────────────────────────────────────────────────────
-  const xAxis = d3.axisTop(xScale)
-    .tickValues([0, 0.25, 0.5, 0.75, 1])
-    .tickFormat(d => `${(d * 100).toFixed(0)}%`)
-    .tickSize(-innerH);
-
-  g.append("g")
-    .attr("class", "axis axis--x")
-    .call(xAxis)
-    .select(".domain").remove();
-
-  // Style tick lines subtly
-  g.selectAll(".axis--x .tick line")
-    .attr("stroke", theme.colors.muted)
-    .attr("stroke-opacity", 0.3);
-
-  g.selectAll(".axis--x .tick text")
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "10px")
-    .style("font-family", theme.fonts.mono);
-
-  // ── LEGEND ─────────────────────────────────────────────────────────────────
-  // Small legend at top-right: hollow = 2000, filled = 2021.
-  const legendG = svg.append("g")
-    .attr("transform", `translate(${width - margin.right + 10}, ${margin.top})`);
-
-  legendG.append("circle")
-    .attr("cx", 6).attr("cy", 6).attr("r", 5)
-    .attr("fill", "none")
-    .attr("stroke", theme.colors.muted)
-    .attr("stroke-width", 1.5);
-
-  legendG.append("text")
-    .attr("x", 16).attr("y", 6).attr("dy", "0.35em")
-    .attr("fill", theme.colors.muted)
-    .style("font-size", "9px")
-    .style("font-family", theme.fonts.mono)
-    .text("2000");
-
-  legendG.append("circle")
-    .attr("cx", 6).attr("cy", 22).attr("r", 6)
-    .attr("fill", theme.colors.emerald).attr("opacity", 0.9);
-
-  legendG.append("text")
-    .attr("x", 16).attr("y", 22).attr("dy", "0.35em")
-    .attr("fill", theme.colors.fog)
-    .style("font-size", "9px")
-    .style("font-family", theme.fonts.mono)
-    .text("2021");
-
+  let y0 = m.top;
+  for (const [group, rows] of groups) {
+    svg.append("text").attr("class", "group-label halo").attr("x", 0).attr("y", y0 + 28).text(group.toUpperCase());
+    y0 += headH;
+    for (const d of rows) {
+      const cy = y0 + 34, up = d.rate2021 >= d.rate2000, col = up ? C.primary : C.accent;
+      const row = svg.append("g");
+      const hl = row.append("rect").attr("y", y0).attr("width", width).attr("height", rowH).attr("fill", C.paper2).attr("opacity", 0);
+      row.append("text").attr("class", "dlabel halo").attr("x", m.left).attr("y", y0 + 14).text(d.label);
+      row.append("line").attr("x1", x(d.rate2000)).attr("x2", x(d.rate2021)).attr("y1", cy).attr("y2", cy)
+        .attr("stroke", col).attr("stroke-width", 2.5);
+      row.append("circle").attr("cx", x(d.rate2000)).attr("cy", cy).attr("r", 5)
+        .attr("fill", C.paper).attr("stroke", C.ink2).attr("stroke-width", 2);
+      row.append("circle").attr("cx", x(d.rate2021)).attr("cy", cy).attr("r", 6)
+        .attr("fill", col).attr("stroke", C.paper).attr("stroke-width", 2);
+      const [lo, hi] = up ? [d.rate2000, d.rate2021] : [d.rate2021, d.rate2000];
+      row.append("text").attr("class", `dlabel ${up ? "dlabel--muted" : "dlabel--strong"}`)
+        .attr("x", x(lo) - 12).attr("y", cy).attr("dy", "0.32em").attr("text-anchor", "end").text(pct(lo, 0));
+      row.append("text").attr("class", `dlabel ${up ? "dlabel--strong" : "dlabel--muted"}`)
+        .attr("x", x(hi) + 12).attr("y", cy).attr("dy", "0.32em").text(pct(hi, 0));
+      row.append("rect").attr("y", y0).attr("width", width).attr("height", rowH).attr("fill", "transparent")
+        .on("pointermove", ev => {
+          hl.attr("opacity", 1);
+          const dp = (d.rate2021 - d.rate2000) * 100;
+          tt.show(`<span class="tt__title">${d.label}</span>` +
+            ttRow("2000", pct(d.rate2000), "ring") + ttRow("2021", pct(d.rate2021), col) +
+            ttRow("Change", `${dp >= 0 ? "+" : "−"}${Math.abs(dp).toFixed(1)} pts`), ev);
+        })
+        .on("pointerleave", () => { hl.attr("opacity", 0); tt.hide(); });
+      y0 += rowH;
+    }
+  }
   return svg.node();
 }

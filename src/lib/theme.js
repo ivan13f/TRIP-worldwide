@@ -1,116 +1,63 @@
 /**
- * theme.js — Design tokens for D3 and Observable Plot charts
- * ------------------------------------------------------------
- * Import this in any chart module to get consistent colors,
- * fonts, and chart defaults without hardcoding hex values.
- *
- * Usage:
- *   import { colors, fonts, chart } from "../theme.js";
- *   svg.append("text").style("fill", colors.fog).style("font-family", fonts.mono)
+ * theme.js — Design tokens for the D3 charts (light editorial system, v2).
+ * Values mirror the CSS custom properties in style.css; keep both in sync.
+ * Every colour here was run through the dataviz palette validator on --paper.
  */
 
-// ── Color palette ──────────────────────────────────────────────
-
 export const colors = {
-  // Backgrounds
-  ink:      "#0f1116",   // page background
-  slate:    "#1e2130",   // elevated surfaces
-
-  // Text
-  fog:      "#d7e8e9",   // primary text / high-score labels
-  muted:    "#8a9aa0",   // secondary text, axis labels
-
-  // Accents — the purple → emerald axis is the color scale for TRIP scores
-  violet:   "#6e5cc5",   // low score / no protections
-  emerald:  "#35bf78",   // high score / full protections
-  coral:    "#e68263",   // global average line, urgency callouts
-  rust:     "#8f4636",   // deep warm, secondary
-  azure:    "#2a8fd4",   // regime annotations
-
-  // Opacity variants (for fills, gridlines)
-  stroke:   "rgba(215,232,233,0.13)",
-  grid:     "rgba(215,232,233,0.09)",
-  axis:     "rgba(215,232,233,0.32)",
-  tick:     "rgba(215,232,233,0.52)",
+  paper:   "#F7F5F0",   // page + chart surface
+  paper2:  "#EFECE4",   // cards, notes, step cards
+  rule:    "#D6D2C8",   // hairlines, gridlines
+  nodata:  "#E7E3DA",   // missing data (always hatched)
+  ink:     "#111111",   // primary text, annotation dots
+  ink2:    "#3D3D3A",   // secondary text, "2000" ring
+  ink3:    "#67655F",   // ticks, captions, kickers (5.35:1)
+  primary: "#5A37D1",   // average line, gain, brand block
+  accent:  "#FF4E00",   // the finding: bottom quarter, loss, 2012 break
 };
 
-// ── Typography ─────────────────────────────────────────────────
+export const primaryRamp = {
+  50: "#ECEDFF", 100: "#AEACF9", 200: "#968FF7", 300: "#7E6EF2",
+  400: "#6B53E4", 500: "#5A37D1", 600: "#4621AC", 700: "#31167E",
+};
+
+// TRIP score classes (out of 13). Bins follow the data: 78% of all
+// country-years score 0–2, so the low end gets one colour per value.
+export const scoreClasses = [
+  { min: 0,  max: 0,  label: "0",    color: "#E2C157" },
+  { min: 1,  max: 1,  label: "1",    color: "#42B59A" },
+  { min: 2,  max: 2,  label: "2",    color: "#008FB5" },
+  { min: 3,  max: 4,  label: "3-4",  color: "#295DC4" },
+  { min: 5,  max: 8,  label: "5-8",  color: "#521CA9" },
+  { min: 9,  max: 13, label: "9-13", color: "#490053" },
+];
+
+// percent: trip_percent (0–1). Returns the class colour, or null for missing data.
+export function scoreColor(percent) {
+  if (percent == null || Number.isNaN(percent)) return null;
+  const n = Math.round(percent * 13);
+  return scoreClasses.find(c => n >= c.min && n <= c.max).color;
+}
 
 export const fonts = {
-  display: "'Syne', ui-sans-serif, system-ui, sans-serif",
-  body:    "'DM Sans', ui-sans-serif, system-ui, sans-serif",
-  mono:    "'DM Mono', ui-monospace, 'Cascadia Code', monospace",
+  serif: "'Besley', Georgia, 'Times New Roman', serif",
+  sans:  "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
 };
-
-// ── TRIP score color scale ─────────────────────────────────────
-// The flagship fingerprint and choropleth both use this scale.
-// It maps TRIP score (0–13) onto the violet → emerald gradient.
-// Import d3 and call: d3.scaleSequential(tripScale).domain([0, 13])
-
-export const tripScale = [colors.violet, "#4f82c2", colors.emerald];
-// For d3 use: d3.scaleSequential(d3.piecewise(d3.interpolateRgb, tripScale))
-
-// ── Observable Plot theme ──────────────────────────────────────
-// Pass `...plotTheme` to any Plot.plot() call for consistent styling.
-
-export const plotTheme = {
-  style: {
-    background:  "transparent",
-    color:       colors.fog,
-    fontFamily:  fonts.mono,
-    fontSize:    "11px",
-  },
-  x: {
-    labelAnchor: "right",
-    tickSize:    0,
-    tickPadding: 8,
-    labelOffset: 28,
-  },
-  y: {
-    tickSize:    0,
-    tickPadding: 8,
-    labelOffset: 28,
-  },
-};
-
-// ── Region colors ──────────────────────────────────────────────
-// Consistent color per region for multi-region charts.
-// Keys match the e_regionpol_6c values in the dataset.
-
-export const regionColors = {
-  "Western Europe and North America":  "#6e5cc5",   // violet
-  "Latin America and the Caribbean":   "#35bf78",   // emerald
-  "Eastern Europe and Central Asia":   "#2a8fd4",   // azure
-  "Asia and Pacific":                  "#e5c94e",   // amber
-  "Sub-Saharan Africa":                "#e68263",   // coral
-  "Middle East and North Africa":      "#b85ccf",   // magenta-purple
-};
-
-// ── Indicator labels ───────────────────────────────────────────
-// Human-readable labels for the 13 TRIP indicators.
-// Used by indicatorDotPlot and country profiles.
 
 export const indicatorLabels = {
-  dir_crim:        "No direct criminalization",
-  ind_crim:        "No indirect criminalization",
-  gmc:             "Gender marker change (any)",
-  gmcpr:           "  — Self-ID / procedure-free",
-  gmcphys:         "  — No physical requirement",
-  gmcpsych:        "  — No psych. requirement",
-  gmcdiv:          "  — No divorce requirement",
-  nb3g:            "Third gender / non-binary",
-  adp_employment:  "Anti-discrim: employment",
-  adp_education:   "Anti-discrim: education",
-  adp_healthcare:  "Anti-discrim: healthcare",
-  adp_housing:     "Anti-discrim: housing",
-  adp_constitution:"Constitutional protection",
+  dir_crim:         "No direct criminalization",
+  ind_crim:         "No indirect criminalization",
+  gmc:              "Legal gender marker change",
+  gmcphys:          "No surgery or physical requirement",
+  gmcpsych:         "No psychiatric diagnosis required",
+  gmcdiv:           "No divorce requirement",
+  nb3g:             "Nonbinary or third gender marker",
+  adp_general:      "General anti-discrimination law",
+  adp_employment:   "Protection in employment",
+  adp_education:    "Protection in education",
+  adp_healthcare:   "Protection in healthcare",
+  adp_housing:      "Protection in housing",
+  adp_constitution: "Constitutional protection",
 };
 
-export const indicators = Object.keys(indicatorLabels);
-
-// ── THEME bundle ───────────────────────────────────────────────
-// Convenience export for chart modules that need colors + fonts together.
-// Import as: import { THEME } from "./lib/theme.js";
-// Pass to chart functions as: { theme: THEME }
-
-export const THEME = { colors, fonts };
+export const THEME = { colors, fonts, primaryRamp, scoreClasses, scoreColor };
