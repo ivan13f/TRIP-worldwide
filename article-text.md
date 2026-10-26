@@ -70,7 +70,7 @@ If the bottom held still while the top moved, who is at the top?
 Part of the answer is what you would expect. Of the 13 countries with the highest scores in 2021, eleven are in Western Europe. Five of them, Belgium, France, Luxembourg, Malta and Norway, hold 11 of the 13 protections. Taken together, Western Europe and North America average 7.5, more than any other region. But the region is not uniform, and the countries that break the pattern, inside Europe and outside it, are the reason this map deserves a closer look.
 
 **Caption:** Fig. 2. TRIP score by country, 2021.  
-**Source line:** Equal Earth projection. Source: TRIP (Williamson, 2024).
+**Source line:** Source: TRIP (Williamson, 2024).
 
 **Step cards (scroll beside the figure):**
 
@@ -86,7 +86,7 @@ Many of the countries at the bottom share something beyond their politics: their
 Iran is a different kind of exception. The state has paid for gender-affirming surgery since the 1980s, yet same-sex relations remain punishable by death. On TRIP it scores 2: legal gender change exists, but only after surgery, a psychiatric diagnosis and a divorce.
 
 > **Aside note (right): Section 377**  
-> India's Supreme Court struck the clause down for consensual adults in 2018. Versions of it remain in force elsewhere in the former empire.
+> India struck the clause down for consensual adults in 2018. Versions of it remain in force in other parts of the former British empire.
 
 
 ---
@@ -161,11 +161,12 @@ Each row is a country, sorted from the highest score in 2021 at the top to the l
 2. In 2000 the picture is almost one colour. 89% of countries held one or two protections, and none held more than four.
 3. Through the 2000s, a few rows at the top begin to darken. By 2011, twelve countries had reached five protections or more.
 4. The **bottom quarter** barely changes colour from left to right. Of its 44 countries, 39 held exactly the same score in 2021 as in 2000.
+5. Now explore on your own. Hover any row, or search for a country to see how its laws changed.
 
 **Caption:** Fig. 4. TRIP score of every country, every year (2000-2021).  
 **Source line:** Source: TRIP (Williamson, 2024).
 
-This is the shape behind the average. The rise was real, but it happened in one part of the picture. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. Further down the image, the colour is still the one it started with.
+This is the shape behind the average. There was real legal progress, but only in one part of the chart. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. But further down the chart, the colour is still the one it started with.
 
 
 ---
@@ -178,7 +179,7 @@ Everything in this article is about laws, and laws are only one part of the pict
 
 The first version of the TRIP records stops in 2021, but the world continued changing. In 2023, Russia banned legal gender change and gender-affirming medical care. The same year, Uganda's Anti-Homosexuality Act made same-sex relations punishable by life imprisonment and, in some cases, death. In the United States, where gender recognition is left to the states, more than twenty states have restricted gender-affirming care for minors since 2021. In the United Kingdom, the government blocked Scotland's self-ID reform in 2023, and in 2025 the Supreme Court ruled that "sex" in equality law means biological sex.
 
-The record shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.
+This dataset shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.
 
 ### About this data
 
@@ -188,11 +189,9 @@ All scores, shares and counts in this article are calculated from the TRIP data.
 
 The LGB comparison uses ILGA World's *State-Sponsored Homophobia Report* (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.
 
-### Credits
+Analysis and visualization: Iván Alfonso Burgos
 
-Text, data analysis and graphics: Iván Alfonso Burgos
-
-Photo by Karollyne Videira Hubert on Unsplash
+Photo by Karollyne Videira Hubert
 
 
 ---

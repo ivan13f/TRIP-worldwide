@@ -104,7 +104,10 @@ button { font: inherit; color: inherit; }
 @keyframes cue { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .hero__arrow { animation: none; } }
 .hero__title { font: 600 var(--t-display)/0.98 var(--serif); letter-spacing: -0.02em; margin: 0; }
-.hero__title-sub { display: block; margin-top: var(--s-4); font: 500 var(--t-h3)/1.2 var(--serif); letter-spacing: 0; }
+.hero__title-sub { display: block; margin: var(--s-4) 0 var(--s-3); font: 600 var(--t-h3)/1.2 var(--serif); letter-spacing: 0; }
+/* "Uneven" sits on a slight clockwise tilt, like uneven terrain, and levels out on hover. */
+.hero__tilt { display: inline-block; transform: rotate(4deg); transform-origin: 0% 100%; transition: transform var(--dur-step) var(--ease); }
+.hero__title:hover .hero__tilt { transform: none; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }
 .hero__intro a:hover { background: rgba(255, 255, 255, .14); }
@@ -112,7 +115,7 @@ button { font: inherit; color: inherit; }
    scale's green, light tones become paper. Screen-blending a greyscale image
    over green turns black into green and leaves white as white; the paper
    overlay then warms the whites to match the page. */
-.hero__art { position: relative; overflow: hidden; background: #42B59A; isolation: isolate; }
+.hero__art { position: relative; overflow: hidden; background: #2A8C70; isolation: isolate; }
 .hero__art img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: 50% 35%;
@@ -359,5 +362,4 @@ button { font: inherit; color: inherit; }
 .data-table__download { display: inline-block; margin-top: var(--s-3); }
 
 /* ── Credits ──────────────────────────────────────────────────────────────── */
-.credits { margin-top: var(--s-7); margin-bottom: var(--s-9); font: 400 var(--t-note)/1.6 var(--sans); color: var(--ink-2); }
-.credits p { margin: 0; }
+.sources .sources__label--credits { margin-top: var(--s-6); }

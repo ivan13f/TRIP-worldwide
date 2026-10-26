@@ -108,7 +108,7 @@ initCarousel("#country-carousel");
 
 <header class="hero" id="hero">
 <div class="hero__text">
-<h1 class="hero__title">Uneven Ground<span class="hero__title-sub">Trans Rights Worldwide 2000-2021</span></h1>
+<h1 class="hero__title"><span class="hero__tilt">Uneven</span> Ground<span class="hero__title-sub">Trans Rights Worldwide 2000-2021</span></h1>
 <p class="hero__intro">An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people.</p>
 <a class="hero__cue" href="#act1">Scroll for more <span class="hero__arrow" aria-hidden="true">↓</span></a>
 </div>
@@ -195,7 +195,7 @@ initCarousel("#country-carousel");
 <div class="scrolly__graphic">
 <figure class="fig">
 <div class="fig__plot" id="chart-act2"></div>
-<figcaption class="fig__cap"><span class="fig__tag">Fig. 2</span><span>TRIP score by country, 2021.</span><span class="fig__src">Equal Earth projection. Source: TRIP (Williamson, 2024).</span></figcaption>
+<figcaption class="fig__cap"><span class="fig__tag">Fig. 2</span><span>TRIP score by country, 2021.</span><span class="fig__src">Source: TRIP (Williamson, 2024).</span></figcaption>
 </figure>
 </div>
 <div class="scrolly__steps">
@@ -215,7 +215,7 @@ initCarousel("#country-carousel");
 </div>
 <aside class="note note--right reveal">
 <p class="note__label">Section 377</p>
-<p>India's Supreme Court struck the clause down for consensual adults in 2018. Versions of it remain in force elsewhere in the former empire.</p>
+<p>India struck the clause down for consensual adults in 2018. Versions of it remain in force in other parts of the former British empire.</p>
 </aside>
 </div>
 </section>
@@ -256,6 +256,10 @@ initCarousel("#country-carousel");
 <div class="row">
 <div class="prose">
 <h3 class="subhead">Going backwards</h3>
+</div>
+</div>
+<div class="row">
+<div class="prose">
 <p>Progress was not in one direction. Twenty-one countries lost at least one protection at some point between 2000 and 2021. Six ended the period with a lower score than they started with: Cambodia, Equatorial Guinea, The Gambia, Indonesia, Kuwait and Oman.</p>
 <p>The clearest cases are four countries that wrote new laws against trans people. In TRIP's dataset, Indonesia did it in 2002, Kuwait in 2007, The Gambia in 2013 and Oman in 2018. Other countries took recognition away. Hungary's parliament ended legal gender change in 2020; Bulgaria and Kyrgyzstan lost it in 2021.</p>
 <p>In 14 of the 21 countries, the only loss came from indirect criminalization, an indicator that tracks laws not written about trans people but used against them.</p>
@@ -312,6 +316,7 @@ initCarousel("#country-carousel");
 <div class="step"><p>In 2000 the picture is almost one colour. 89% of countries held one or two protections, and none held more than four.</p></div>
 <div class="step"><p>Through the 2000s, a few rows at the top begin to darken. By 2011, twelve countries had reached five protections or more.</p></div>
 <div class="step"><p>The <strong>bottom quarter</strong> barely changes colour from left to right. Of its 44 countries, 39 held exactly the same score in 2021 as in 2000.</p></div>
+<div class="step"><p>Now explore on your own. Hover any row, or search for a country to see how its laws changed.</p></div>
 </div>
 </div>
 <figure class="fig">
@@ -320,7 +325,7 @@ initCarousel("#country-carousel");
 <div class="table-slot" id="table-act4"></div>
 <div class="row">
 <div class="prose">
-<p>This is the shape behind the average. The rise was real, but it happened in one part of the picture. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. Further down the image, the colour is still the one it started with.</p>
+<p>This is the shape behind the average. There was real legal progress, but only in one part of the chart. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. But further down the chart, the colour is still the one it started with.</p>
 </div>
 </div>
 </section>
@@ -334,7 +339,7 @@ initCarousel("#country-carousel");
 <div class="prose">
 <p>Everything in this article is about laws, and laws are only one part of the picture. They say nothing about the lived experience of trans people: what happens in the street, in a hospital or at home. A country can score 85% and still be a dangerous place for trans people, and a country with a low score can have strong communities that no law records. Still, the law matters. It shapes what the police can do, what a doctor can say and which documents a person is allowed to carry. It is just not the whole story.</p>
 <p>The first version of the TRIP records stops in 2021, but the world continued changing. In 2023, Russia banned legal gender change and gender-affirming medical care. The same year, Uganda's Anti-Homosexuality Act made same-sex relations punishable by life imprisonment and, in some cases, death. In the United States, where gender recognition is left to the states, more than twenty states have restricted gender-affirming care for minors since 2021. In the United Kingdom, the government blocked Scotland's self-ID reform in 2023, and in 2025 the Supreme Court ruled that "sex" in equality law means biological sex.</p>
-<p>The record shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.</p>
+<p>This dataset shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.</p>
 </div>
 </div>
 <div class="sources">
@@ -342,11 +347,9 @@ initCarousel("#country-carousel");
 <p>The <a href="https://www.myleswilliamson.net/trip-data" target="_blank" rel="noopener">Trans Rights Indicator Project (TRIP)</a> is a dataset of 13 legal indicators for 173 countries from 2000 to 2021, developed by Myles Williamson as part of his doctoral research at the University of Alabama and published in <em>Perspectives on Politics</em> (Cambridge University Press), Vol. 22, No. 3 (2024).</p>
 <p>All scores, shares and counts in this article are calculated from the TRIP data.</p>
 <p>The LGB comparison uses ILGA World's <em>State-Sponsored Homophobia Report</em> (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.</p>
-</div>
-<div class="credits">
-<p class="sources__label">Credits</p>
-<p>Text, data analysis and graphics: <a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
-<p>Photo by <a href="https://unsplash.com/@karohubert?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Karollyne Videira Hubert</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Unsplash</a></p>
+<p class="sources__label sources__label--credits">Credits</p>
+<p>Analysis and visualization: <a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
+<p>Photo by <a href="https://unsplash.com/@karohubert?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Karollyne Videira Hubert</a></p>
 </div>
 </section>
 
