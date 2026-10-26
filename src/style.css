@@ -108,14 +108,20 @@ button { font: inherit; color: inherit; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }
 .hero__intro a:hover { background: rgba(255, 255, 255, .14); }
-/* Photo rendered as a single-hue green monochrome: greyscale image over the
-   score scale's green, blended by luminosity so only its tones show. */
-.hero__art { position: relative; overflow: hidden; background: #42B59A; }
+/* Photo printed in a single green ink on paper: dark tones become the score
+   scale's green, light tones become paper. Screen-blending a greyscale image
+   over green turns black into green and leaves white as white; the paper
+   overlay then warms the whites to match the page. */
+.hero__art { position: relative; overflow: hidden; background: #42B59A; isolation: isolate; }
 .hero__art img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: 50% 35%;
-  filter: grayscale(1) contrast(1.05);
-  mix-blend-mode: luminosity;
+  filter: grayscale(1) contrast(1.4) brightness(0.95);
+  mix-blend-mode: screen;
+}
+.hero__art::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--paper); mix-blend-mode: multiply; pointer-events: none;
 }
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; grid-template-rows: 1fr 30vh; }
