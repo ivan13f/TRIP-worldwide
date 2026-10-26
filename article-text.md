@@ -1,14 +1,14 @@
 # Uneven Ground: current article text
 
-Everything a reader sees, in reading order. Main text appears plain; aside notes, step cards (the text that scrolls beside a figure), legends and captions are labelled. Text that lives inside the chart code is listed at the end. Numbers were checked against the TRIP data: if you change one, tell me and I'll verify it.
+Everything a reader sees, in reading order. Main text appears plain; aside notes, step cards, legends and captions are labelled. Text that lives inside the chart code is listed at the end. Numbers were checked against the TRIP data: if you change one, tell me and I'll verify it.
 
 ---
 
 ## HERO
 
-**Title:** Uneven Ground
+**Title:** Uneven Ground: Trans Rights Worldwide 2000-2021
 
-**Intro:** An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people. It follows the countries that rewrote those laws, the many that left them untouched, and the few that went backwards.
+**Intro:** An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people.
 
 **Scroll cue:** Scroll for more
 
@@ -19,21 +19,23 @@ Everything a reader sees, in reading order. Main text appears plain; aside notes
 
 **Headline:** What the world's laws say about trans people
 
-For most of the world, trans legal rights in 2000 came down to one fact: being trans was not, in itself, a crime.
+In 2000, most of the world offered trans people very little in law. Often it came down to a single thing: being trans was not, in itself, a crime.
 
-That was the only protection held by 98 of the 170 countries with data that year. Nothing in their laws let a person change the name or gender on a passport, and nothing stopped an employer, a school or a landlord from turning them away. Eight countries went further and made being trans a criminal offence.
+For 98 of the 170 countries with data that year, that was where it stopped. No way to change the name or gender on a passport. No rule to stop an employer, a school or a landlord from saying no. And eight countries went even further and made being trans a criminal offence.
 
-We know this because Myles Williamson, a political scientist, went through the laws of 173 countries for every year between 2000 and 2021 as part of his doctoral research at the University of Alabama, and asked each of them the same thirteen questions. His Trans Rights Indicator Project, TRIP for short, was published in *Perspectives on Politics* in 2024. The questions fall into three groups.
+Political scientist Myles Williamson went through the laws of 173 countries for every year between 2000 and 2021 as part of his doctoral research at the University of Alabama. His Trans Rights Indicator Project, TRIP for short, was published in *Perspectives on Politics* in 2024. He composed a score that is based on 13 indicators that answer questions that fall into three groups:
 
 - **Criminalization, two questions.** Is there no law that directly targets trans people, and none that is used against them indirectly?
 - **Recognition, five questions.** Can people change the gender marker on their official documents? Can they do it without surgery or other physical requirements, without a psychiatric diagnosis, and without having to divorce? Is there a nonbinary or third gender option?
 - **Protection, six questions.** Is there a general anti-discrimination law covering trans people? Specific protection in employment, education, healthcare and housing? Protection written into the constitution?
 
-Building a record like this means making choices. "Transgender" is not a legal category everywhere. In South Asia, laws recognize hijra, khawaja sira and other third-gender identities that overlap with, but are not the same as, the Western idea of being trans. Federal countries complicate things further: in the United States, gender recognition is decided state by state, so a national score can only describe federal law. And a yes-or-no question flattens detail. A country that allows gender change after a year-long waiting period and one that allows it on the spot can both answer yes.
+Building a record like this is no easy task. "Transgender" is not a legal category everywhere. In South Asia, for example, laws recognize hijra, khawaja sira and other third-gender identities that overlap with the Western idea of being trans, but are not the same as it. Federal countries add another difficulty. In the United States, gender recognition is decided state by state, while a national record can only count federal law. A yes-or-no question also flattens detail. A country that allows a change of gender after a year-long waiting period and one that allows it on the spot can both answer yes.
 
-Every yes is a point. A country that answers yes to all thirteen scores 100%; one that answers no to all of them scores 0%. Nobody has reached the top. The highest score in the dataset belongs to Uruguay, with 12.
+The sources have limits too. Williamson coded each law by hand, using at least two sources whenever possible: reports from human rights organizations, government websites and news articles. Some forms of persecution can also be undercounted, such as arrests under vague laws that never name trans people. Finally, all thirteen questions weigh the same, so two countries can reach the same score by very different roads. Williamson himself notes that the real richness of the data is in the individual indicators, not only in the total.
 
-Measured this way, the world made progress. The average score more than doubled, from 10.9% in 2000 to 23.5% in 2021. But an average of 173 countries hides almost everything that matters about them. Scroll through the chart and the number comes apart.
+None of this makes the record less useful. It means the score should be read as a map of the law, not as a portrait of daily life.
+
+Measured this way, the world has made some progress. The average score more than doubled, from 10.9% in 2000 to 23.5% in 2021. But an average of 173 countries hides almost everything that matters about them.
 
 > **Aside note (left): What the score measures**  
 > TRIP records what the law says. It does not measure how laws are enforced, how courts read them or how safe daily life is. A high score describes a legal framework, not a guarantee.
@@ -45,18 +47,16 @@ Measured this way, the world made progress. The average score more than doubled,
 
 **Step cards (scroll beside the figure):**
 
-1. The **average**: 10.9% in 2000, 23.5% in 2021. This is the number a press release would use.
+1. The **average**: 10.9% in 2000, 23.5% in 2021. But this hides the real distribution.
 2. The **median** country, the one in the middle of the ranking, gained a single protection in 22 years. It went from 7.7% to 15.4% in 2015 and stayed there.
 3. The **middle half** of countries. Its upper edge climbs from 15.4% to 30.8%. Its lower edge does not move once.
-4. The **top tenth**. In 2000 a country needed 15.4% to belong to it. By 2021 it needed 61.5%. This is where the average's growth comes from.
-5. The **bottom quarter**: 7.7% in 2000 and 7.7% in 2021. One point out of thirteen, the absence of a criminal law, and nothing else.
+4. The **top tenth**. From 2000 to 2021, the score needed to be among them climbed from 15.4% to 61.5%. This is where the average's growth comes from.
+5. The **bottom quarter**: same score in 2000 as in 2021. One point out of thirteen, often the absence of a criminal law, and nothing else.
 
-Read together, the lines describe two different decades for two groups of countries. A few dozen rewrote their laws, often more than once. Half the world did not touch them: 88 countries ended 2021 with exactly the score they had in 2000.
-
-The distance between the two groups shows up in the gap between the average and the median. In 2000 they were three points apart, 10.9% and 7.7%. By 2021 the gap had grown to eight: 23.5% against 15.4%. The average climbed because the top ran ahead, not because the middle followed.
+Read all together in the graph, the lines describe two different groups of countries. A few dozen rewrote their laws, often more than once. Half the world did not touch them: 88 countries ended 2021 with exactly the score they had in 2000. The average climbed because the top ran ahead, not because the middle followed.
 
 > **Aside note (right): Measuring divergence**  
-> The middle half of countries spanned 7.7 percentage points in 2000 and 23.1 in 2021. That distance, the interquartile range, tripled.
+> The distance between the countries at the 25th and the 75th percentile tripled, from 7.7 to 23.1 percentage points. The middle of the world is more spread out than it was.
 
 
 ---
@@ -65,11 +65,11 @@ The distance between the two groups shows up in the gap between the average and 
 
 **Headline:** A map of exceptions
 
-If the floor held still while the top moved, the next question is where the top is.
+If the bottom held still while the top moved, who is at the top?
 
-Part of the answer is predictable. Eleven of the thirteen highest scores in 2021 belong to Western Europe, led by Luxembourg, Malta, France, Belgium and Norway with 11 points each. The region averages 7.5 points, more than any other. But it is not uniform, and the countries that break the pattern, inside Europe and outside it, are what make the map worth reading closely.
+Part of the answer is what you would expect. Of the 13 countries with the highest scores in 2021, eleven are in Western Europe. Five of them, Belgium, France, Luxembourg, Malta and Norway, hold 11 of the 13 protections. Taken together, Western Europe and North America average 7.5, more than any other region. But the region is not uniform, and the countries that break the pattern, inside Europe and outside it, are the reason this map deserves a closer look.
 
-**Caption:** Fig. 2. TRIP score by country, 2021. Small island states are shown as dots.  
+**Caption:** Fig. 2. TRIP score by country, 2021.  
 **Source line:** Equal Earth projection. Source: TRIP (Williamson, 2024).
 
 **Step cards (scroll beside the figure):**
@@ -85,7 +85,7 @@ Many of the countries at the bottom share something beyond their politics: their
 
 Iran is a different kind of exception. The state has paid for gender-affirming surgery since the 1980s, yet same-sex relations remain punishable by death. On TRIP it scores 2: legal gender change exists, but only after surgery, a psychiatric diagnosis and a divorce.
 
-> **Aside note (right): Section 377 · 1860**  
+> **Aside note (right): Section 377**  
 > India's Supreme Court struck the clause down for consensual adults in 2018. Versions of it remain in force elsewhere in the former empire.
 
 
@@ -93,51 +93,53 @@ Iran is a different kind of exception. The state has paid for gender-affirming s
 
 ## SECTION 3
 
-**Headline:** Recognition first, protection later
+**Headline:** Recognition before protection
 
-The thirteen rights did not move at the same speed, and not every country moved forward.
+Not all thirteen rights moved at the same speed, and not every country moved forward.
 
 The chart compares the share of countries that held each right in 2000 with the share in 2021.
 
-> **Aside note (left): The one that went backwards**  
-> Eight countries criminalized trans people directly in 2000, twelve in 2021. Five added such laws, including newly independent South Sudan; Guyana removed its law in 2018.
+> **Aside note (left): Direct criminalization went backwards**  
+> It is the only right that went the wrong way. Eight countries criminalized trans people directly in 2000, and twelve did in 2021.
 
 **Legend:** 2000 · 2021, rose · 2021, fell
 
 **Caption:** Fig. 3. Share of countries with each protection in law, 2000 and 2021.  
-**Source line:** Source: TRIP (Williamson, 2024). Author's calculations.
+**Source line:** Source: TRIP (Williamson, 2024).
 
-Recognition led. In 2000, 11% of countries let people change the gender marker on their documents; by 2021, 35% did. The conditions attached to that change eased more slowly. In 2021, 15% of countries no longer demanded surgery, and 11% no longer demanded a psychiatric diagnosis.
+Recognition led the progress. In 2000 you could change the gender on your documents in 18 countries, mostly European, and in none of the Americas. By 2021 you could in 60, ten of them in Latin America.
 
-Protection came later and stayed thinner. No country had an anti-discrimination law covering trans people in 2000. By 2021, 20% protected them at work and about 17% in schools, hospitals and housing. Five countries, Bolivia, Cuba, Ecuador, Fiji and Malta, wrote that protection into their constitutions. Eight offered a nonbinary or third gender marker.
+Protection from discrimination came later and ranked lower. No country had an anti-discrimination law covering trans people in 2000. By 2021, 20% protected them at work and about 17% in schools, hospitals and housing. Five countries (Bolivia, Cuba, Ecuador, Fiji and Malta) wrote that protection into their constitutions. Eight offered a nonbinary or third gender marker.
 
 ### Subheading: Going backwards
 
-Progress did not run in one direction. Twenty-one countries lost at least one protection at some point between 2000 and 2021. Six ended the period with a lower score than they started with: Cambodia, Equatorial Guinea, The Gambia, Indonesia, Kuwait and Oman.
+Progress was not in one direction. Twenty-one countries lost at least one protection at some point between 2000 and 2021. Six ended the period with a lower score than they started with: Cambodia, Equatorial Guinea, The Gambia, Indonesia, Kuwait and Oman.
 
-The clearest losses are new laws aimed at trans people. In TRIP's coding, Indonesia added direct criminalization in 2002, Kuwait in 2007, The Gambia in 2013 and Oman in 2018. Other countries took recognition away. Hungary's parliament ended legal gender change in 2020; Bulgaria and Kyrgyzstan lost it in 2021. Most of the remaining drops come from the indirect criminalization indicator, which tracks laws not written about trans people but used against them. It switches on and off in countries such as Haiti, Panama and Kyrgyzstan, and its changes are less clear-cut than a new statute.
+The clearest cases are four countries that wrote new laws against trans people. In TRIP's dataset, Indonesia did it in 2002, Kuwait in 2007, The Gambia in 2013 and Oman in 2018. Other countries took recognition away. Hungary's parliament ended legal gender change in 2020; Bulgaria and Kyrgyzstan lost it in 2021.
+
+In 14 of the 21 countries, the only loss came from indirect criminalization, an indicator that tracks laws not written about trans people but used against them.
 
 > **Aside note (right): LGB vs. trans**  
-> Austria scores 82% for LGB protections (ILGA World, 2020) but 23% on TRIP. The indicators measure different rights for different groups.
+> The two usually go together: in 2020, 134 of 173 countries had similar scores on both scales. But when they split, it is mostly trans rights that are left behind.
 
-Behind each score is a different legal history. Six countries show how much a single number can hide.
+Behind each score is a different legal history. In these examples we can see how much a number can hide.
 
 **Country cards (carousel):**
 
 - **Argentina**: Recognition without protection · 6 of 13 · 46% · 2021  
   In 2012, the first country to let people change their legal gender by declaration alone, with no medical requirements. A nonbinary marker followed in 2021. Yet none of the six anti-discrimination protections is in law.
 
-- **India**: Protection with gatekeeping · 8 of 13 · 62% · 2021  
-  Legal gender change and a third gender option since 2014, and anti-discrimination protection in employment, education, healthcare and housing. But changing a legal gender still requires medical steps.
+- **India**: Protection with conditions · 8 of 13 · 62% · 2021  
+  India recognized a third gender and allowed a change of legal gender in 2014. Six years later came protection against discrimination in employment, education, healthcare and housing. But the change of legal gender still depends on medical conditions, and indirect criminalization remains in the data.
 
 - **Austria**: The progressive exception · 3 of 13 · 23% · 2021  
   Scores 82% on LGB rights but 23% on trans rights. Legal gender change is possible, yet none of the six anti-discrimination protections covers trans people.
 
-- **Pakistan**: Courts moved before laws did · 11 of 13 · 85% · 2021  
-  A 2009 Supreme Court ruling recognized a third gender. The 2018 Transgender Persons Act added self-identification and protection in employment, education, healthcare and housing. Same-sex relations remain criminalized.
+- **Pakistan**: Trans rights without LGB rights · 11 of 13 · 85% · 2021  
+  One or two protections until 2017, then 11 in 2018: the biggest one-year gain in the dataset, tied with Luxembourg. It is the poorest of the 13 countries with 10 points or more, and the only one not classified as a democracy. On the LGB index it scores 0% (2020).
 
-- **Iran**: The medical exception · 2 of 13 · 15% · 2021  
-  State-funded gender-affirming surgery since the 1980s, but legal gender change requires surgery, a psychiatric diagnosis and divorce. Same-sex relations remain punishable by death.
+- **Iran**: Joint second in the region, unchanged since 2000 · 2 of 13 · 15% · 2021  
+  The same score, 2 of 13, in all 22 years: no direct criminalization and a legal route to change gender, with all three conditions still attached. It is still joint second, with Turkey, in a region of 19 countries where 16 score one point or none.
 
 - **United States**: No federal recognition · 5 of 13 · 38% · 2021  
   There is no federal way to change a legal gender marker; that is left to the states. Its score comes from federal anti-discrimination protection in employment, education, healthcare and housing.
@@ -151,20 +153,19 @@ Behind each score is a different legal history. Six countries show how much a si
 
 Put every country and every year into one image, and both stories become visible at once.
 
-Each row is a country, sorted from the highest score in 2021 at the top to the lowest at the bottom. Each column is a year. The colour of a cell is the number of protections that country held that year, from yellow for none to deep purple for nine or more.
+Each row is a country, sorted from the highest score in 2021 at the top to the lowest at the bottom. Each column is a year. The colour of a cell is the number of protections that country held that year.
 
 **Step cards (scroll beside the figure):**
 
 1. Each row is a country, each column a year. Hover a row, or look a country up in the search box.
 2. In 2000 the picture is almost one colour. 89% of countries held one or two protections, and none held more than four.
 3. Through the 2000s, a few rows at the top begin to darken. By 2011, twelve countries had reached five protections or more.
-4. From **2012**, the year of Argentina's law, the change speeds up. Thirty more countries crossed five protections in the decade that followed.
-5. The **bottom quarter** barely changes colour from left to right. Of its 44 countries, 39 held exactly the same score in 2021 as in 2000.
+4. The **bottom quarter** barely changes colour from left to right. Of its 44 countries, 39 held exactly the same score in 2021 as in 2000.
 
-**Caption:** Fig. 4. TRIP score of every country, every year, 2000 to 2021.  
-**Source line:** Source: TRIP (Williamson, 2024). 173 countries × 22 years.
+**Caption:** Fig. 4. TRIP score of every country, every year (2000-2021).  
+**Source line:** Source: TRIP (Williamson, 2024).
 
-This is the shape behind the average. The rise was real, but it was concentrated. In 2000, no country held five protections. By 2021, 42 did, and 16 held nine or more. Below them, the image stays the colour it was in 2000.
+This is the shape behind the average. The rise was real, but it happened in one part of the picture. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. Further down the image, the colour is still the one it started with.
 
 
 ---
@@ -173,11 +174,11 @@ This is the shape behind the average. The rise was real, but it was concentrated
 
 **Headline:** What the law doesn't record
 
-These are laws. They do not record what happens in the street, in hospitals or at home. A country can score 85% and still be dangerous for trans people, and a low score can coexist with community networks that no statute sees. The law still matters: it shapes what police can do, what doctors can say and which documents a person can carry. But it is not the whole story.
+Everything in this article is about laws, and laws are only one part of the picture. They say nothing about the lived experience of trans people: what happens in the street, in a hospital or at home. A country can score 85% and still be a dangerous place for trans people, and a country with a low score can have strong communities that no law records. Still, the law matters. It shapes what the police can do, what a doctor can say and which documents a person is allowed to carry. It is just not the whole story.
 
-The record also stops in 2021, and the losses did not. In 2023, Russia banned legal gender change and gender-affirming medical care. The same year, Uganda's Anti-Homosexuality Act made same-sex relations punishable by life imprisonment and, in some cases, death. In the United States, where gender recognition is left to the states, more than twenty states have restricted gender-affirming care for minors since 2021. In the United Kingdom, the government blocked Scotland's self-ID reform in 2023, and in 2025 the Supreme Court ruled that "sex" in equality law means biological sex.
+The first version of the TRIP records stops in 2021, but the world continued changing. In 2023, Russia banned legal gender change and gender-affirming medical care. The same year, Uganda's Anti-Homosexuality Act made same-sex relations punishable by life imprisonment and, in some cases, death. In the United States, where gender recognition is left to the states, more than twenty states have restricted gender-affirming care for minors since 2021. In the United Kingdom, the government blocked Scotland's self-ID reform in 2023, and in 2025 the Supreme Court ruled that "sex" in equality law means biological sex.
 
-The countries that moved between 2000 and 2021 show that legal change can come quickly. The ones that moved back, inside the data and after it, show that it can be undone just as fast.
+The record shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.
 
 ### About this data
 
@@ -214,11 +215,10 @@ Each label shows "Country · X of 13" plus this note:
 - Africa: **Kenya**: Colonial-era penal code
 - Africa: **South Africa**: Gender marker change since 2003
 
-**Map hint:** Drag to pan · ⌘/Ctrl + scroll or the buttons to zoom · hover for scores (on touch screens: Pinch with two fingers to zoom · tap a country for its score)
+**Map hint:** Drag to pan · ⌘/Ctrl + scroll or the buttons to zoom · Hover for scores (on touch screens: Pinch with two fingers to zoom · tap a country for its score)
 
 ### Fig. 4 (src/lib/charts/flagship.js)
 
-- Label on the 2012 step: 2012 · Argentina's self-ID law
 - Label on the bottom-quarter step: Bottom quarter · 44 countries
 - Search box: "Find a country", placeholder "e.g. Kenya"
 - Search result: "[Country] ranks N of 173 in 2021. 2000: X of 13 · 2021: Y of 13"

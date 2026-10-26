@@ -177,7 +177,7 @@ export function choropleth(data, { width = 960, height, theme, topoJson } = {}) 
   hint.className = "map__hint";
   hint.textContent = matchMedia("(pointer: coarse)").matches
     ? "Pinch with two fingers to zoom · tap a country for its score"
-    : "Drag to pan · ⌘/Ctrl + scroll or the buttons to zoom · hover for scores";
+    : "Drag to pan · ⌘/Ctrl + scroll or the buttons to zoom · Hover for scores";
 
   // ── Annotations for a step ─────────────────────────────────────────────────
   const drawNotes = notes => {

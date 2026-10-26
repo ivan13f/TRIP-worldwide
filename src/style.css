@@ -104,6 +104,7 @@ button { font: inherit; color: inherit; }
 @keyframes cue { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .hero__arrow { animation: none; } }
 .hero__title { font: 600 var(--t-display)/0.98 var(--serif); letter-spacing: -0.02em; margin: 0; }
+.hero__title-sub { display: block; margin-top: var(--s-4); font: 500 var(--t-h3)/1.2 var(--serif); letter-spacing: 0; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }
 .hero__intro a:hover { background: rgba(255, 255, 255, .14); }

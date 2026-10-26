@@ -2,7 +2,7 @@
 //
 // 173 countries (rows, sorted by 2021 score) × 22 years (columns), each cell
 // coloured by TRIP score class. Returns the plot node with:
-//   node.step(i)   0 everything · 1 only 2000 · 2 2000–2011 · 3 the 2012 break · 4 the bottom quarter
+//   node.step(i)   0 everything · 1 only 2000 · 2 2000–2011 · 3 the bottom quarter
 //   node.controls  legend + country search, for the page to place (aside column on desktop)
 
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
@@ -64,13 +64,6 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
   const quarterRow = countries.length - Math.ceil(countries.length / 4);
   const maskTop = svg.append("rect").attr("x", m.left).attr("y", m.top - 1).attr("width", width - m.left - m.right)
     .attr("height", y(quarterRow) - m.top + 1).attr("fill", C.paper).attr("opacity", 0).attr("pointer-events", "none");
-
-  const x2012 = x(2012) + x.bandwidth() / 2;
-  const rule2012 = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
-  rule2012.append("line").attr("x1", x2012).attr("x2", x2012).attr("y1", m.top - 8).attr("y2", m.top + innerH)
-    .attr("stroke", C.accent).attr("stroke-width", 2.5);
-  rule2012.append("text").attr("class", "dlabel dlabel--strong halo").attr("x", x2012 + 6).attr("y", m.top - 12)
-    .text("2012 · Argentina's self-ID law");
 
   const quarter = svg.append("g").attr("opacity", 0).attr("pointer-events", "none");
   quarter.append("line").attr("x1", m.left).attr("x2", width - m.right).attr("y1", y(quarterRow)).attr("y2", y(quarterRow))
@@ -152,9 +145,8 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
     const cut = i === 1 ? end(years[0]) : i === 2 ? end(2011) : null;
     if (cut != null) maskRight.attr("x", cut).attr("width", width - m.right - cut);
     maskRight.transition().duration(D).attr("opacity", cut != null ? 0.88 : 0);
-    maskTop.transition().duration(D).attr("opacity", i === 4 ? 0.88 : 0);
-    rule2012.transition().duration(D).attr("opacity", i === 3 ? 1 : 0);
-    quarter.transition().duration(D).attr("opacity", i === 4 ? 1 : 0);
+    maskTop.transition().duration(D).attr("opacity", i === 3 ? 0.88 : 0);
+    quarter.transition().duration(D).attr("opacity", i === 3 ? 1 : 0);
   };
   node.controls = controls;
   node.step(0);
