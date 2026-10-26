@@ -108,8 +108,8 @@ button { font: inherit; color: inherit; }
 /* "Uneven" and "Ground" tilt in opposite directions, like uneven terrain, and
    level out on hover. Each word sits on its own line with room to rotate. */
 .hero__tilt { display: table; transition: transform var(--dur-step) var(--ease); }
-.hero__tilt--cw  { transform: rotate(4deg);  transform-origin: 50% 50%; margin-bottom: 0.32em; }
-.hero__tilt--ccw { transform: rotate(-4deg); transform-origin: 50% 50%; margin-bottom: 0.32em; }
+.hero__tilt--cw  { transform: rotate(4deg);  transform-origin: 50% 50%; margin-bottom: 0.1em; }
+.hero__tilt--ccw { transform: rotate(-4deg); transform-origin: 50% 50%; margin-bottom: 0.55em; }
 .hero__title:hover .hero__tilt { transform: none; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }
