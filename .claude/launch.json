@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--port", "4321"],
       "port": 4321
+    },
+    {
+      "name": "trip-project built site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4322", "--directory", "dist"],
+      "port": 4322
     }
   ]
 }
