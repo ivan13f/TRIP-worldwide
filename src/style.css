@@ -105,11 +105,11 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .hero__arrow { animation: none; } }
 .hero__title { font: 600 var(--t-display)/0.98 var(--serif); letter-spacing: -0.02em; margin: 0; }
 .hero__title-sub { display: block; margin: var(--s-4) 0 var(--s-3); font: 600 var(--t-h3)/1.2 var(--serif); letter-spacing: 0; }
-/* "Uneven" and "Ground" tilt in opposite directions, like uneven terrain, and
-   level out on hover. Each word sits on its own line with room to rotate. */
-.hero__tilt { display: table; transition: transform var(--dur-step) var(--ease); }
-.hero__tilt--cw  { transform: rotate(4deg);  transform-origin: 50% 50%; margin-bottom: 0.1em; }
-.hero__tilt--ccw { transform: rotate(-4deg); transform-origin: 50% 50%; margin-bottom: 0.55em; }
+/* "Uneven" and "Ground" both sit on a slight clockwise tilt, like uneven
+   terrain, and level out on hover. */
+.hero__tilt { display: table; transform: rotate(4deg); transform-origin: 50% 50%; transition: transform var(--dur-step) var(--ease); }
+.hero__tilt--first  { margin-bottom: 0.1em; }
+.hero__tilt--second { margin-bottom: 0.55em; }
 .hero__title:hover .hero__tilt { transform: none; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }

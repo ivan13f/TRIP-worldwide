@@ -108,7 +108,7 @@ initCarousel("#country-carousel");
 
 <header class="hero" id="hero">
 <div class="hero__text">
-<h1 class="hero__title"><span class="hero__tilt hero__tilt--cw">Uneven</span> <span class="hero__tilt hero__tilt--ccw">Ground</span><span class="hero__title-sub">Trans Rights Worldwide 2000-2021</span></h1>
+<h1 class="hero__title"><span class="hero__tilt hero__tilt--first">Uneven</span> <span class="hero__tilt hero__tilt--second">Ground</span><span class="hero__title-sub">Trans Rights Worldwide 2000-2021</span></h1>
 <p class="hero__intro">An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people.</p>
 <a class="hero__cue" href="#act1">Scroll for more <span class="hero__arrow" aria-hidden="true">↓</span></a>
 </div>
