@@ -108,7 +108,15 @@ button { font: inherit; color: inherit; }
 .hero__intro { font: 400 var(--t-lede)/1.45 var(--serif); margin: 0; max-width: 32ch; }
 .hero__intro a { text-decoration-color: currentColor; }
 .hero__intro a:hover { background: rgba(255, 255, 255, .14); }
-.hero__art { background: var(--paper-2); }
+/* Photo rendered as a single-hue green monochrome: greyscale image over the
+   score scale's green, blended by luminosity so only its tones show. */
+.hero__art { position: relative; overflow: hidden; background: #42B59A; }
+.hero__art img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 35%;
+  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: luminosity;
+}
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; grid-template-rows: 1fr 30vh; }
 }
@@ -317,6 +325,7 @@ button { font: inherit; color: inherit; }
 }
 .sources__label { font: 600 var(--t-tick)/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-3); }
 .sources p { margin: 0; }
+.sources p + p { margin-top: var(--s-3); }
 .article-end { padding-bottom: var(--s-10); }
 
 /* ── Subheading inside a section ──────────────────────────────────────────── */

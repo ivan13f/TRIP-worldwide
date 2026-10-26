@@ -112,7 +112,7 @@ initCarousel("#country-carousel");
 <p class="hero__intro">An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people.</p>
 <a class="hero__cue" href="#act1">Scroll for more <span class="hero__arrow" aria-hidden="true">↓</span></a>
 </div>
-<div class="hero__art" aria-hidden="true"></div>
+<div class="hero__art"><img src="./assets/hero-protest.jpg" alt="Protesters at a trans rights march holding signs that read Protect Trans Youth and End Trans Torture, under a trans pride flag"></div>
 </header>
 
 <article class="article">
@@ -339,11 +339,14 @@ initCarousel("#country-carousel");
 </div>
 <div class="sources">
 <p class="sources__label">About this data</p>
-<p>This piece uses the <a href="https://www.myleswilliamson.net/trip-data" target="_blank" rel="noopener">Trans Rights Indicator Project (TRIP)</a>, a dataset of 13 legal indicators for 173 countries from 2000 to 2021, developed by Myles Williamson as part of his doctoral research at the University of Alabama and published in <em>Perspectives on Politics</em> (Cambridge University Press), Vol. 22, No. 3 (2024). All scores, shares and counts in this article are calculated from the TRIP data. The LGB comparison uses ILGA World's <em>State-Sponsored Homophobia Report</em> (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.</p>
+<p>The <a href="https://www.myleswilliamson.net/trip-data" target="_blank" rel="noopener">Trans Rights Indicator Project (TRIP)</a> is a dataset of 13 legal indicators for 173 countries from 2000 to 2021, developed by Myles Williamson as part of his doctoral research at the University of Alabama and published in <em>Perspectives on Politics</em> (Cambridge University Press), Vol. 22, No. 3 (2024).</p>
+<p>All scores, shares and counts in this article are calculated from the TRIP data.</p>
+<p>The LGB comparison uses ILGA World's <em>State-Sponsored Homophobia Report</em> (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.</p>
 </div>
 <div class="credits">
 <p class="sources__label">Credits</p>
-<p><a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
+<p>Text, data analysis and graphics: <a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
+<p>Photo by <a href="https://unsplash.com/@karohubert?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Karollyne Videira Hubert</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Unsplash</a></p>
 </div>
 </section>
 

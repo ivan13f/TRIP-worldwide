@@ -182,11 +182,17 @@ The record shows that a country can change its laws in a year. It also shows tha
 
 ### About this data
 
-This piece uses the Trans Rights Indicator Project (TRIP), a dataset of 13 legal indicators for 173 countries from 2000 to 2021, developed by Myles Williamson as part of his doctoral research at the University of Alabama and published in *Perspectives on Politics* (Cambridge University Press), Vol. 22, No. 3 (2024). All scores, shares and counts in this article are calculated from the TRIP data. The LGB comparison uses ILGA World's *State-Sponsored Homophobia Report* (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.
+The Trans Rights Indicator Project (TRIP) is a dataset of 13 legal indicators for 173 countries from 2000 to 2021, developed by Myles Williamson as part of his doctoral research at the University of Alabama and published in *Perspectives on Politics* (Cambridge University Press), Vol. 22, No. 3 (2024).
+
+All scores, shares and counts in this article are calculated from the TRIP data.
+
+The LGB comparison uses ILGA World's *State-Sponsored Homophobia Report* (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.
 
 ### Credits
 
-Iván Alfonso Burgos
+Text, data analysis and graphics: Iván Alfonso Burgos
+
+Photo by Karollyne Videira Hubert on Unsplash
 
 
 ---
