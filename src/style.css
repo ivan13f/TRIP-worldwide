@@ -202,6 +202,16 @@ button { font: inherit; color: inherit; }
 .step p { margin: 0; }
 .step strong { font-weight: 600; }
 
+@media (min-width: 1081px) {
+  /* Left notes sit flush against the main column */
+  .note--left { text-align: right; }
+  /* Fitted variant: the graphic keeps its own height and sticks near the top,
+     right under the text that introduces it, instead of centring in 100vh. */
+  .scrolly--fit { margin-top: var(--s-5); }
+  .scrolly--fit .scrolly__graphic { height: auto; align-self: start; top: var(--s-6); justify-content: flex-start; }
+  .scrolly--fit .scrolly__steps { padding: 8vh 0 30vh; }
+}
+
 /* ── Single column below 1080px: notes inline, step cards pass over the graphic */
 @media (max-width: 1080px) {
   .act { grid-template-columns: [left main right] minmax(0, var(--w-text)); column-gap: 0; }

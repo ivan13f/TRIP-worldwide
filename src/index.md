@@ -109,7 +109,7 @@ initCarousel("#country-carousel");
 <header class="hero" id="hero">
 <div class="hero__text">
 <h1 class="hero__title"><span class="hero__tilt hero__tilt--first">Uneven</span> <span class="hero__tilt hero__tilt--second">Ground</span><span class="hero__title-sub">Trans Rights Worldwide 2000-2021</span></h1>
-<p class="hero__intro">An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built of what the world's laws say about trans people.</p>
+<p class="hero__intro">An exploration of the Trans Rights Indicator Project, the record that political scientist Myles Williamson built to follow the legal status of trans people across 173 countries.</p>
 <a class="hero__cue" href="#act1">Scroll for more <span class="hero__arrow" aria-hidden="true">↓</span></a>
 </div>
 <div class="hero__art"><img src="./assets/hero-protest.jpg" alt="Protesters at a trans rights march holding signs that read Protect Trans Youth and End Trans Torture, under a trans pride flag"></div>
@@ -125,7 +125,7 @@ initCarousel("#country-carousel");
 <div class="row">
 <div class="prose">
 <p class="lede">In 2000, most of the world offered trans people very little in law. Often it came down to a single thing: being trans was not, in itself, a crime.</p>
-<p>For 98 of the 170 countries with data that year, that was where it stopped. No way to change the name or gender on a passport. No rule to stop an employer, a school or a landlord from saying no. And eight countries went even further and made being trans a criminal offence.</p>
+<p>For 98 of the 170 countries, that was where it stopped. No way to change the name or gender on a passport. No rule to stop an employer, a school or a landlord from saying no. And eight countries went even further and made being trans a criminal offence.</p>
 </div>
 </div>
 <div class="row">
@@ -136,17 +136,22 @@ initCarousel("#country-carousel");
 <li><strong>Recognition, five questions.</strong> Can people change the gender marker on their official documents? Can they do it without surgery or other physical requirements, without a psychiatric diagnosis, and without having to divorce? Is there a nonbinary or third gender option?</li>
 <li><strong>Protection, six questions.</strong> Is there a general anti-discrimination law covering trans people? Specific protection in employment, education, healthcare and housing? Protection written into the constitution?</li>
 </ul>
-<p>Building a record like this is no easy task. "Transgender" is not a legal category everywhere. In South Asia, for example, laws recognize hijra, khawaja sira and other third-gender identities that overlap with the Western idea of being trans, but are not the same as it. Federal countries add another difficulty. In the United States, gender recognition is decided state by state, while a national record can only count federal law. A yes-or-no question also flattens detail. A country that allows a change of gender after a year-long waiting period and one that allows it on the spot can both answer yes.</p>
+<p>Building a record like this is no easy task. "Transgender" is not a legal category everywhere. In South Asia, for example, laws recognize hijra, khawaja sira and other third-gender identities that overlap with the Western idea of being trans, but are not the same. Federal countries add another difficulty. In the United States, gender recognition is decided state by state, while a national record can only count federal law. A yes-or-no question also flattens detail. A country that allows a change of gender after a year-long waiting period and one that allows it on the spot can both answer yes.</p>
 <p>The sources have limits too. Williamson coded each law by hand, using at least two sources whenever possible: reports from human rights organizations, government websites and news articles. Some forms of persecution can also be undercounted, such as arrests under vague laws that never name trans people. Finally, all thirteen questions weigh the same, so two countries can reach the same score by very different roads. Williamson himself notes that the real richness of the data is in the individual indicators, not only in the total.</p>
 <p>None of this makes the record less useful. It means the score should be read as a map of the law, not as a portrait of daily life.</p>
-<p>Measured this way, the world has made some progress. The average score more than doubled, from 10.9% in 2000 to 23.5% in 2021. But an average of 173 countries hides almost everything that matters about them.</p>
 </div>
 <aside class="note note--left reveal">
 <p class="note__label">What the score measures</p>
 <p>TRIP records what the law says. It does not measure how laws are enforced, how courts read them or how safe daily life is. A high score describes a legal framework, not a guarantee.</p>
 </aside>
 </div>
-<div class="scrolly" id="scrolly-act1">
+<div class="row">
+<div class="prose">
+<h3 class="subhead">What the average hides</h3>
+<p>Measured this way, the world has made some progress. The average score more than doubled, from 10.9% in 2000 to 23.5% in 2021. But an average of 173 countries can hide a lot.</p>
+</div>
+</div>
+<div class="scrolly scrolly--fit" id="scrolly-act1">
 <div class="scrolly__graphic">
 <figure class="fig">
 <div class="fig__legend">
@@ -162,9 +167,9 @@ initCarousel("#country-carousel");
 </div>
 <div class="scrolly__steps">
 <div class="step"><p>The <strong>average</strong>: 10.9% in 2000, 23.5% in 2021. But this hides the real distribution.</p></div>
-<div class="step"><p>The <strong>median</strong> country, the one in the middle of the ranking, gained a single protection in 22 years. It went from 7.7% to 15.4% in 2015 and stayed there.</p></div>
-<div class="step"><p>The <strong>middle half</strong> of countries. Its upper edge climbs from 15.4% to 30.8%. Its lower edge does not move once.</p></div>
-<div class="step"><p>The <strong>top tenth</strong>. From 2000 to 2021, the score needed to be among them climbed from 15.4% to 61.5%. This is where the average's growth comes from.</p></div>
+<div class="step"><p>The <strong>median</strong> country, the one in the middle of the ranking, gained a single protection in 22 years. It went from 7.7% to 15.4%.</p></div>
+<div class="step"><p>The <strong>middle half</strong> of countries. Its upper edge climbs from 15.4% to 30.8%. Its lower edge stays flat.</p></div>
+<div class="step"><p>The <strong>top tenth</strong>. From 2000 to 2021, the score needed to be among them climbed from 15.4% to 61.5%. This is where the growth of the average comes from.</p></div>
 <div class="step"><p>The <strong>bottom quarter</strong>: same score in 2000 as in 2021. One point out of thirteen, often the absence of a criminal law, and nothing else.</p></div>
 </div>
 </div>
@@ -187,7 +192,7 @@ initCarousel("#country-carousel");
 </div>
 <div class="row">
 <div class="prose">
-<p class="lede">If the bottom held still while the top moved, who is at the top?</p>
+<p class="lede">If progress is spread much more unevenly than the average suggests, where did the changes actually happen?</p>
 <p>Part of the answer is what you would expect. Of the 13 countries with the highest scores in 2021, eleven are in Western Europe. Five of them, Belgium, France, Luxembourg, Malta and Norway, hold 11 of the 13 protections. Taken together, Western Europe and North America average 7.5, more than any other region. But the region is not uniform, and the countries that break the pattern, inside Europe and outside it, are the reason this map deserves a closer look.</p>
 </div>
 </div>
@@ -210,7 +215,7 @@ initCarousel("#country-carousel");
 <div class="table-slot" id="table-act2"></div>
 <div class="row">
 <div class="prose">
-<p>Many of the countries at the bottom share something beyond their politics: their criminal codes were written under British rule. Section 377 of the Indian Penal Code, drafted in 1860, criminalized "carnal intercourse against the order of nature." It, or close copies of it, spread to Pakistan, Bangladesh, Malaysia and Singapore, and similar "unnatural offences" clauses entered the codes of Nigeria, Kenya and Uganda. Courts and police have applied them to gender-nonconforming people for more than a century.</p>
+<p>Several countries at the bottom share a legal inheritance: criminal codes written under British rule. Section 377 of the Indian Penal Code, from 1860, outlawed "carnal intercourse against the order of nature". Close copies of it, or similar "unnatural offences" clauses, ended up in the codes of Malaysia, Singapore, Nigeria, Kenya and Uganda, which score 0 or 1 out of 13. Yet India and Pakistan, where the clause began, score 8 and 11.</p>
 <p>Iran is a different kind of exception. The state has paid for gender-affirming surgery since the 1980s, yet same-sex relations remain punishable by death. On TRIP it scores 2: legal gender change exists, but only after surgery, a psychiatric diagnosis and a divorce.</p>
 </div>
 <aside class="note note--right reveal">
@@ -249,7 +254,7 @@ initCarousel("#country-carousel");
 </div>
 <div class="row">
 <div class="prose">
-<p>Recognition led the progress. In 2000 you could change the gender on your documents in 18 countries, mostly European, and in none of the Americas. By 2021 you could in 60, ten of them in Latin America.</p>
+<p>Recognition led the progress first. In 2000 you could change the gender on your documents in 18 countries, mostly European, and in none of the Americas. By 2021 you could in 60, ten of them in Latin America.</p>
 <p>Protection from discrimination came later and ranked lower. No country had an anti-discrimination law covering trans people in 2000. By 2021, 20% protected them at work and about 17% in schools, hospitals and housing. Five countries (Bolivia, Cuba, Ecuador, Fiji and Malta) wrote that protection into their constitutions. Eight offered a nonbinary or third gender marker.</p>
 </div>
 </div>
@@ -260,8 +265,8 @@ initCarousel("#country-carousel");
 </div>
 <div class="row">
 <div class="prose">
-<p>Progress was not in one direction. Twenty-one countries lost at least one protection at some point between 2000 and 2021. Six ended the period with a lower score than they started with: Cambodia, Equatorial Guinea, The Gambia, Indonesia, Kuwait and Oman.</p>
-<p>The clearest cases are four countries that wrote new laws against trans people. In TRIP's dataset, Indonesia did it in 2002, Kuwait in 2007, The Gambia in 2013 and Oman in 2018. Other countries took recognition away. Hungary's parliament ended legal gender change in 2020; Bulgaria and Kyrgyzstan lost it in 2021.</p>
+<p>However, progress was not in one direction. Twenty-one countries lost at least one protection at some point between 2000 and 2021. Six ended the period with a lower score than they started with: Cambodia, Equatorial Guinea, The Gambia, Indonesia, Kuwait and Oman.</p>
+<p>The clearest cases are four countries that wrote new laws against trans people. In TRIP's dataset we find that Indonesia did it in 2002, Kuwait in 2007, The Gambia in 2013 and Oman in 2018. Other countries took recognition away. Hungary's parliament ended legal gender change in 2020; Bulgaria and Kyrgyzstan lost it in 2021.</p>
 <p>In 14 of the 21 countries, the only loss came from indirect criminalization, an indicator that tracks laws not written about trans people but used against them.</p>
 </div>
 <aside class="note note--right reveal">
@@ -281,7 +286,7 @@ initCarousel("#country-carousel");
 <div class="typology-card"><div class="typology-country">India</div><div class="typology-label">Protection with conditions</div><div class="typology-score">8 of 13 · 62% · 2021</div><p class="typology-body">India recognized a third gender and allowed a change of legal gender in 2014. Six years later came protection against discrimination in employment, education, healthcare and housing. But the change of legal gender still depends on medical conditions, and indirect criminalization remains in the data.</p></div>
 <div class="typology-card"><div class="typology-country">Austria</div><div class="typology-label">The progressive exception</div><div class="typology-score">3 of 13 · 23% · 2021</div><p class="typology-body">Scores 82% on LGB rights but 23% on trans rights. Legal gender change is possible, yet none of the six anti-discrimination protections covers trans people.</p></div>
 <div class="typology-card"><div class="typology-country">Pakistan</div><div class="typology-label">Trans rights without LGB rights</div><div class="typology-score">11 of 13 · 85% · 2021</div><p class="typology-body">One or two protections until 2017, then 11 in 2018: the biggest one-year gain in the dataset, tied with Luxembourg. It is the poorest of the 13 countries with 10 points or more, and the only one not classified as a democracy. On the LGB index it scores 0% (2020).</p></div>
-<div class="typology-card"><div class="typology-country">Iran</div><div class="typology-label">Joint second in the region, unchanged since 2000</div><div class="typology-score">2 of 13 · 15% · 2021</div><p class="typology-body">The same score, 2 of 13, in all 22 years: no direct criminalization and a legal route to change gender, with all three conditions still attached. It is still joint second, with Turkey, in a region of 19 countries where 16 score one point or none.</p></div>
+<div class="typology-card"><div class="typology-country">Iran</div><div class="typology-label">Second in the region, unchanged since 2000</div><div class="typology-score">2 of 13 · 15% · 2021</div><p class="typology-body">The same score, 2 of 13, in all 22 years: no direct criminalization and a legal route to change gender, with all three conditions still attached. It is still joint second, with Turkey, in a region of 19 countries where 16 score one point or none.</p></div>
 <div class="typology-card"><div class="typology-country">United States</div><div class="typology-label">No federal recognition</div><div class="typology-score">5 of 13 · 38% · 2021</div><p class="typology-body">There is no federal way to change a legal gender marker; that is left to the states. Its score comes from federal anti-discrimination protection in employment, education, healthcare and housing.</p></div>
 </div>
 </div>
@@ -312,11 +317,11 @@ initCarousel("#country-carousel");
 </figure>
 </div>
 <div class="scrolly__steps">
-<div class="step"><p>Each row is a country, each column a year. Hover a row, or look a country up in the search box.</p></div>
+<div class="step"><p>Hover over any row to see a country's score. Or look one up in the search box.</p></div>
 <div class="step"><p>In 2000 the picture is almost one colour. 89% of countries held one or two protections, and none held more than four.</p></div>
 <div class="step"><p>Through the 2000s, a few rows at the top begin to darken. By 2011, twelve countries had reached five protections or more.</p></div>
 <div class="step"><p>The <strong>bottom quarter</strong> barely changes colour from left to right. Of its 44 countries, 39 held exactly the same score in 2021 as in 2000.</p></div>
-<div class="step"><p>Now explore on your own. Hover any row, or search for a country to see how its laws changed.</p></div>
+<div class="step"><p>Now explore on your own. Search for a country to see how its laws changed.</p></div>
 </div>
 </div>
 <figure class="fig">
@@ -325,7 +330,7 @@ initCarousel("#country-carousel");
 <div class="table-slot" id="table-act4"></div>
 <div class="row">
 <div class="prose">
-<p>This is the shape behind the average. There was real legal progress, but only in one part of the chart. In 2000, not one country had five protections. By 2021, 42 did, and 16 had nine or more. But further down the chart, the colour is still the one it started with.</p>
+<p>This is the shape behind the average. The legal progress was real, but it happened in only one part of the chart. In 2000, no country had five protections. By 2021, 42 did, and 16 had nine or more. Further down, the colour has hardly changed since the first year.</p>
 </div>
 </div>
 </section>
@@ -339,7 +344,7 @@ initCarousel("#country-carousel");
 <div class="prose">
 <p>Everything in this article is about laws, and laws are only one part of the picture. They say nothing about the lived experience of trans people: what happens in the street, in a hospital or at home. A country can score 85% and still be a dangerous place for trans people, and a country with a low score can have strong communities that no law records. Still, the law matters. It shapes what the police can do, what a doctor can say and which documents a person is allowed to carry. It is just not the whole story.</p>
 <p>The first version of the TRIP records stops in 2021, but the world continued changing. In 2023, Russia banned legal gender change and gender-affirming medical care. The same year, Uganda's Anti-Homosexuality Act made same-sex relations punishable by life imprisonment and, in some cases, death. In the United States, where gender recognition is left to the states, more than twenty states have restricted gender-affirming care for minors since 2021. In the United Kingdom, the government blocked Scotland's self-ID reform in 2023, and in 2025 the Supreme Court ruled that "sex" in equality law means biological sex.</p>
-<p>This dataset shows that a country can change its laws in a year. It also shows that it can change them back. Some of the countries that moved forward between 2000 and 2021 did it fast, and some of the ones that went the other way did it just as fast, as we continue to see in different parts of the world.</p>
+<p>This dataset makes one thing clear: laws can change in a year, and they can change back. Some countries moved forward fast between 2000 and 2021, and others went the other way just as fast, something we still see today in different parts of the world.</p>
 </div>
 </div>
 <div class="sources">
@@ -348,7 +353,7 @@ initCarousel("#country-carousel");
 <p>All scores, shares and counts in this article are calculated from the TRIP data.</p>
 <p>The LGB comparison uses ILGA World's <em>State-Sponsored Homophobia Report</em> (2020). Post-2021 events: ACLU Legislative Tracker, Human Rights Watch.</p>
 <p class="sources__label sources__label--credits">Credits</p>
-<p>Analysis and visualization: <a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
+<p>Analysis and Visualization: <a href="https://www.ivan-alfonsoburgos.com/" target="_blank" rel="noopener">Iván Alfonso Burgos</a></p>
 <p>Photo by <a href="https://unsplash.com/@karohubert?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank" rel="noopener">Karollyne Videira Hubert</a></p>
 </div>
 </section>
