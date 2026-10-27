@@ -17,7 +17,7 @@ export function distributionTrend(data, { width = 640, height = 420, theme } = {
   const first = data[0], last = data.at(-1);
 
   const x = d3.scaleLinear(d3.extent(data, d => d.year), [m.left, width - m.right]);
-  const y = d3.scaleLinear([0, 0.7], [height - m.bottom, m.top]);
+  const y = d3.scaleLinear([0, 0.65], [height - m.bottom, m.top]);
 
   const svg = d3.create("svg")
     .attr("class", "chart chart--distribution")

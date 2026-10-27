@@ -31,7 +31,16 @@ const act1 = distributionTrend(yearlyStats(raw), {
   width: act1El.clientWidth, height: Math.min(460, stickyHeight(480)), theme: THEME,
 });
 act1El.append(act1);
-scrolly("#scrolly-act1", i => act1.step(i));
+// On desktop the graph (with its table toggle) sits centred below its intro, so steps trigger at the graph's middle.
+// Measured a frame later, once the table toggle below the graph is in place.
+requestAnimationFrame(() => {
+  const graphic = act1El.closest(".scrolly__graphic");
+  const fig = act1El.closest(".fig").getBoundingClientRect();
+  const offset = (parseFloat(getComputedStyle(graphic).top)
+    + fig.top - graphic.getBoundingClientRect().top + fig.height / 2) / window.innerHeight;
+  graphic.style.setProperty("--fig-h", `${fig.height}px`);
+  scrolly("#scrolly-act1", i => act1.step(i), phone ? {} : { offset });
+});
 
 // Act II — zoomable map, flown to a region on each step
 const act2El = document.querySelector("#chart-act2");
@@ -59,7 +68,7 @@ const act4Graphic = act4El.closest(".scrolly__graphic");
 act4Graphic.style.top = `${Math.min(0, window.innerHeight - act4Graphic.offsetHeight)}px`;
 scrolly("#scrolly-act4", i => act4.step(i));
 
-// "View the data" tables, placed after each scrolling section so they open into the page.
+// "View the data" tables. Fig. 1's opens in place of its graph; the others open into the page below their section.
 const pctFmt = v => v == null ? "No data" : `${(v * 100).toFixed(1).replace(/\.0$/, "")}%`;
 const pts = v => v == null ? "No data" : `${v} of 13`;
 const change = v => v == null ? "" : `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}`;
@@ -162,6 +171,7 @@ initCarousel("#country-carousel");
 <div class="fig__plot" id="chart-act1"></div>
 <figcaption class="fig__cap"><span class="fig__tag">Fig. 1</span><span>Distribution of TRIP scores across countries, 2000 to 2021.</span><span class="fig__src">Source: Trans Rights Indicator Project (Williamson, 2024). 170 to 173 countries per year.</span></figcaption>
 </figure>
+<div class="table-slot" id="table-act1"></div>
 </div>
 <div class="scrolly__steps">
 <div class="step"><p>The <strong>average</strong>: 10.9% in 2000, 23.5% in 2021. But this hides the real distribution.</p></div>
@@ -171,7 +181,6 @@ initCarousel("#country-carousel");
 <div class="step"><p>The <strong>bottom quarter</strong>: same score in 2000 as in 2021. One point out of thirteen, often the absence of a criminal law, and nothing else.</p></div>
 </div>
 </div>
-<div class="table-slot" id="table-act1"></div>
 <div class="row">
 <div class="prose">
 <p>Read all together in the graph, the lines describe two different groups of countries. A few dozen rewrote their laws, often more than once. Half the world did not touch them: 88 countries ended 2021 with exactly the score they had in 2000. The average climbed because the top ran ahead, not because the middle followed.</p>
