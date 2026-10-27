@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       # The data loader (src/data/processed/trip_clean.csv.py) runs at build time and needs pandas.
