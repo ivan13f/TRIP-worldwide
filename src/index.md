@@ -28,7 +28,7 @@ const stickyHeight = (reserve) => phone
 // Act I — scroll-driven distribution
 const act1El = document.querySelector("#chart-act1");
 const act1 = distributionTrend(yearlyStats(raw), {
-  width: act1El.clientWidth, height: Math.min(460, stickyHeight(240)), theme: THEME,
+  width: act1El.clientWidth, height: Math.min(460, stickyHeight(480)), theme: THEME,
 });
 act1El.append(act1);
 scrolly("#scrolly-act1", i => act1.step(i));
@@ -145,14 +145,12 @@ initCarousel("#country-carousel");
 <p>TRIP records what the law says. It does not measure how laws are enforced, how courts read them or how safe daily life is. A high score describes a legal framework, not a guarantee.</p>
 </aside>
 </div>
-<div class="row">
-<div class="prose">
+<div class="scrolly scrolly--fit" id="scrolly-act1">
+<div class="scrolly__graphic">
+<div class="scrolly__intro prose">
 <h3 class="subhead">What the average hides</h3>
 <p>Measured this way, the world has made some progress. The average score more than doubled, from 10.9% in 2000 to 23.5% in 2021. But an average of 173 countries can hide a lot.</p>
 </div>
-</div>
-<div class="scrolly scrolly--fit" id="scrolly-act1">
-<div class="scrolly__graphic">
 <figure class="fig">
 <div class="fig__legend">
 <span class="key key--line"><i style="background:var(--primary)"></i>Average</span>

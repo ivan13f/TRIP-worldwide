@@ -207,10 +207,13 @@ button { font: inherit; color: inherit; }
   .note--left { text-align: right; }
   /* Fitted variant: the graphic keeps its own height and sticks near the top,
      right under the text that introduces it, instead of centring in 100vh. */
-  .scrolly--fit { margin-top: var(--s-5); }
-  .scrolly--fit .scrolly__graphic { height: auto; align-self: start; top: var(--s-6); justify-content: flex-start; }
-  .scrolly--fit .scrolly__steps { padding: 8vh 0 30vh; }
+  .scrolly--fit { margin-top: var(--s-6); }
+  .scrolly--fit .scrolly__graphic { height: auto; align-self: start; top: var(--s-5); justify-content: flex-start; }
+  .scrolly--fit .scrolly__steps { padding: 30vh 0 15vh; }
 }
+/* The intro (subhead + short paragraph) sticks with the graphic it introduces */
+.scrolly__intro .subhead { margin-top: 0; }
+.scrolly__intro { margin-bottom: var(--s-3); }
 
 /* ── Single column below 1080px: notes inline, step cards pass over the graphic */
 @media (max-width: 1080px) {
@@ -223,6 +226,11 @@ button { font: inherit; color: inherit; }
   .scrolly__steps { padding: 100vh var(--s-2) 40vh; pointer-events: none; }
   .step { pointer-events: auto; margin-bottom: 85vh; opacity: .94; font-size: 1.0625rem; box-shadow: 4px 4px 0 rgba(17,17,17,.08); }
   .step.is-active { opacity: 1; }
+  /* Phones: the intro scrolls away as normal text; only the figure sticks */
+  .scrolly--fit .scrolly__graphic { display: contents; }
+  .scrolly--fit .scrolly__intro { grid-column: main; grid-row: 1; margin-bottom: 0; }
+  .scrolly--fit .fig { grid-column: main; grid-row: 2; position: sticky; top: 0; height: 100vh; padding-top: var(--s-4); }
+  .scrolly--fit .scrolly__steps { grid-row: 2; }
 }
 
 /* ── Figures ──────────────────────────────────────────────────────────────── */
