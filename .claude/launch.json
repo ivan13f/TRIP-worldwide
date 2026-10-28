@@ -12,6 +12,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4322", "--directory", "dist"],
       "port": 4322
+    },
+    {
+      "name": "portfolio case-study preview",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8099", "--directory", "/Users/ivan13f/Desktop/Portfolio"],
+      "port": 8099
     }
   ]
 }

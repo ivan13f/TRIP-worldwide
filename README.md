@@ -1,59 +1,89 @@
-# Trip Project
+# Uneven Ground
 
-This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
+**Trans Rights Worldwide 2000-2021.** A scrollytelling data story about what the world's laws say about trans people, built on the Trans Rights Indicator Project (TRIP).
 
-```
-npm install
-```
+- **Read it live:** [uneven-ground.ivan-alfonsoburgos.com](https://uneven-ground.ivan-alfonsoburgos.com/)
+- **Case study:** [ivan-alfonsoburgos.com/uneven-ground](https://www.ivan-alfonsoburgos.com/uneven-ground) (coming soon)
 
-Then, to start the local preview server, run:
+## About the story
 
-```
-npm run dev
-```
+The piece is one page in four sections, each built around a chart:
 
-Then visit <http://localhost:3000> to preview your app.
+| Section | Chart |
+|---|---|
+| What the world's laws say about trans people | How the distribution of scores changed, step by step (average, median, middle half, top tenth, bottom quarter) |
+| A map of exceptions | Zoomable choropleth of 2021 scores, flown region by region |
+| Recognition before protection | Dot plot of each of the 13 rights in 2000 and 2021, plus country cards |
+| Every country, every year | Heatmap of every country and year, with search and hover |
 
-For more, see <https://observablehq.com/framework/getting-started>.
+Every chart has a "View the data" table underneath, and the article works on desktop and mobile.
+
+## Data
+
+**Trans Rights Indicator Project (TRIP)**, by Myles Williamson, developed as part of his doctoral research at the University of Alabama and published in *Perspectives on Politics* (Cambridge University Press), Vol. 22, No. 3 (2024). Data and documentation: [myleswilliamson.net/trip-data](https://www.myleswilliamson.net/trip-data).
+
+TRIP codes 13 yes-or-no legal indicators for 173 countries, every year from 2000 to 2021, in three groups:
+
+- **Criminalization (2):** no direct criminalization, no indirect criminalization
+- **Recognition (5):** legal gender marker change, and whether it is possible without physical requirements, without a psychiatric diagnosis and without divorce; nonbinary or third gender option
+- **Protection (6):** general anti-discrimination law, plus protection in employment, education, healthcare, housing and the constitution
+
+A country's score is the number of indicators it meets, out of 13. The article shows it as a percentage.
+
+TRIP records what the law says. It doesn't measure enforcement, court rulings or how safe daily life is. Other sources used in the article: ILGA World's *State-Sponsored Homophobia Report* (2020) for the LGB comparison, and the ACLU and Human Rights Watch for events after 2021.
+
+The raw TRIP file is in `src/data/raw/`. The data belongs to its author, so please cite the original publication if you reuse it.
+
+## Built with
+
+- [Observable Framework](https://observablehq.com/framework/) for the static site and the data loader
+- [D3](https://d3js.org/) for all charts
+- [Scrollama](https://github.com/russellsamora/scrollama) for the scroll-driven steps
+- Python and pandas to clean the raw data at build time
+- Besley and Inter type, via Google Fonts
 
 ## Project structure
 
-A typical Framework project looks like this:
-
-```ini
-.
-├─ src
-│  ├─ components
-│  │  └─ timeline.js           # an importable module
-│  ├─ data
-│  │  ├─ launches.csv.js       # a data loader
-│  │  └─ events.json           # a static data file
-│  ├─ example-dashboard.md     # a page
-│  ├─ example-report.md        # another page
-│  └─ index.md                 # the home page
-├─ .gitignore
-├─ observablehq.config.js      # the app config file
-├─ package.json
-└─ README.md
+```
+src/
+  index.md                     the article: text and chart wiring
+  style.css                    design system
+  assets/                      hero image
+  data/
+    raw/                       original TRIP CSV
+    processed/trip_clean.csv.py   Python data loader (cleans and reshapes the raw file)
+    geo/world-110m.json        world map (TopoJSON)
+  lib/
+    data.js                    all data transforms
+    theme.js                   colours, fonts, score classes
+    geo.js                     TopoJSON to GeoJSON
+    scroll.js                  scroll reveals and Scrollama steps
+    carousel.js                country cards
+    charts/                    one module per chart, plus shared table, legend and tooltip helpers
+analysis/                      notebook and verification scripts
+article-text.md                the full article text, in reading order
 ```
 
-**`src`** - This is the “source root” — where your source files live. Pages go here. Each page is a Markdown file. Observable Framework uses [file-based routing](https://observablehq.com/framework/project-structure#routing), which means that the name of the file controls where the page is served. You can create as many pages as you like. Use folders to organize your pages.
+## Run it locally
 
-**`src/index.md`** - This is the home page for your app. You can have as many additional pages as you’d like, but you should always have a home page, too.
+You need Node 18 or newer (the site is built on Node 22) and Python 3 with pandas, because the data loader runs at build time.
 
-**`src/data`** - You can put [data loaders](https://observablehq.com/framework/data-loaders) or static data files anywhere in your source root, but we recommend putting them here.
+```bash
+pip install -r requirements.txt
+```
 
-**`src/components`** - You can put shared [JavaScript modules](https://observablehq.com/framework/imports) anywhere in your source root, but we recommend putting them here. This helps you pull code out of Markdown files and into JavaScript modules, making it easier to reuse code across pages, write tests and run linters, and even share code with vanilla web applications.
+```bash
+npm install
+```
 
-**`observablehq.config.js`** - This is the [app configuration](https://observablehq.com/framework/config) file, such as the pages and sections in the sidebar navigation, and the app’s title.
+```bash
+npm run dev
+```
 
-## Command reference
+Then open http://localhost:3000. `npm run build` writes the static site to `dist/`, and `npm run clean` clears the data loader cache.
 
-| Command           | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `npm install`            | Install or reinstall dependencies                        |
-| `npm run dev`        | Start local preview server                               |
-| `npm run build`      | Build your static site, generating `./dist`              |
-| `npm run deploy`     | Deploy your app to Observable                            |
-| `npm run clean`      | Clear the local data loader cache                        |
-| `npm run observable` | Run commands like `observable help`                      |
+## Credits
+
+- Analysis and visualization: [Iván Alfonso Burgos](https://www.ivan-alfonsoburgos.com/)
+- Data: Myles Williamson, Trans Rights Indicator Project
+- Hero photo: [Karollyne Videira Hubert](https://unsplash.com/@karohubert)
