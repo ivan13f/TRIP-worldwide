@@ -3,7 +3,9 @@
 // 173 countries (rows, sorted by 2021 score) × 22 years (columns), each cell
 // coloured by TRIP score class. Returns the plot node with:
 //   node.step(i)   0 everything · 1 only 2000 · 2 2000–2011 · 3 the bottom quarter
-//   node.controls  legend + country search, for the page to place (aside column on desktop)
+//   node.controls  legend + country search, for the page to place (aside column on desktop).
+//                  A country picked in the search, or clicked in the heatmap, lists its
+//                  13 indicators for 2021 below the search.
 
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { tooltip, ttRow, pct } from "./tooltip.js";
@@ -79,17 +81,24 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
 
   const hover = svg.append("rect").attr("x", m.left - 1).attr("width", width - m.right - m.left + 2).attr("height", rh + 2)
     .attr("fill", "none").attr("stroke", C.ink).attr("stroke-width", 1.5).attr("opacity", 0).attr("pointer-events", "none");
+  const rowAt = py => Math.max(0, Math.min(countries.length - 1, Math.floor((py - m.top) / rh)));
   svg.append("rect").attr("x", m.left).attr("y", m.top).attr("width", width - m.left - m.right).attr("height", innerH)
-    .attr("fill", "transparent")
+    .attr("fill", "transparent").style("cursor", "pointer")
+    .on("click", ev => {
+      const c = countries[rowAt(d3.pointer(ev)[1])];
+      input.value = shortName(c.name);
+      select(c);
+    })
     .on("pointermove", ev => {
       const [px, py] = d3.pointer(ev);
-      const i = Math.max(0, Math.min(countries.length - 1, Math.floor((py - m.top) / rh)));
+      const i = rowAt(py);
       const yr = years[Math.max(0, Math.min(years.length - 1, Math.floor((px - m.left) / x.step())))];
       const c = countries[i], v = scoreAt.get(`${c.iso3}|${yr}`);
       hover.attr("y", y(i) - 1).attr("opacity", 1);
       tt.show(`<span class="tt__title">${shortName(c.name)} · ${yr}</span>` +
         ttRow("TRIP score", v == null ? "No data" : `${of13(v)} · ${pct(v)}`) +
-        ttRow("In 2021", `${of13(c.score2021)} · ${pct(c.score2021)}`), ev);
+        ttRow("In 2021", `${of13(c.score2021)} · ${pct(c.score2021)}`) +
+        `<span class="tt__hint">Click to see its indicators</span>`, ev);
     })
     .on("pointerleave", () => { hover.attr("opacity", 0); tt.hide(); });
 
@@ -104,9 +113,20 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
     <label class="search__label" for="fingerprint-search">Find a country</label>
     <input class="search__input" id="fingerprint-search" type="search" list="${listId}" placeholder="e.g. Kenya" autocomplete="off">
     <datalist id="${listId}">${countries.map(c => `<option value="${shortName(c.name)}"></option>`).join("")}</datalist>
-    <p class="search__result" aria-live="polite"></p>`;
+    <p class="search__result" aria-live="polite"></p>
+    <div class="ind-list" hidden></div>`;
   controls.appendChild(search);
   const input = search.querySelector("input"), result = search.querySelector(".search__result");
+  const indList = search.querySelector(".ind-list");
+  const renderIndicators = c => {
+    const groups = d3.groups(c.indicators2021, d => d.category);
+    indList.innerHTML = `<p class="ind-list__title">Indicators in ${years.at(-1)}</p>` + groups.map(([cat, inds]) =>
+      `<p class="ind-list__group">${cat}</p><ul>${inds.map(d =>
+        `<li class="ind-list__item ${d.has ? "is-held" : d.has === false ? "is-missing" : "is-nodata"}">` +
+        `<span class="ind-list__mark" aria-hidden="true"></span>${d.label}` +
+        `<span class="visually-hidden">: ${d.has ? "yes" : d.has === false ? "no" : "no data"}</span></li>`).join("")}</ul>`).join("");
+    indList.hidden = false;
+  };
   const byName = new Map(countries.map(c => [shortName(c.name).toLowerCase(), c]));
 
   const select = c => {
@@ -114,6 +134,7 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
       selected.attr("opacity", 0);
       labels.selectAll(".row-label").attr("opacity", 1);
       result.textContent = "";
+      indList.hidden = true;
       return;
     }
     const i = rowOf.get(c.iso3);
@@ -127,11 +148,12 @@ export function flagship({ countries, years, cells }, { width = 640, rowHeight =
     selected.attr("opacity", 1);
     result.innerHTML = `<b>${shortName(c.name)}</b> ranks ${i + 1} of ${countries.length} in 2021.<br>` +
       `${years[0]}: ${of13(s2000)} · ${years.at(-1)}: ${of13(c.score2021)}`;
+    renderIndicators(c);
   };
   input.addEventListener("input", () => {
     const q = input.value.trim().toLowerCase();
     select(q ? byName.get(q) : null);
-    if (q && !byName.has(q)) result.textContent = "Pick a country from the list.";
+    if (q && !byName.has(q)) { result.textContent = "Pick a country from the list."; indList.hidden = true; }
   });
 
   // ── Steps ──────────────────────────────────────────────────────────────────

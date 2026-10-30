@@ -31,7 +31,7 @@ const act1 = distributionTrend(yearlyStats(raw), {
   width: act1El.clientWidth, height: Math.min(460, stickyHeight(480)), theme: THEME,
 });
 act1El.append(act1);
-// On desktop the graph (with its table toggle) sits centred below its intro, so steps trigger at the graph's middle.
+// On desktop the whole block (intro, graph, table toggle) is centred on screen, so steps trigger at the graph's middle.
 // Measured a frame later, once the table toggle below the graph is in place.
 requestAnimationFrame(() => {
   const graphic = act1El.closest(".scrolly__graphic");
@@ -216,7 +216,7 @@ initCarousel("#country-carousel");
 <div class="step"><p><strong>South Asia.</strong> Pakistan scores 11, level with France and Norway, while its penal code still criminalizes same-sex relations. India holds 8. All four countries here recognize a third gender.</p></div>
 <div class="step"><p><strong>Europe.</strong> Malta is the only European country that protects trans people in its constitution. Austria, Italy and Switzerland hold 3 points each. Hungary abolished legal gender change in 2020.</p></div>
 <div class="step"><p><strong>Sub-Saharan Africa.</strong> Three in four countries score 0 or 1, and none scores higher than 3. Nigeria criminalizes trans people directly.</p></div>
-<div class="step"><p>Now explore. Zoom with the buttons, pinch, or ⌘/Ctrl + scroll. Hover any country for its score.</p></div>
+<div class="step"><p>Now explore. Hover any country for its score.</p></div>
 </div>
 </div>
 <div class="table-slot" id="table-act2"></div>

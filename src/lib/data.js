@@ -156,6 +156,8 @@ export function indicatorAdoption(raw) {
 // countries: sorted by 2021 trip_percent descending
 // years: 2000–2021
 // cells: flat array of { countryIdx, yearIdx, score } for D3 rendering
+// Each country also carries indicators2021: the 13 indicators with
+// has = true / false / null (no data), for the selected-country panel.
 // Used by flagship.js.
 
 export function fingerprintMatrix(raw) {
@@ -164,16 +166,21 @@ export function fingerprintMatrix(raw) {
   ).sort((a, b) => a - b);
 
   // Get 2021 scores to determine sort order
-  const scores2021 = new Map(
-    raw.filter(d => d.year === 2021)
-       .map(d => [d.iso3, d.trip_percent ?? 0])
-  );
+  const rows2021 = new Map(raw.filter(d => d.year === 2021).map(d => [d.iso3, d]));
+  const scores2021 = new Map([...rows2021].map(([iso3, d]) => [iso3, d.trip_percent ?? 0]));
+  const indicators2021 = iso3 => {
+    const row = rows2021.get(iso3);
+    return INDICATORS.map(ind => ({
+      label: ind.label, category: ind.category,
+      has: row?.[ind.col] == null ? null : row[ind.col] === ind.held,
+    }));
+  };
 
   // Unique countries sorted by 2021 score descending
   const countries = Array.from(
     new Map(raw.map(d => [d.iso3, d.country_name]))
   )
-    .map(([iso3, name]) => ({ iso3, name, score2021: scores2021.get(iso3) ?? 0 }))
+    .map(([iso3, name]) => ({ iso3, name, score2021: scores2021.get(iso3) ?? 0, indicators2021: indicators2021(iso3) }))
     .sort((a, b) => b.score2021 - a.score2021);
 
   const countryIndex = new Map(countries.map((c, i) => [c.iso3, i]));
