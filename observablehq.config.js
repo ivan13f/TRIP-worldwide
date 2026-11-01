@@ -7,7 +7,7 @@ export default {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3'><rect width='5' height='3' fill='%235BCEFA'/><rect y='.6' width='5' height='1.8' fill='%23F5A9B8'/><rect y='1.2' width='5' height='.6' fill='%23FFFFFF'/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5'><circle cx='2.5' cy='2.5' r='2.5' fill='rgb(91,206,250)'/><path fill='rgb(245,169,184)' d='M.5 1H4.5A2.5 2.5 0 0 1 4.5 4H.5A2.5 2.5 0 0 1 .5 1Z'/><path fill='rgb(255,255,255)' d='M.05 2H4.95A2.5 2.5 0 0 1 4.95 3H.05A2.5 2.5 0 0 1 .05 2Z'/></svg>">
   `,
 
   // All source files live in src/
