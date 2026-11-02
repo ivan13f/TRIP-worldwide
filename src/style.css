@@ -227,7 +227,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 1080px) {
   .act { grid-template-columns: [left main right] minmax(0, var(--w-text)); column-gap: 0; }
   .row > *, .scrolly > * { grid-row: auto; }
-  .note { background: var(--paper-2); border-top: 0; border-left: 2px solid var(--ink); padding: var(--s-3) var(--s-4); margin: 0 0 var(--s-5); }
+  .note { background: var(--paper-2); border-top: 0; padding: var(--s-3) var(--s-4); margin: 0 0 var(--s-5); }
   .scrolly__side { position: static; grid-row: 1; margin-bottom: var(--s-4); }
   .scrolly__graphic, .scrolly__steps { grid-row: 2; }
   .scrolly__graphic { justify-content: flex-start; padding-top: var(--s-4); }
